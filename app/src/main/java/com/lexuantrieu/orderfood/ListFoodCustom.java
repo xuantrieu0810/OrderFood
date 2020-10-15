@@ -1,5 +1,11 @@
 package com.lexuantrieu.orderfood;
 
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -7,14 +13,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.database.Cursor;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -22,9 +20,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ public class ListFoodCustom extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_food_custom);
-        rvFood = (RecyclerView) findViewById(R.id.recyclerViewSearch);
+        rvFood = findViewById(R.id.recyclerViewSearch);
         arrayFood = new ArrayList<>();
         GetDataWebSV(Server.urlGetFood);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -125,7 +125,7 @@ public class ListFoodCustom extends AppCompatActivity {
                         if(error) {
                             Toast.makeText(ListFoodCustom.this, "Xảy ra lỗi trong quá trình load.", Toast.LENGTH_SHORT).show();
                         }
-                        Log.d("LXT_Log", "arrFood.size: "+String.valueOf(arrayFood.size()));
+                        Log.d("LXT_Log", "arrFood.size: " + arrayFood.size());
                         SetAdapter();
                     }
                 },
@@ -183,13 +183,13 @@ public class ListFoodCustom extends AppCompatActivity {
                 }
         ){
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
-                Log.d("LXT_LOG","food: "+idFood+" quality:" + quantity);
-                params.put("tableid",99+"");
-                params.put("foodid",idFood+"");
-                params.put("quantity",quantity+"");
-                Log.d("LXT_LOG",params.toString());
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                Log.d("LXT_LOG", "food: " + idFood + " quality:" + quantity);
+                params.put("tableid", 99 + "");
+                params.put("foodid", idFood + "");
+                params.put("quantity", quantity + "");
+                Log.d("LXT_LOG", params.toString());
                 return params;
             }
         };
