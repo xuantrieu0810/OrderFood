@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/txtNameFood_dial"
+        android:layout_width="250dp"
+        android:layout_height="50dp"
+        android:background="#689F38"
+        android:gravity="center"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/editLayout_dial"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        app:hintEnabled="true"
+        app:counterEnabled="true"
+        app:counterMaxLength="254"
+        app:layout_constraintEnd_toEndOf="@+id/txtNameFood_dial"
+        app:layout_constraintStart_toStartOf="@+id/txtNameFood_dial"
+        app:layout_constraintTop_toBottomOf="@+id/txtNameFood_dial">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editCommentFood_dial"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|top"
+            android:textSize="14sp"
+            android:hint="Nhập ghi chú..."
+            android:maxLength="254"
+            android:lines="3"
+            android:inputType="textMultiLine"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/buttonSubmit_dial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:text="Đồng ý"
+        android:textColor="@android:color/holo_red_dark"
+        app:layout_constraintStart_toStartOf="@+id/txtNameFood_dial"
+        app:layout_constraintTop_toBottomOf="@+id/editLayout_dial" />
+
+    <Button
+        android:id="@+id/buttonCancel_dial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:text="Huỷ"
+        android:textColor="@android:color/holo_red_dark"
+        app:layout_constraintEnd_toEndOf="@+id/txtNameFood_dial"
+        app:layout_constraintTop_toBottomOf="@+id/editLayout_dial" />
+</androidx.constraintlayout.widget.ConstraintLayout>
