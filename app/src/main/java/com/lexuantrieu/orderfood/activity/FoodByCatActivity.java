@@ -1,8 +1,10 @@
-package com.lexuantrieu.orderfood;
+package com.lexuantrieu.orderfood.activity;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.lexuantrieu.orderfood.R;
 
 public class FoodByCatActivity extends AppCompatActivity {
 

@@ -1,4 +1,6 @@
-package com.lexuantrieu.orderfood;
+package com.lexuantrieu.orderfood.model;
+
+import com.lexuantrieu.orderfood.Server;
 
 public class Food {
     private int stt;

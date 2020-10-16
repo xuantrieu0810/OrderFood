@@ -1,8 +1,6 @@
-package com.lexuantrieu.orderfood;
+package com.lexuantrieu.orderfood.adapter;
 
 import android.app.Dialog;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +17,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.lexuantrieu.orderfood.model.Food;
+import com.lexuantrieu.orderfood.activity.ListFoodCustom;
+import com.lexuantrieu.orderfood.R;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 

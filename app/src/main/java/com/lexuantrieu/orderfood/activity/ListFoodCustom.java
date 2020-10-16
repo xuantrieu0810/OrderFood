@@ -1,4 +1,4 @@
-package com.lexuantrieu.orderfood;
+package com.lexuantrieu.orderfood.activity;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +20,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.lexuantrieu.orderfood.model.Food;
+import com.lexuantrieu.orderfood.R;
+import com.lexuantrieu.orderfood.Server;
+import com.lexuantrieu.orderfood.adapter.FoodAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
