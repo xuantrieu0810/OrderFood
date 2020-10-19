@@ -1,6 +1,6 @@
 package com.lexuantrieu.orderfood.model;
 
-import com.lexuantrieu.orderfood.Server;
+import com.lexuantrieu.orderfood.utils.Server;
 
 public class Food {
     private int stt;
@@ -19,7 +19,7 @@ public class Food {
         this.idFood = idFood;
         this.nameFood = nameFood;
         this.priceFood = priceFood;
-        this.imageFood = Server.urlImage+imageFood;
+        this.imageFood = Server.urlImage+"product/"+imageFood;
         this.countFood = countFood;
         this.commentFood = commentFood;
         this.statusFood = statusFood;

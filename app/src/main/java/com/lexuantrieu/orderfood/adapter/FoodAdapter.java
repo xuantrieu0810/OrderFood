@@ -147,7 +147,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
                         @Override
                         public void onError(Exception e) {
-
+                            Log.d("LXT_Error:","LoadImage: "+food.getNameFood());
                         }
                     });
             edtCount.setText(String.valueOf(food.getCountFood()));

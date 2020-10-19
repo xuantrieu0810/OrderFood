@@ -22,8 +22,9 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.lexuantrieu.orderfood.model.Food;
 import com.lexuantrieu.orderfood.R;
-import com.lexuantrieu.orderfood.Server;
+import com.lexuantrieu.orderfood.utils.Server;
 import com.lexuantrieu.orderfood.adapter.FoodAdapter;
+import com.lexuantrieu.orderfood.utils.CheckConnection;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +38,8 @@ import java.util.regex.Pattern;
 
 public class ListFoodCustom extends AppCompatActivity {
 
+    int tableID = 9; //default = -1
+    boolean ckGetFoodData = false;
     RecyclerView rvFood;
     ArrayList<Food> arrayFood;
     FoodAdapter adapter;
@@ -47,18 +50,22 @@ public class ListFoodCustom extends AppCompatActivity {
         setContentView(R.layout.activity_list_food_custom);
         rvFood = findViewById(R.id.recyclerViewSearch);
         arrayFood = new ArrayList<>();
-        GetDataWebSV(Server.urlGetFood);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         rvFood.setLayoutManager(layoutManager);
         rvFood.setItemAnimator(null);
         rvFood.setItemAnimator(null);
         rvFood.addItemDecoration(new DividerItemDecoration(rvFood.getContext(), DividerItemDecoration.VERTICAL));
+        if(CheckConnection.isNetworkAvailable(getApplicationContext())) {
+            GetDataWebSV(Server.urlGetFood);
+        } else {
+            Toast.makeText(this, "Vui lòng kết nối internet!!!", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     private void SetAdapter() {
         adapter = new FoodAdapter(this, arrayFood);
         rvFood.setAdapter(adapter);
-
     }
 
     @Override
@@ -101,13 +108,14 @@ public class ListFoodCustom extends AppCompatActivity {
     }
 
     private void GetDataWebSV(String url) {
+        tableID = 9;
+        ckGetFoodData = false;
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null,
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url+"?tableid="+tableID, null,
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
                         arrayFood.clear();
-                        boolean error = false;
                         for (int i = 0; i < response.length(); i++) {
                             try {
                                 JSONObject object = response.getJSONObject(i);
@@ -123,21 +131,24 @@ public class ListFoodCustom extends AppCompatActivity {
                                         covertToString(object.getString("name"))
                                 ));
                             } catch (JSONException e) {
-                                error = true;
                                 Log.d("LXT_Error", "GetFood: at #" + i);
                                 e.printStackTrace();
                             }
                         }
-                        if (error) {
+                        Log.d("LXT_Log", "arrFood.size: " + arrayFood.size());
+                        Log.d("LXT_Log", "response.length: " + response.length());
+                        if (arrayFood.size() == response.length()) {
+                            ckGetFoodData = true;
+                            SetAdapter();
+                        } else  {
                             Toast.makeText(ListFoodCustom.this, "Xảy ra lỗi trong quá trình load.", Toast.LENGTH_SHORT).show();
                         }
-                        Log.d("LXT_Log", "arrFood.size: " + arrayFood.size());
-                        SetAdapter();
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(ListFoodCustom.this, "Lỗi Server", Toast.LENGTH_SHORT).show();
                         Log.d("LXT_Error", error.toString());
                     }
                 });
@@ -193,7 +204,7 @@ public class ListFoodCustom extends AppCompatActivity {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 Log.d("LXT_LOG", "food: " + idFood + " quality:" + quantity);
-                params.put("tableid", 99 + "");
+                params.put("tableid", tableID + "");
                 params.put("foodid", idFood + "");
                 params.put("quantity", quantity + "");
                 Log.d("LXT_LOG", params.toString());
