@@ -1,22 +1,17 @@
 package com.lexuantrieu.orderfood.activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -27,29 +22,33 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.lexuantrieu.orderfood.R;
+import com.lexuantrieu.orderfood.Service.APIUtils;
+import com.lexuantrieu.orderfood.Service.DataClient;
 import com.lexuantrieu.orderfood.model.Category;
-import com.lexuantrieu.orderfood.utils.Server;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SetFoodActivity extends AppCompatActivity {
 
+    String realPath = "";
     boolean ckUploadImage = false;
     ImageView imgFood;
-    public static Bitmap bitmap = null;
     ImageButton btnCamera, btnFolder;
     Spinner spnCategory;
     EditText edtnameFood, edtpriceFood;
@@ -124,13 +123,14 @@ public class SetFoodActivity extends AppCompatActivity {
 
                     if (CheckBeforeAdd(nameFood, priceFood, idCategoryClick) == 1) {
                         UploadImage(nameFood);
-                        if(ckUploadImage) {
-                            AddFoodToData();
-                            Toast.makeText(SetFoodActivity.this, "Đã thêm!!!", Toast.LENGTH_SHORT).show();
-                            edtnameFood.setText("");
-                            edtpriceFood.setText("");
-                            imgFood.setImageResource(R.drawable.imagepreview);
-                        }
+                        realPath = "";
+//                        if(ckUploadImage) {
+//                            AddFoodToData();
+//                            Toast.makeText(SetFoodActivity.this, "Đã thêm!!!", Toast.LENGTH_SHORT).show();
+//                            edtnameFood.setText("");
+//                            edtpriceFood.setText("");
+//                            imgFood.setImageResource(R.drawable.imagepreview);
+//                        }
                     }
                 }
             }
@@ -149,41 +149,34 @@ public class SetFoodActivity extends AppCompatActivity {
     private void AddFoodToData() {
     }
 
-    private String ImageToString(Bitmap bitmap) {
-
-        ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-        SetFoodActivity.bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArray);
-
-        byte[] imageFood = byteArray.toByteArray();
-        return Base64.encodeToString(imageFood,Base64.DEFAULT);
-    }
-
     private  void UploadImage (final String nameImage) {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, Server.urlUploadImage,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        ckUploadImage = true;
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(SetFoodActivity.this, "Xảy ra lỗi. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-        {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
-                params.put("name", nameImage.trim());
-                params.put("image", ImageToString(bitmap));
+        File file = new File(realPath);
+        String file_path = file.getAbsolutePath();
+        String[] arrNameFile = file_path.split("\\.");
+        file_path = arrNameFile[0]+ System.currentTimeMillis()+"."+arrNameFile[1];
+        Log.d("LXT_Log", "file_path: "+file_path);
 
-                return params;
+        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"),file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("upload_file",file_path,requestBody);
+
+        DataClient dataClient = APIUtils.getData();
+        Call<String> callBack = dataClient.UploadPhoto(body);
+        callBack.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.d("LXT_Log", "response.body :"+response.body()+"\nresponse.message: "+response.message());
+
+                assert response.body() != null;
+                if(!response.body().toString().equals("Failed"))
+                    Toast.makeText(SetFoodActivity.this, "Đã upload ảnh.", Toast.LENGTH_SHORT).show();
             }
-        };
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(SetFoodActivity.this, "Lỗi Sever. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                Log.d("LXT_Error", "onFailure :"+t.getMessage());
+            }
+        });
     }
     private int CheckBeforeAdd(String nameFood, Double priceFood, int idCategoryClick) {
         //check
@@ -218,24 +211,51 @@ public class SetFoodActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == REQUEST_CODE_CAMERA && resultCode == RESULT_OK && data != null) {
-            bitmap = (Bitmap) data.getExtras().get("data");
-            imgFood.setImageBitmap(bitmap);
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            imgFood.setImageBitmap(photo);
+            // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
+            Uri tempUri = getImageUri(getApplicationContext(), photo);
+            realPath = getRealPathFromURI(tempUri);
+            Log.d("LXT_Log","realPath: "+ realPath);
         }
         if(requestCode == REQUEST_CODE_FOLDER && resultCode == RESULT_OK && data != null) {
+            Bitmap photo = null;
             Uri uri = data.getData();
+            realPath = getRealPathFromURI(uri);
+            Log.d("LXT_Log","realPath: "+ realPath);
             try {
                 InputStream inputStream = getContentResolver().openInputStream(uri);
-                bitmap = BitmapFactory.decodeStream(inputStream);
+                photo = BitmapFactory.decodeStream(inputStream);
 //                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
-                imgFood.setImageBitmap(bitmap);
+                imgFood.setImageBitmap(photo);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "data", null);
+        return Uri.parse(path);
+    }
+
+    public String getRealPathFromURI (Uri contentUri) {
+        String path = null;
+        String[] proj = { MediaStore.MediaColumns.DATA };
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            path = cursor.getString(column_index);
+        }
+        cursor.close();
+        return path;
+    }
+
     private void GetCategoryFood() {
 
     }
