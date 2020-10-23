@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -35,7 +36,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -53,6 +56,7 @@ public class SetFoodActivity extends AppCompatActivity {
     Spinner spnCategory;
     EditText edtnameFood, edtpriceFood;
     Button btnAdd;
+    ProgressBar progressBar;
     final int REQUEST_CODE_CAMERA = 123, REQUEST_CODE_FOLDER = 456;
     ArrayList<Category> arrayCategory;
     ArrayList<String> arrayNameCat;
@@ -71,7 +75,8 @@ public class SetFoodActivity extends AppCompatActivity {
         spnCategory = (Spinner) findViewById(R.id.spinnerCategoryFood_setFood);
         edtpriceFood = (EditText) findViewById(R.id.edtPriceFood_setFood);
         btnAdd = (Button) findViewById(R.id.buttonAddChange_setFood);
-
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.INVISIBLE);
         arrayNameCat = new ArrayList<>();
         arrayCategory = new ArrayList<>();
         arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,arrayNameCat);
@@ -123,7 +128,6 @@ public class SetFoodActivity extends AppCompatActivity {
 
                     if (CheckBeforeAdd(nameFood, priceFood, idCategoryClick) == 1) {
                         UploadImage(nameFood);
-                        realPath = "";
 //                        if(ckUploadImage) {
 //                            AddFoodToData();
 //                            Toast.makeText(SetFoodActivity.this, "Đã thêm!!!", Toast.LENGTH_SHORT).show();
@@ -150,10 +154,19 @@ public class SetFoodActivity extends AppCompatActivity {
     }
 
     private  void UploadImage (final String nameImage) {
+        if(realPath.equals("")){
+            Toast.makeText(this, "Vui lòng chọn ảnh đại diện", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        SwapStatus(-1);
         File file = new File(realPath);
         String file_path = file.getAbsolutePath();
-        String[] arrNameFile = file_path.split("\\.");
-        file_path = arrNameFile[0]+ System.currentTimeMillis()+"."+arrNameFile[1];
+        String[] arr1 = file_path.split("\\.");
+        String typeFile = arr1[1];
+        String[] arr2 = file_path.split("\\/");
+        String pathFile = file_path.delete;
+        file_path = covertToString(nameImage)+"."+typeFile;
+//        file_path = arr1[0]+ System.currentTimeMillis()+"."+arr1[1];
         Log.d("LXT_Log", "file_path: "+file_path);
 
         RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"),file);
@@ -165,21 +178,43 @@ public class SetFoodActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 Log.d("LXT_Log", "response.body :"+response.body()+"\nresponse.message: "+response.message());
-
                 assert response.body() != null;
                 if(!response.body().toString().equals("Failed"))
                     Toast.makeText(SetFoodActivity.this, "Đã upload ảnh.", Toast.LENGTH_SHORT).show();
+                SwapStatus(1);
+                ClearContent();
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Toast.makeText(SetFoodActivity.this, "Lỗi Sever. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
                 Log.d("LXT_Error", "onFailure :"+t.getMessage());
+                SwapStatus(1);
             }
         });
     }
+
+    private void SwapStatus(int key) {
+        if(key == -1) {
+            btnAdd.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+        else {
+            btnAdd.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+
+    }
+
+    private void ClearContent() {
+        edtnameFood.setText(null);
+        edtpriceFood.setText(null);
+        imgFood.setImageResource(R.drawable.imagepreview);
+        realPath = "";
+    }
+
     private int CheckBeforeAdd(String nameFood, Double priceFood, int idCategoryClick) {
-        //check
+        //
 
         return 1;
     }
@@ -258,5 +293,15 @@ public class SetFoodActivity extends AppCompatActivity {
 
     private void GetCategoryFood() {
 
+    }
+    public static String covertToString(String value) {
+        try {
+            String temp = Normalizer.normalize(value, Normalizer.Form.NFD);
+            Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+            return pattern.matcher(temp).replaceAll("");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 }
