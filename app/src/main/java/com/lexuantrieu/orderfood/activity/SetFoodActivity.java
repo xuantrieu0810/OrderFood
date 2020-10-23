@@ -13,7 +13,6 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import okhttp3.MediaType;
@@ -50,41 +50,29 @@ import retrofit2.Response;
 public class SetFoodActivity extends AppCompatActivity {
 
     String realPath = "";
-    boolean ckUploadImage = false;
     ImageView imgFood;
     ImageButton btnCamera, btnFolder;
     Spinner spnCategory;
-    EditText edtnameFood, edtpriceFood;
+    EditText edtNameFood, edtPriceFood;
     Button btnAdd;
     ProgressBar progressBar;
     final int REQUEST_CODE_CAMERA = 123, REQUEST_CODE_FOLDER = 456;
-    ArrayList<Category> arrayCategory;
-    ArrayList<String> arrayNameCat;
-    ArrayAdapter arrayAdapter;
-    int idCategoryClick=-1;
+    ArrayList<Category> arrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_food);
 
-        imgFood =  (ImageView) findViewById(R.id.imgfood_setFood);
-        btnCamera = (ImageButton) findViewById(R.id.imgButtonCamera_setFood);
-        btnFolder = (ImageButton) findViewById(R.id.imgButtonFolder_setFood);
-        edtnameFood = (EditText) findViewById(R.id.edtNameFood_setFood);
-        spnCategory = (Spinner) findViewById(R.id.spinnerCategoryFood_setFood);
-        edtpriceFood = (EditText) findViewById(R.id.edtPriceFood_setFood);
-        btnAdd = (Button) findViewById(R.id.buttonAddChange_setFood);
+        imgFood = findViewById(R.id.imgfood_setFood);
+        btnCamera = findViewById(R.id.imgButtonCamera_setFood);
+        btnFolder = findViewById(R.id.imgButtonFolder_setFood);
+        edtNameFood = findViewById(R.id.edtNameFood_setFood);
+        spnCategory = findViewById(R.id.spinnerCategoryFood_setFood);
+        edtPriceFood = findViewById(R.id.edtPriceFood_setFood);
+        btnAdd = findViewById(R.id.buttonAddChange_setFood);
         progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.INVISIBLE);
-        arrayNameCat = new ArrayList<>();
-        arrayCategory = new ArrayList<>();
-        arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,arrayNameCat);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         GetCategoryFood();
-        GetArrayListCat();
-        spnCategory.setAdapter(arrayAdapter);
         btnCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,59 +101,71 @@ public class SetFoodActivity extends AppCompatActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Category catItem = (Category) spnCategory.getSelectedItem();
                 int check = 1;
-                if( TextUtils.isEmpty(edtnameFood.getText())){
-                    edtnameFood.setError("Nhập tên món ăn");
+                if( TextUtils.isEmpty(edtNameFood.getText())){
+                    edtNameFood.setError("Nhập tên món ăn");
                     check = -1;
                 }
-                if( TextUtils.isEmpty(edtpriceFood.getText())){
-                    edtpriceFood.setError("Nhập giá tiền");
+                if( TextUtils.isEmpty(edtPriceFood.getText())){
+                    edtPriceFood.setError("Nhập giá tiền");
                     check = -1;
                 }
                 if(check != -1) {
-                    String nameFood = edtnameFood.getText().toString().trim();
-                    Double priceFood = Double.valueOf(edtpriceFood.getText().toString().trim());
+                    String nameFood = edtNameFood.getText().toString().trim();
+                    Float priceFood = Float.valueOf(edtPriceFood.getText().toString().trim());
 
-                    if (CheckBeforeAdd(nameFood, priceFood, idCategoryClick) == 1) {
-                        UploadImage(nameFood);
-//                        if(ckUploadImage) {
-//                            AddFoodToData();
-//                            Toast.makeText(SetFoodActivity.this, "Đã thêm!!!", Toast.LENGTH_SHORT).show();
-//                            edtnameFood.setText("");
-//                            edtpriceFood.setText("");
-//                            imgFood.setImageResource(R.drawable.imagepreview);
-//                        }
+                    if (CheckBeforeAdd(nameFood, priceFood, catItem.getId()) == 1) {
+                        String slug = covertToString(nameFood);
+                        UploadFood(catItem.getId(),nameFood,slug,99,priceFood, (float) -1.0,1,1);
                     }
                 }
             }
         });
-        spnCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+    }//end of onCreate
+    private void SetAdapter() {
+        ArrayAdapter<Category> adapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,arrayList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spnCategory.setAdapter(adapter);
+    }
+    private void GetCategoryFood() {
+        SwapStatus(-1);
+        DataClient dataClient = APIUtils.getData();
+        Call<List<Category>> callback = dataClient.GetCategory();
+        callback.enqueue(new Callback<List<Category>>() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                idCategoryClick = arrayCategory.get(position).getIdCategory();
+            public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
+                assert response.body() != null;
+                if(!response.body().equals("null")) {
+                    arrayList = (ArrayList<Category>) response.body();
+                    Log.d("LXT_Log", String.valueOf(arrayList));
+                    SetAdapter();
+                    SwapStatus(1);
+                } else {
+                    Toast.makeText(SetFoodActivity.this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
+                    Log.d("LXT_Log", "response: "+response.body());
+                }
             }
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            public void onFailure(Call<List<Category>> call, Throwable t) {
+                Log.d("LXT_Error", "v: "+t.getMessage());
             }
         });
-    }//end of onCreate
-
-    private void AddFoodToData() {
     }
-
-    private  void UploadImage (final String nameImage) {
+    private void UploadFood(String catid, String name, String image, int number, Float price, Float pricesale, int created_by, int status) {
         if(realPath.equals("")){
             Toast.makeText(this, "Vui lòng chọn ảnh đại diện", Toast.LENGTH_SHORT).show();
             return;
         }
+        String chPriceSale = (pricesale == -1.0) ? "NULL" : pricesale.toString();
         SwapStatus(-1);
         File file = new File(realPath);
         String file_path = file.getAbsolutePath();
         String[] arr1 = file_path.split("\\.");
         String typeFile = arr1[1];
-        String[] arr2 = file_path.split("\\/");
-        String pathFile = file_path.delete;
-        file_path = covertToString(nameImage)+"."+typeFile;
+//        String path = file_path.substring(0,file_path.lastIndexOf('/'));
+//        file_path = path+"/"+nameImage+"."+typeFile;
+        file_path = image+"."+typeFile;
 //        file_path = arr1[0]+ System.currentTimeMillis()+"."+arr1[1];
         Log.d("LXT_Log", "file_path: "+file_path);
 
@@ -173,26 +173,55 @@ public class SetFoodActivity extends AppCompatActivity {
         MultipartBody.Part body = MultipartBody.Part.createFormData("upload_file",file_path,requestBody);
 
         DataClient dataClient = APIUtils.getData();
-        Call<String> callBack = dataClient.UploadPhoto(body);
-        callBack.enqueue(new Callback<String>() {
+        Call<String> callback = dataClient.UploadPhoto(body);
+        callback.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.d("LXT_Log", "response.body :"+response.body()+"\nresponse.message: "+response.message());
+                Log.d("LXT_Log", "\nresponse.body :"+response.body()+"\nresponse.message: "+response.message());
                 assert response.body() != null;
-                if(!response.body().toString().equals("Failed"))
-                    Toast.makeText(SetFoodActivity.this, "Đã upload ảnh.", Toast.LENGTH_SHORT).show();
-                SwapStatus(1);
-                ClearContent();
+                if(!response.body().equals("Failed")) {
+                    String imgLink = response.body();
+                    //
+                    DataClient InsertFood = APIUtils.getData();
+                    Call<String> callback = InsertFood.InsertFood(catid+"",name+"",imgLink+"",number+"",price+"",chPriceSale+"",created_by+"",status+"");
+                    callback.enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            Log.d("LXT_Log", "\nresponse.body :"+response.body()+"\nresponse.message: "+response.message());
+                            assert response.body() != null;
+                            if(response.body().equals("success")){
+                                Toast.makeText(SetFoodActivity.this, "Đã thêm thành công.", Toast.LENGTH_SHORT).show();
+                                SwapStatus(1);
+                                ClearContent();
+                            } else {
+                                Toast.makeText(SetFoodActivity.this, "Xảy ra lỗi. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                                SwapStatus(1);
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+                            Toast.makeText(SetFoodActivity.this, "Lỗi Sever. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                            Log.d("LXT_Error", "onFailure InsertFood :"+t.getMessage());
+                            SwapStatus(1);
+                        }
+                    });
+                    //
+                } else {
+                    Toast.makeText(SetFoodActivity.this, "Xảy ra lỗi. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                    SwapStatus(1);
+                }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Toast.makeText(SetFoodActivity.this, "Lỗi Sever. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
-                Log.d("LXT_Error", "onFailure :"+t.getMessage());
+                Log.d("LXT_Error", "onFailure UploadImage:"+t.getMessage());
                 SwapStatus(1);
             }
         });
     }
+
+
 
     private void SwapStatus(int key) {
         if(key == -1) {
@@ -203,26 +232,52 @@ public class SetFoodActivity extends AppCompatActivity {
             btnAdd.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.INVISIBLE);
         }
-
     }
 
     private void ClearContent() {
-        edtnameFood.setText(null);
-        edtpriceFood.setText(null);
+        edtNameFood.setText(null);
+        edtPriceFood.setText(null);
         imgFood.setImageResource(R.drawable.imagepreview);
         realPath = "";
     }
 
-    private int CheckBeforeAdd(String nameFood, Double priceFood, int idCategoryClick) {
+    private int CheckBeforeAdd(String nameFood, Float priceFood, String catID) {
         //
 
         return 1;
     }
 
-    private void GetArrayListCat() {
-        int n = arrayCategory.size();
-        for(int i = 0 ; i < n; i++)
-            arrayNameCat.add(arrayCategory.get(i).getNameCategory());
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "data", null);
+        return Uri.parse(path);
+    }
+
+    public String getRealPathFromURI (Uri contentUri) {
+        String path = null;
+        String[] proj = { MediaStore.MediaColumns.DATA };
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            path = cursor.getString(column_index);
+        }
+        cursor.close();
+        return path;
+    }
+
+
+
+    public static String covertToString(String value) {
+        value = value.trim().replace(' ', '-');
+        try {
+            String temp = Normalizer.normalize(value, Normalizer.Form.NFD);
+            Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+            return pattern.matcher(temp).replaceAll("");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -256,7 +311,7 @@ public class SetFoodActivity extends AppCompatActivity {
             Log.d("LXT_Log","realPath: "+ realPath);
         }
         if(requestCode == REQUEST_CODE_FOLDER && resultCode == RESULT_OK && data != null) {
-            Bitmap photo = null;
+            Bitmap photo;
             Uri uri = data.getData();
             realPath = getRealPathFromURI(uri);
             Log.d("LXT_Log","realPath: "+ realPath);
@@ -272,36 +327,5 @@ public class SetFoodActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "data", null);
-        return Uri.parse(path);
-    }
 
-    public String getRealPathFromURI (Uri contentUri) {
-        String path = null;
-        String[] proj = { MediaStore.MediaColumns.DATA };
-        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
-        if (cursor.moveToFirst()) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            path = cursor.getString(column_index);
-        }
-        cursor.close();
-        return path;
-    }
-
-    private void GetCategoryFood() {
-
-    }
-    public static String covertToString(String value) {
-        try {
-            String temp = Normalizer.normalize(value, Normalizer.Form.NFD);
-            Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-            return pattern.matcher(temp).replaceAll("");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
 }

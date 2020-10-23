@@ -1,41 +1,35 @@
 package com.lexuantrieu.orderfood.model;
 
-import com.lexuantrieu.orderfood.utils.Server;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class Category {
 
-    private int idCategory;
-    private String nameCategory;
-    private String imageCategory;
+    @SerializedName("id")
+    @Expose
+    private String id;
+    @SerializedName("name")
+    @Expose
+    private String name;
 
-    public Category(int idCategory, String nameCategory, String imageCategory) {
-        this.idCategory = idCategory;
-        this.nameCategory = nameCategory;
-        this.imageCategory = Server.urlImage+"category/"+imageCategory;
+    public String getId() {
+        return id;
     }
 
-    public int getIdCategory() {
-        return idCategory;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setIdCategory(int idCategory) {
-        this.idCategory = idCategory;
+    public String getName() {
+        return name;
     }
 
-    public String getNameCategory() {
-        return nameCategory;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setNameCategory(String nameCategory) {
-        this.nameCategory = nameCategory;
-    }
-
-    public String getImageCategory() {
-        return imageCategory;
-    }
-
-    public void setImageCategory(String imageCategory) {
-        this.imageCategory = imageCategory;
+    @Override
+    public String toString() {
+        return name;
     }
 }
-

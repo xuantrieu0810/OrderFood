@@ -14,17 +14,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SplashActivity"></activity>
-        <activity android:name=".activity.SetFoodActivity">
+        <activity android:name=".activity.SplashActivity" />
+        <activity android:name=".activity.SetFoodActivity" />
+        <activity android:name=".activity.FoodByCatActivity" />
+        <activity android:name=".activity.ListFoodCustom" />
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.FoodByCatActivity" />
-        <activity android:name=".activity.ListFoodCustom"></activity>
-        <activity android:name=".activity.MainActivity" />
     </application>
 
 </manifest>
