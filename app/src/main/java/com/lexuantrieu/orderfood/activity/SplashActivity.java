@@ -42,9 +42,9 @@ public class SplashActivity extends AppCompatActivity {
 
     private void doLoadingWork() {
 
-        for (int progress=0; progress<50; progress+=10) {
+        for (int progress=0; progress<20; progress+=10) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(700);
                 progressBar.setProgress(progress);
             } catch (Exception e) {
                 e.printStackTrace(); }

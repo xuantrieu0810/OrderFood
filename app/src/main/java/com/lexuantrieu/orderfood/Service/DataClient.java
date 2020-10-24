@@ -26,11 +26,14 @@ public interface DataClient {
     @POST("insertFood.php")
     Call<String> InsertFood(@Field("catid") String catid
                             ,@Field("name") String name
+                            ,@Field("slug") String slug
                             ,@Field("image") String image
                             ,@Field("number") String number
                             ,@Field("price") String price
                             ,@Field("pricesale") String pricesale
                             ,@Field("created_by") String created_by
                             ,@Field("status") String status);
-
+    @FormUrlEncoded
+    @POST("checkNameFood.php")
+    Call<String> CheckExistsName(@Field("name") String name);
 }

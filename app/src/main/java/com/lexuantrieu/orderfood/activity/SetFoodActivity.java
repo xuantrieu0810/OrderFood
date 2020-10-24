@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -53,7 +55,8 @@ public class SetFoodActivity extends AppCompatActivity {
     ImageView imgFood;
     ImageButton btnCamera, btnFolder;
     Spinner spnCategory;
-    EditText edtNameFood, edtPriceFood;
+    EditText edtNameFood, edtPriceFood, edtNumber, edtSaleFood;
+    CheckBox cbSales;
     Button btnAdd;
     ProgressBar progressBar;
     final int REQUEST_CODE_CAMERA = 123, REQUEST_CODE_FOLDER = 456;
@@ -70,6 +73,9 @@ public class SetFoodActivity extends AppCompatActivity {
         edtNameFood = findViewById(R.id.edtNameFood_setFood);
         spnCategory = findViewById(R.id.spinnerCategoryFood_setFood);
         edtPriceFood = findViewById(R.id.edtPriceFood_setFood);
+        edtNumber = findViewById(R.id.edtNumber_setFood);
+        edtSaleFood = findViewById(R.id.edtPriceSale_setFood);
+        cbSales = findViewById(R.id.checkBoxSales);
         btnAdd = findViewById(R.id.buttonAddChange_setFood);
         progressBar = findViewById(R.id.progressBar);
         GetCategoryFood();
@@ -98,31 +104,76 @@ public class SetFoodActivity extends AppCompatActivity {
                 );
             }
         });
+        cbSales.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(cbSales.isChecked())
+                    edtSaleFood.setVisibility(View.VISIBLE);
+                else
+                    edtSaleFood.setVisibility(View.INVISIBLE);
+            }
+        });
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Category catItem = (Category) spnCategory.getSelectedItem();
-                int check = 1;
-                if( TextUtils.isEmpty(edtNameFood.getText())){
-                    edtNameFood.setError("Nhập tên món ăn");
-                    check = -1;
+                if(realPath.equals("")){
+                    Toast.makeText(getApplicationContext(), "Vui lòng chọn ảnh đại diện", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                if( TextUtils.isEmpty(edtPriceFood.getText())){
-                    edtPriceFood.setError("Nhập giá tiền");
-                    check = -1;
-                }
-                if(check != -1) {
-                    String nameFood = edtNameFood.getText().toString().trim();
-                    Float priceFood = Float.valueOf(edtPriceFood.getText().toString().trim());
-
-                    if (CheckBeforeAdd(nameFood, priceFood, catItem.getId()) == 1) {
-                        String slug = covertToString(nameFood);
-                        UploadFood(catItem.getId(),nameFood,slug,99,priceFood, (float) -1.0,1,1);
-                    }
+                if(CheckNullEdt()) {
+                    CheckNameFood();
                 }
             }
         });
     }//end of onCreate
+
+    private boolean CheckNullEdt() {
+        boolean check = true;
+        if( TextUtils.isEmpty(edtNameFood.getText())){
+            edtNameFood.setError("Nhập tên món ăn");
+            check = false;
+        }
+        if( TextUtils.isEmpty(edtPriceFood.getText())){
+            edtPriceFood.setError("Nhập giá tiền");
+            check = false;
+        }
+        if( TextUtils.isEmpty(edtNumber.getText())){
+            edtPriceFood.setError("Nhập số lượng");
+            check = false;
+        }
+        if(cbSales.isChecked() && edtSaleFood.getText().toString().equals("")) {
+            edtSaleFood.setError("Nhập giá tiền");
+            check = false;
+        }
+        return  check;
+    }
+
+    private void CheckNameFood() {
+        String nameFood = edtNameFood.getText().toString().trim();
+        String slug = covertToString(nameFood);
+        final boolean[] check = new boolean[1];
+        DataClient dataClient = APIUtils.getData();
+        Call<String> callback = dataClient.CheckExistsName(slug);
+        callback.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.d("LXT_Log","onResponse CheckExistsName: "+response.body());
+                assert response.body() != null;
+                if(response.body().equals("ok")){
+                    UploadFood();
+                }
+                else {
+                    edtNameFood.setError("Tên món ăn đã tồn tại.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("LXT_Error","onFailure CheckExistsName: "+t.getMessage());
+            }
+        });
+    }
+
     private void SetAdapter() {
         ArrayAdapter<Category> adapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,arrayList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -152,20 +203,23 @@ public class SetFoodActivity extends AppCompatActivity {
             }
         });
     }
-    private void UploadFood(String catid, String name, String image, int number, Float price, Float pricesale, int created_by, int status) {
-        if(realPath.equals("")){
-            Toast.makeText(this, "Vui lòng chọn ảnh đại diện", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        String chPriceSale = (pricesale == -1.0) ? "NULL" : pricesale.toString();
-        SwapStatus(-1);
+    private void UploadFood() {
+        Category catItem = (Category) spnCategory.getSelectedItem();
+        String catid = catItem.getId();
+        String nameFood = edtNameFood.getText().toString().trim();
+        String slug = covertToString(nameFood);
+        String priceFood = String.valueOf(Float.parseFloat(edtPriceFood.getText().toString().trim()));
+        String number = String.valueOf(Integer.parseInt(edtNumber.getText().toString().trim()));
+        String pricesale = (cbSales.isChecked())?String.valueOf(Float.parseFloat(edtSaleFood.getText().toString().trim())):"NULL";
+        String created_by = "1" ; String status = "1";
+
         File file = new File(realPath);
         String file_path = file.getAbsolutePath();
         String[] arr1 = file_path.split("\\.");
         String typeFile = arr1[1];
 //        String path = file_path.substring(0,file_path.lastIndexOf('/'));
 //        file_path = path+"/"+nameImage+"."+typeFile;
-        file_path = image+"."+typeFile;
+        file_path = slug+"."+typeFile;
 //        file_path = arr1[0]+ System.currentTimeMillis()+"."+arr1[1];
         Log.d("LXT_Log", "file_path: "+file_path);
 
@@ -174,20 +228,21 @@ public class SetFoodActivity extends AppCompatActivity {
 
         DataClient dataClient = APIUtils.getData();
         Call<String> callback = dataClient.UploadPhoto(body);
+        SwapStatus(-1);
         callback.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.d("LXT_Log", "\nresponse.body :"+response.body()+"\nresponse.message: "+response.message());
+                Log.d("LXT_Log", "onResponse UploadPhoto :"+response.body());
                 assert response.body() != null;
                 if(!response.body().equals("Failed")) {
                     String imgLink = response.body();
                     //
                     DataClient InsertFood = APIUtils.getData();
-                    Call<String> callback = InsertFood.InsertFood(catid+"",name+"",imgLink+"",number+"",price+"",chPriceSale+"",created_by+"",status+"");
+                    Call<String> callback = InsertFood.InsertFood(catid,nameFood,slug,imgLink,number,priceFood,pricesale,created_by,status);
                     callback.enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
-                            Log.d("LXT_Log", "\nresponse.body :"+response.body()+"\nresponse.message: "+response.message());
+                            Log.d("LXT_Log", "onResponse InsertFood :"+response.body());
                             assert response.body() != null;
                             if(response.body().equals("success")){
                                 Toast.makeText(SetFoodActivity.this, "Đã thêm thành công.", Toast.LENGTH_SHORT).show();
@@ -200,7 +255,7 @@ public class SetFoodActivity extends AppCompatActivity {
                         }
                         @Override
                         public void onFailure(Call<String> call, Throwable t) {
-                            Toast.makeText(SetFoodActivity.this, "Lỗi Sever. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SetFoodActivity.this, "Lỗi Network.", Toast.LENGTH_SHORT).show();
                             Log.d("LXT_Error", "onFailure InsertFood :"+t.getMessage());
                             SwapStatus(1);
                         }
@@ -214,7 +269,7 @@ public class SetFoodActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(SetFoodActivity.this, "Lỗi Sever. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SetFoodActivity.this, "Lỗi Network.", Toast.LENGTH_SHORT).show();
                 Log.d("LXT_Error", "onFailure UploadImage:"+t.getMessage());
                 SwapStatus(1);
             }
@@ -237,6 +292,9 @@ public class SetFoodActivity extends AppCompatActivity {
     private void ClearContent() {
         edtNameFood.setText(null);
         edtPriceFood.setText(null);
+        edtSaleFood.setText(null);
+        edtNumber.setText(null);
+        cbSales.setChecked(false);
         imgFood.setImageResource(R.drawable.imagepreview);
         realPath = "";
     }
