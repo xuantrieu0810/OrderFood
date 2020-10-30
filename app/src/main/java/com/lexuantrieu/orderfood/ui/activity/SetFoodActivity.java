@@ -1,6 +1,9 @@
-package com.lexuantrieu.orderfood.activity;
+package com.lexuantrieu.orderfood.ui.activity;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,7 +19,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -25,13 +27,18 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentManager;
 
 import com.lexuantrieu.orderfood.R;
-import com.lexuantrieu.orderfood.Service.APIUtils;
-import com.lexuantrieu.orderfood.Service.DataClient;
 import com.lexuantrieu.orderfood.model.Category;
+import com.lexuantrieu.orderfood.presenter.SetFoodPresenter;
+import com.lexuantrieu.orderfood.presenter.impl.SetFoodPresenterImpl;
+import com.lexuantrieu.orderfood.service.APIUtils;
+import com.lexuantrieu.orderfood.service.DataClient;
+import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,8 +56,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SetFoodActivity extends AppCompatActivity {
+public class SetFoodActivity extends AppCompatActivity implements SetFoodPresenter.View , AlertDialogFragment.AlertDialogFragmentListener{
 
+    SetFoodPresenter presenter;
+    ProgressDialog progressDialog;
     String realPath = "";
     ImageView imgFood;
     ImageButton btnCamera, btnFolder;
@@ -61,12 +70,43 @@ public class SetFoodActivity extends AppCompatActivity {
     ProgressBar progressBar;
     final int REQUEST_CODE_CAMERA = 123, REQUEST_CODE_FOLDER = 456;
     ArrayList<Category> arrayList;
+    ArrayAdapter<Category> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_food);
+        init();
+        presenter.invokeData();
+        btnCamera.setOnClickListener(v -> ActivityCompat.requestPermissions(
+                SetFoodActivity.this,
+                new String[]{Manifest.permission.CAMERA},
+                REQUEST_CODE_CAMERA
+        ));
+        btnFolder.setOnClickListener(v -> ActivityCompat.requestPermissions(
+                SetFoodActivity.this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                REQUEST_CODE_FOLDER
+        ));
+        cbSales.setOnCheckedChangeListener((compoundButton, b) -> {
+            if(cbSales.isChecked())
+                edtSaleFood.setVisibility(View.VISIBLE);
+            else
+                edtSaleFood.setVisibility(View.INVISIBLE);
+        });
+        btnAdd.setOnClickListener(v -> {
+            if(realPath.equals("")){
+                Toast.makeText(getApplicationContext(), "Vui lòng chọn ảnh đại diện", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(CheckNullEdt()) {
+                CheckNameFood();
+            }
+        });
+    }//end of onCreate
 
+    private void init() {
+        presenter = new SetFoodPresenterImpl(this, this);
         imgFood = findViewById(R.id.imgfood_setFood);
         btnCamera = findViewById(R.id.imgButtonCamera_setFood);
         btnFolder = findViewById(R.id.imgButtonFolder_setFood);
@@ -78,54 +118,8 @@ public class SetFoodActivity extends AppCompatActivity {
         cbSales = findViewById(R.id.checkBoxSales);
         btnAdd = findViewById(R.id.buttonAddChange_setFood);
         progressBar = findViewById(R.id.progressBar);
-        GetCategoryFood();
-        btnCamera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent intent =new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                startActivityForResult(intent,REQUEST_CODE_CAMERA);
-                ActivityCompat.requestPermissions(
-                        SetFoodActivity.this,
-                        new String[]{Manifest.permission.CAMERA},
-                        REQUEST_CODE_CAMERA
-                );
-            }
-        });
-        btnFolder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent intent = new Intent(Intent.ACTION_PICK);
-//                intent.setType("image/*");
-//                startActivityForResult(intent,REQUEST_CODE_FOLDER);
-                ActivityCompat.requestPermissions(
-                        SetFoodActivity.this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        REQUEST_CODE_FOLDER
-                );
-            }
-        });
-        cbSales.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(cbSales.isChecked())
-                    edtSaleFood.setVisibility(View.VISIBLE);
-                else
-                    edtSaleFood.setVisibility(View.INVISIBLE);
-            }
-        });
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(realPath.equals("")){
-                    Toast.makeText(getApplicationContext(), "Vui lòng chọn ảnh đại diện", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if(CheckNullEdt()) {
-                    CheckNameFood();
-                }
-            }
-        });
-    }//end of onCreate
+        progressDialog = new ProgressDialog(this);
+    }
 
     private boolean CheckNullEdt() {
         boolean check = true;
@@ -166,7 +160,6 @@ public class SetFoodActivity extends AppCompatActivity {
                     edtNameFood.setError("Tên món ăn đã tồn tại.");
                 }
             }
-
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Log.d("LXT_Error","onFailure CheckExistsName: "+t.getMessage());
@@ -174,35 +167,13 @@ public class SetFoodActivity extends AppCompatActivity {
         });
     }
 
-    private void SetAdapter() {
-        ArrayAdapter<Category> adapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,arrayList);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spnCategory.setAdapter(adapter);
+    private void ShowDialogConfirm() {
+        new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert)
+                .setCancelable(false)
+                .setTitle("Error Loading").setMessage("Không thể tải dữ liệu. \nVui lòng tải lại.")
+                .setPositiveButton("Yes", (dialog, which) -> presenter.invokeData()).setNegativeButton("No", (dialogInterface, i) -> finish()).show();
     }
-    private void GetCategoryFood() {
-        SwapStatus(-1);
-        DataClient dataClient = APIUtils.getData();
-        Call<List<Category>> callback = dataClient.GetCategory();
-        callback.enqueue(new Callback<List<Category>>() {
-            @Override
-            public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
-                assert response.body() != null;
-                if(!response.body().equals("null")) {
-                    arrayList = (ArrayList<Category>) response.body();
-                    Log.d("LXT_Log", String.valueOf(arrayList));
-                    SetAdapter();
-                    SwapStatus(1);
-                } else {
-                    Toast.makeText(SetFoodActivity.this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
-                    Log.d("LXT_Log", "response: "+response.body());
-                }
-            }
-            @Override
-            public void onFailure(Call<List<Category>> call, Throwable t) {
-                Log.d("LXT_Error", "v: "+t.getMessage());
-            }
-        });
-    }
+
     private void UploadFood() {
         Category catItem = (Category) spnCategory.getSelectedItem();
         String catid = catItem.getId();
@@ -232,7 +203,7 @@ public class SetFoodActivity extends AppCompatActivity {
         callback.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.d("LXT_Log", "onResponse UploadPhoto :"+response.body());
+                Log.i("LXT_Log", "onResponse UploadPhoto :"+response.body());
                 assert response.body() != null;
                 if(!response.body().equals("Failed")) {
                     String imgLink = response.body();
@@ -242,7 +213,7 @@ public class SetFoodActivity extends AppCompatActivity {
                     callback.enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
-                            Log.d("LXT_Log", "onResponse InsertFood :"+response.body());
+                            Log.i("LXT_Log", "onResponse InsertFood :"+response.body());
                             assert response.body() != null;
                             if(response.body().equals("success")){
                                 Toast.makeText(SetFoodActivity.this, "Đã thêm thành công.", Toast.LENGTH_SHORT).show();
@@ -256,7 +227,7 @@ public class SetFoodActivity extends AppCompatActivity {
                         @Override
                         public void onFailure(Call<String> call, Throwable t) {
                             Toast.makeText(SetFoodActivity.this, "Lỗi Network.", Toast.LENGTH_SHORT).show();
-                            Log.d("LXT_Error", "onFailure InsertFood :"+t.getMessage());
+                            Log.e("LXT_Error", "onFailure InsertFood :"+t.getMessage());
                             SwapStatus(1);
                         }
                     });
@@ -270,7 +241,7 @@ public class SetFoodActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Toast.makeText(SetFoodActivity.this, "Lỗi Network.", Toast.LENGTH_SHORT).show();
-                Log.d("LXT_Error", "onFailure UploadImage:"+t.getMessage());
+                Log.e("LXT_Error", "onFailure UploadImage:"+t.getMessage());
                 SwapStatus(1);
             }
         });
@@ -297,12 +268,6 @@ public class SetFoodActivity extends AppCompatActivity {
         cbSales.setChecked(false);
         imgFood.setImageResource(R.drawable.imagepreview);
         realPath = "";
-    }
-
-    private int CheckBeforeAdd(String nameFood, Float priceFood, String catID) {
-        //
-
-        return 1;
     }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
@@ -386,4 +351,63 @@ public class SetFoodActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onInvokeDataSuccess() {
+        onStopProcessBar();
+    }
+
+    @Override
+    public void onInvokeDataFail() {
+       // Create YesNoDialogFragment
+        AlertDialogFragment dialogFragment = new AlertDialogFragment();
+        dialogFragment.setOnAlertDialogFragmentListener(this);
+        // Arguments:
+        Bundle args = new Bundle();
+        args.putString(AlertDialogFragment.ARG_TITLE, "Confirmation");
+        args.putString(AlertDialogFragment.ARG_MESSAGE, "Do you like this example?");
+        dialogFragment.setArguments(args);
+
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+
+        // Show:
+        dialogFragment.show(fragmentManager, "Dialog");
+    }
+
+    @Override
+    public void onInvokeDataPending() {
+        onStartProcessBar("Chờ chút...");
+    }
+
+    @Override
+    public void onStartProcessBar(String message) {
+        progressDialog.setMessage(message);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    @Override
+    public void onStopProcessBar() {
+        progressDialog.dismiss();
+    }
+
+    @Override
+    public void initAdapter(Context context, List<Category> listData) {
+        arrayList = (ArrayList<Category>) listData;
+        adapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,arrayList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    }
+
+    @Override
+    public void initSpinner() {
+        spnCategory.setAdapter(adapter);
+    }
+
+    @Override // of AlertDialogFragmentListener
+    public void onClickResultDialog (int resultCode, @Nullable Intent data) {
+        if(resultCode == Activity.RESULT_OK) {
+            presenter.invokeData();
+        } else {//if(resultCode == Activity.RESULT_CANCELED) {
+            finish();
+        }
+    }
 }

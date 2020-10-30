@@ -14,11 +14,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SplashActivity" />
-        <activity android:name=".activity.SetFoodActivity" />
-        <activity android:name=".activity.FoodByCatActivity" />
-        <activity android:name=".activity.ListFoodCustom" />
-        <activity android:name=".activity.MainActivity">
+        <activity android:name=".ui.activity.SplashActivity" />
+        <activity android:name=".ui.activity.SetFoodActivity" />
+        <activity android:name=".ui.activity.FoodByCatActivity" />
+        <activity android:name=".ui.activity.ListFoodCustom" />
+        <activity android:name=".ui.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

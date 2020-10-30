@@ -1,4 +1,4 @@
-package com.lexuantrieu.orderfood.activity;
+package com.lexuantrieu.orderfood.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,8 +18,6 @@ public class MainActivity extends AppCompatActivity {
         btnGet = findViewById(R.id.btnListFood);
         btnSet = findViewById(R.id.btnSetFood);
 
-        Intent intent = new Intent(MainActivity.this,SplashActivity.class);
-        startActivity(intent);
 
         btnSet.setOnClickListener(view -> {
             Intent intent1 = new Intent(MainActivity.this,SetFoodActivity.class);

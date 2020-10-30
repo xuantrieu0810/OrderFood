@@ -1,4 +1,4 @@
-package com.lexuantrieu.orderfood.activity;
+package com.lexuantrieu.orderfood.ui.activity;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -17,28 +17,29 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.lexuantrieu.orderfood.model.Food;
 import com.lexuantrieu.orderfood.R;
-import com.lexuantrieu.orderfood.utils.Server;
-import com.lexuantrieu.orderfood.adapter.FoodAdapter;
+import com.lexuantrieu.orderfood.model.Food;
+import com.lexuantrieu.orderfood.network.Server;
+import com.lexuantrieu.orderfood.service.APIUtils;
+import com.lexuantrieu.orderfood.service.DataClient;
+import com.lexuantrieu.orderfood.ui.adapter.FoodAdapter;
 import com.lexuantrieu.orderfood.utils.CheckConnection;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+
 public class ListFoodCustom extends AppCompatActivity {
 
-    int tableID = 9; //default = -1
+    int tableID = -1; //default = -1
     boolean ckGetFoodData = false;
     RecyclerView rvFood;
     ArrayList<Food> arrayFood;
@@ -56,7 +57,7 @@ public class ListFoodCustom extends AppCompatActivity {
         rvFood.setItemAnimator(null);
         rvFood.addItemDecoration(new DividerItemDecoration(rvFood.getContext(), DividerItemDecoration.VERTICAL));
         if(CheckConnection.isNetworkAvailable(getApplicationContext())) {
-            GetDataWebSV(Server.urlGetFood);
+            GetDataWebSV(9);
         } else {
             Toast.makeText(this, "Vui lòng kết nối internet!!!", Toast.LENGTH_SHORT).show();
             finish();
@@ -107,52 +108,32 @@ public class ListFoodCustom extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void GetDataWebSV(String url) {
-        tableID = 9;
-        ckGetFoodData = false;
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url+"?tableid="+tableID, null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        arrayFood.clear();
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-                                JSONObject object = response.getJSONObject(i);
-                                arrayFood.add(new Food(
-                                        object.getInt("stt"),//stt
-                                        object.getInt("id"),//idFood
-                                        object.getString("name"),//nameFood
-                                        object.getDouble("price"),//priceFood
-                                        object.getString("image"),//imageFood
-                                        object.getInt("quantity"),//quantity
-                                        object.getString("comment"),//comment
-                                        object.getInt("status"),//Status
-                                        covertToString(object.getString("name"))
-                                ));
-                            } catch (JSONException e) {
-                                Log.d("LXT_Error", "GetFood: at #" + i);
-                                e.printStackTrace();
-                            }
-                        }
-                        Log.d("LXT_Log", "arrFood.size: " + arrayFood.size());
-                        Log.d("LXT_Log", "response.length: " + response.length());
-                        if (arrayFood.size() == response.length()) {
-                            ckGetFoodData = true;
-                            SetAdapter();
-                        } else  {
-                            Toast.makeText(ListFoodCustom.this, "Xảy ra lỗi trong quá trình load.", Toast.LENGTH_SHORT).show();
-                        }
+    private void GetDataWebSV(int tableID) {
+        DataClient dataClient = APIUtils.getData();
+        Call<List<Food>> callback = dataClient.GetFoodByTable(tableID);
+        callback.enqueue(new Callback<List<Food>>() {
+            @Override
+            public void onResponse(Call<List<Food>> call, retrofit2.Response<List<Food>> response) {
+                Log.i("LXT_Log", "onResponse GetFoodByTable: "+response.body());
+                if(response.body() != null) {
+                    arrayFood = (ArrayList<Food>) response.body();
+                    for(Food f: arrayFood){
+                        f.setNameFoodNonVN(covertToString(f.getNameFood()));
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(ListFoodCustom.this, "Lỗi Server", Toast.LENGTH_SHORT).show();
-                        Log.d("LXT_Error", error.toString());
-                    }
-                });
-        requestQueue.add(jsonArrayRequest);
+                    Log.i("LXT_Log", "arrayFood: "+arrayFood.size());
+                    SetAdapter();
+                } else {
+                    Toast.makeText(ListFoodCustom.this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
+//                    ShowDialogConfirm();
+                }
+//                progressDialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<List<Food>> call, Throwable t) {
+
+            }
+        });
     }
 
     public static String covertToString(String value) {

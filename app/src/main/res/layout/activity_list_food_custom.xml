@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.ListFoodCustom">
+    tools:context=".ui.activity.ListFoodCustom">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewSearch"
@@ -16,5 +16,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/item_food_type1"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

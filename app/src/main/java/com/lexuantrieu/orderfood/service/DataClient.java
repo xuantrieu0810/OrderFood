@@ -1,6 +1,7 @@
-package com.lexuantrieu.orderfood.Service;
+package com.lexuantrieu.orderfood.service;
 
 import com.lexuantrieu.orderfood.model.Category;
+import com.lexuantrieu.orderfood.model.Food;
 
 import java.util.List;
 
@@ -12,11 +13,15 @@ import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Query;
 
 public interface DataClient {
 
     @GET("getCategory.php")
     Call<List<Category>> GetCategory();
+
+    @GET("getFoodByTable.php")
+    Call<List<Food>> GetFoodByTable(@Query("tableid") int tableid);
 
     @Multipart
     @POST("uploadImage.php")

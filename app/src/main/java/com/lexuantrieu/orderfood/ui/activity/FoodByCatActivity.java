@@ -1,4 +1,4 @@
-package com.lexuantrieu.orderfood.activity;
+package com.lexuantrieu.orderfood.ui.activity;
 
 import android.os.Bundle;
 

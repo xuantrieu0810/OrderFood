@@ -1,4 +1,4 @@
-package com.lexuantrieu.orderfood.Service;
+package com.lexuantrieu.orderfood.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

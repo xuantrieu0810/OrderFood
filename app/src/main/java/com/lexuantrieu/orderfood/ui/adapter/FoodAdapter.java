@@ -1,4 +1,4 @@
-package com.lexuantrieu.orderfood.adapter;
+package com.lexuantrieu.orderfood.ui.adapter;
 
 import android.app.Dialog;
 import android.util.Log;
@@ -17,9 +17,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.lexuantrieu.orderfood.model.Food;
-import com.lexuantrieu.orderfood.activity.ListFoodCustom;
 import com.lexuantrieu.orderfood.R;
+import com.lexuantrieu.orderfood.model.Food;
+import com.lexuantrieu.orderfood.ui.activity.ListFoodCustom;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
