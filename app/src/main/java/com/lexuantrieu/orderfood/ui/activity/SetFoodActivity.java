@@ -2,7 +2,6 @@ package com.lexuantrieu.orderfood.ui.activity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +26,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
@@ -56,7 +54,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SetFoodActivity extends AppCompatActivity implements SetFoodPresenter.View , AlertDialogFragment.AlertDialogFragmentListener{
+public class SetFoodActivity extends AppCompatActivity implements SetFoodPresenter.View {
 
     SetFoodPresenter presenter;
     ProgressDialog progressDialog;
@@ -165,13 +163,6 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
                 Log.d("LXT_Error","onFailure CheckExistsName: "+t.getMessage());
             }
         });
-    }
-
-    private void ShowDialogConfirm() {
-        new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert)
-                .setCancelable(false)
-                .setTitle("Error Loading").setMessage("Không thể tải dữ liệu. \nVui lòng tải lại.")
-                .setPositiveButton("Yes", (dialog, which) -> presenter.invokeData()).setNegativeButton("No", (dialogInterface, i) -> finish()).show();
     }
 
     private void UploadFood() {
@@ -358,17 +349,16 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
 
     @Override
     public void onInvokeDataFail() {
+        onStopProcessBar();
        // Create YesNoDialogFragment
-        AlertDialogFragment dialogFragment = new AlertDialogFragment();
-        dialogFragment.setOnAlertDialogFragmentListener(this);
-        // Arguments:
-        Bundle args = new Bundle();
-        args.putString(AlertDialogFragment.ARG_TITLE, "Confirmation");
-        args.putString(AlertDialogFragment.ARG_MESSAGE, "Do you like this example?");
-        dialogFragment.setArguments(args);
-
+        AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
+            if(resultOk == Activity.RESULT_OK) {
+                presenter.invokeData();
+            } else {//if(resultCode == Activity.RESULT_CANCELED) {
+                finish();
+            }
+        });
         FragmentManager fragmentManager = this.getSupportFragmentManager();
-
         // Show:
         dialogFragment.show(fragmentManager, "Dialog");
     }
@@ -402,12 +392,4 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         spnCategory.setAdapter(adapter);
     }
 
-    @Override // of AlertDialogFragmentListener
-    public void onClickResultDialog (int resultCode, @Nullable Intent data) {
-        if(resultCode == Activity.RESULT_OK) {
-            presenter.invokeData();
-        } else {//if(resultCode == Activity.RESULT_CANCELED) {
-            finish();
-        }
-    }
 }

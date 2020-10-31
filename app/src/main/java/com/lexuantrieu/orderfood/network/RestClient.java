@@ -33,7 +33,7 @@ public class RestClient {
         httpClient
                 .readTimeout(5,TimeUnit.SECONDS)
                 .writeTimeout(5,TimeUnit.SECONDS)
-                .connectTimeout(5, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
                 .pingInterval(1, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
                 .eventListener(new EventListener() {

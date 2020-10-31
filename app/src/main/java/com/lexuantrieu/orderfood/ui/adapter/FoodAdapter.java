@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.Food;
 import com.lexuantrieu.orderfood.ui.activity.ListFoodCustom;
+import com.lexuantrieu.orderfood.utils.LibaryString;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -87,7 +88,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             charConstraint = constraint.toString().toLowerCase().trim();
-            charConstraint = ListFoodCustom.covertToString(charConstraint);
+            charConstraint = LibaryString.covertStringToVN(charConstraint);
             ArrayList<Food>  filterList = new ArrayList<>();
             if(charConstraint.isEmpty()) {
                 filterList.addAll(arrListFoodFull);
