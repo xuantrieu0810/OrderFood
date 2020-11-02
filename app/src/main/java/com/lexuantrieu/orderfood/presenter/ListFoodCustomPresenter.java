@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface ListFoodCustomPresenter {
     void invokeData(int tableid);
+    void InsertOrderList(int tableid, int foodid, int quantity);
+    void UpdateOrderList(int stt, int tableid, int foodid, int quantity);
     interface View{
         void onInvokeDataSuccess();
         void onInvokeDataFail();

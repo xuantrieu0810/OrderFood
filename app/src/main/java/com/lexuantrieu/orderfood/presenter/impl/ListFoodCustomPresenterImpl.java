@@ -2,13 +2,14 @@ package com.lexuantrieu.orderfood.presenter.impl;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.lexuantrieu.orderfood.model.Food;
 import com.lexuantrieu.orderfood.network.RestClient;
 import com.lexuantrieu.orderfood.presenter.ListFoodCustomPresenter;
 import com.lexuantrieu.orderfood.service.GetFoodByTableService;
-import com.lexuantrieu.orderfood.utils.LibaryString;
+import com.lexuantrieu.orderfood.service.SetFoodOrderListService;
+import com.lexuantrieu.orderfood.utils.LibraryString;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -35,10 +36,10 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
 //                    return true;
 //                })
                 .subscribe(response->{
-                    Log.e("LXT_Log",new Gson().toJson(response));
+//                    Log.e("LXT_Log",new Gson().toJson(response));
                     if(response != null) {
                         for(Food f:response){
-                            f.setNameFoodNonVN(LibaryString.covertStringToVN(f.getNameFood()));
+                            f.setNameFoodNonVN(LibraryString.covertStringToVN(f.getNameFood()));
                         }
                         view.initAdapter(context, response);
                         view.initRecyclerView();
@@ -53,5 +54,42 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
                     throwable.printStackTrace();
                 });
     }
+
+    @Override
+    public void InsertOrderList(int tableid, int foodid, int quantity) {
+        SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
+        service.InsertOrderList(tableid,foodid,quantity).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(response->{
+                    Log.i("LXT_Log","subscribe: "+response.toString());
+                    if (!response.equals("error")) {
+                        Toast.makeText(context, "Thêm thành công", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(context, "Lỗi không thêm được", Toast.LENGTH_SHORT).show();
+                    }
+                },throwable -> {
+                    Log.e("LXT_Log", throwable.toString());
+                    throwable.printStackTrace();
+                });
+    }
+
+    @Override
+    public void UpdateOrderList(int stt, int tableid, int foodid, int quantity) {
+        SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
+        service.UpdateOrderList(stt, tableid,foodid,quantity).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(response->{
+                    Log.i("LXT_Log","subscribe: "+response.toString());
+                    if (!response.equals("error")) {
+                        Toast.makeText(context, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(context, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
+                    }
+                },throwable -> {
+                    Log.e("LXT_Log", throwable.toString());
+                    throwable.printStackTrace();
+                });
+    }
+
 
 }

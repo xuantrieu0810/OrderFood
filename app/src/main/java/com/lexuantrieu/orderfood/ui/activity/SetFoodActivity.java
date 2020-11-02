@@ -37,15 +37,14 @@ import com.lexuantrieu.orderfood.presenter.impl.SetFoodPresenterImpl;
 import com.lexuantrieu.orderfood.service.APIUtils;
 import com.lexuantrieu.orderfood.service.DataClient;
 import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
+import com.lexuantrieu.orderfood.utils.LibraryString;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -130,10 +129,10 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
             check = false;
         }
         if( TextUtils.isEmpty(edtNumber.getText())){
-            edtPriceFood.setError("Nhập số lượng");
+            edtNumber.setError("Nhập số lượng");
             check = false;
         }
-        if(cbSales.isChecked() && edtSaleFood.getText().toString().equals("")) {
+        if(cbSales.isChecked() && TextUtils.isEmpty(edtSaleFood.getText())) {
             edtSaleFood.setError("Nhập giá tiền");
             check = false;
         }
@@ -142,7 +141,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
 
     private void CheckNameFood() {
         String nameFood = edtNameFood.getText().toString().trim();
-        String slug = covertToString(nameFood);
+        String slug = LibraryString.covertStringToSlug(nameFood);
         final boolean[] check = new boolean[1];
         DataClient dataClient = APIUtils.getData();
         Call<String> callback = dataClient.CheckExistsName(slug);
@@ -169,7 +168,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         Category catItem = (Category) spnCategory.getSelectedItem();
         String catid = catItem.getId();
         String nameFood = edtNameFood.getText().toString().trim();
-        String slug = covertToString(nameFood);
+        String slug = LibraryString.covertStringToSlug(nameFood);
         String priceFood = String.valueOf(Float.parseFloat(edtPriceFood.getText().toString().trim()));
         String number = String.valueOf(Integer.parseInt(edtNumber.getText().toString().trim()));
         String pricesale = (cbSales.isChecked())?String.valueOf(Float.parseFloat(edtSaleFood.getText().toString().trim())):"NULL";
@@ -282,17 +281,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
 
 
 
-    public static String covertToString(String value) {
-        value = value.trim().replace(' ', '-');
-        try {
-            String temp = Normalizer.normalize(value, Normalizer.Form.NFD);
-            Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-            return pattern.matcher(temp).replaceAll("");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -345,6 +334,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
     @Override
     public void onInvokeDataSuccess() {
         onStopProcessBar();
+        edtNameFood.requestFocus();
     }
 
     @Override
