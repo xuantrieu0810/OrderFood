@@ -13,7 +13,7 @@ public interface SetFoodOrderListService {
             , @Field("quantity") int quantity);
 
     @FormUrlEncoded
-    @POST("insertOrderList.php")
+    @POST("updateOrderList.php")
     Observable<String> UpdateOrderList(@Field("stt") int stt
             ,@Field("tableid") int tableid
             , @Field("foodid") int foodid
