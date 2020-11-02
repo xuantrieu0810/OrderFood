@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface ListFoodCustomPresenter {
     void invokeData(int tableid);
-    void InsertOrderList(int tableid, int foodid, int quantity);
-    void UpdateOrderList(int stt, int tableid, int foodid, int quantity);
+    void InsertOrderList(int tabeID, Food food, int quantity, int pos);
+    void UpdateOrderList(int tableID, Food food, int quantity, int pos);
     interface View{
         void onInvokeDataSuccess();
         void onInvokeDataFail();
@@ -18,5 +18,7 @@ public interface ListFoodCustomPresenter {
         void onStopProcessBar();
         void initAdapter(Context context, List<Food> listData);
         void initRecyclerView();
+        void onFailSetFood();
+        void onSuccessSetFood();//-1 onUpdateSuccess
     }
 }

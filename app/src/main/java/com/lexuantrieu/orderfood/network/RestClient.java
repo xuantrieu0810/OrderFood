@@ -2,6 +2,9 @@ package com.lexuantrieu.orderfood.network;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -15,12 +18,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RestClient {
 
     private static final String BASE_URL = Server.localhost;
-
+    private static Gson gson = new GsonBuilder().setLenient().create();;
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create()).client(getHttpClient().build());
+                    .addConverterFactory(GsonConverterFactory.create(gson)).client(getHttpClient().build());
 
 
     public static OkHttpClient.Builder getHttpClient() {

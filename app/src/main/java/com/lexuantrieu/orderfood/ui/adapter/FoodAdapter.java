@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.Food;
 import com.lexuantrieu.orderfood.ui.activity.ListFoodCustom;
+import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
 import com.lexuantrieu.orderfood.utils.LibraryString;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -28,7 +29,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
+public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable, FoodAdapterListener {
     static String charConstraint = "";
     private static int TYPE_DEFAULT = 1;
     private static int TYPE_CUSTOM = 2;
@@ -36,7 +37,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     private ArrayList<Food> arrListFoodFull;
     private static ListFoodCustom mContext;
 
-    public FoodAdapter(ListFoodCustom context,ArrayList<Food> arrListFood) {
+    public FoodAdapter(ListFoodCustom context,ArrayList<Food> arrListFood, FoodAdapterListener adapterListener) {
         mContext = context;
         this.arrListFood = arrListFood;
         arrListFoodFull = new ArrayList<>(arrListFood);
@@ -112,6 +113,13 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             notifyDataSetChanged();
         }
     };
+
+    @Override
+    public void onItemChange(int pos, Food food) {
+        arrListFood.get(pos).setCountFood(food.getCountFood());
+        arrListFood.get(pos).setStt(food.getStt());
+        notifyItemChanged(pos);
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -191,12 +199,10 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                     else {
                         int countTmp = Integer.parseInt(edtInputCount.getText().toString());
                         if(countTmp>=0 && countTmp<=99) {
-                            arrListFood.get(position).setCountFood(countTmp);
                             SetCountFood(position , countTmp);
-                            notifyItemChanged(position);
                             dialog.dismiss();
                         }
-                        else Toast.makeText(mContext, "Giá trị không hợp lệ", Toast.LENGTH_SHORT).show();
+                        else edtInputCount.setError("Số lượng không hợp lệ.");
                     }
                 }
             });
@@ -213,9 +219,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             int countTmp = arrListFood.get(position).getCountFood();
             if(countTmp < 99) {
                 countTmp++;
-                arrListFood.get(position).setCountFood(countTmp);
                 SetCountFood(position , countTmp);
-                notifyItemChanged(position);
             }
             else
                 Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
@@ -225,9 +229,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             int countTmp = arrListFood.get(position).getCountFood();
             if(countTmp > 0) {
                 countTmp--;
-                arrListFood.get(position).setCountFood(countTmp);
                 SetCountFood(position , countTmp);
-                notifyItemChanged(position);
             }
             else
                 Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();

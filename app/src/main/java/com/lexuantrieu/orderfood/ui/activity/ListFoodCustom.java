@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import com.lexuantrieu.orderfood.model.Food;
 import com.lexuantrieu.orderfood.presenter.ListFoodCustomPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.ListFoodCustomPresenterImpl;
 import com.lexuantrieu.orderfood.ui.adapter.FoodAdapter;
+import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
 import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import com.lexuantrieu.orderfood.utils.CheckConnection;
 
@@ -34,6 +36,7 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     RecyclerView recyclerView;
     ArrayList<Food> arrayFood;
     FoodAdapter adapter;
+    FoodAdapterListener adapterListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +64,8 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     }
 
     private void init() {
-        presenter = new ListFoodCustomPresenterImpl(this, this);
+        adapterListener = new FoodAdapter(this,arrayFood,);
+        presenter = new ListFoodCustomPresenterImpl(this, this, adapterListener);
         recyclerView = findViewById(R.id.recyclerViewSearch);
         progressDialog = new ProgressDialog(this);
     }
@@ -137,9 +141,9 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
         int foodId = food.getIdFood();
         int stt = food.getStt();
         if (stt != -1 && food.getStatusFood() == 0) {
-            presenter.UpdateOrderList(stt,tableID,foodId, quantity);
+            presenter.UpdateOrderList(tableID,food, quantity, position);
         } else {
-            presenter.InsertOrderList(tableID,foodId,quantity);
+            presenter.InsertOrderList(tableID,food,quantity, position);
         }
     }
 
@@ -227,12 +231,22 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     @Override
     public void initAdapter(Context context, List<Food> listData) {
         arrayFood = (ArrayList<Food>) listData;
-        adapter = new FoodAdapter(this, arrayFood);
+        adapter = new FoodAdapter(this, arrayFood,adapterListener);
     }
 
     @Override
     public void initRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onFailSetFood() {
+        Toast.makeText(this, "Xảy ra lỗi", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSuccessSetFood() {
+        Toast.makeText(this, "Thành công", Toast.LENGTH_SHORT).show();
     }
 }

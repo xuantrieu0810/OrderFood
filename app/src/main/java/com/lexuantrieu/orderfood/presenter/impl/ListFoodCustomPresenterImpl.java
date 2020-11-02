@@ -2,13 +2,13 @@ package com.lexuantrieu.orderfood.presenter.impl;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.lexuantrieu.orderfood.model.Food;
 import com.lexuantrieu.orderfood.network.RestClient;
 import com.lexuantrieu.orderfood.presenter.ListFoodCustomPresenter;
 import com.lexuantrieu.orderfood.service.GetFoodByTableService;
 import com.lexuantrieu.orderfood.service.SetFoodOrderListService;
+import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
 import com.lexuantrieu.orderfood.utils.LibraryString;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -17,10 +17,12 @@ import io.reactivex.schedulers.Schedulers;
 public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     private Context context;
     private ListFoodCustomPresenter.View view;
+    private FoodAdapterListener adapterListener;
 
-    public ListFoodCustomPresenterImpl(Context context, ListFoodCustomPresenter.View view) {
+    public ListFoodCustomPresenterImpl(Context context, ListFoodCustomPresenter.View view, FoodAdapterListener adapterListener) {
         this.context = context;
         this.view = view;
+        this.adapterListener = adapterListener;
     }
 
     @Override
@@ -56,16 +58,24 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     }
 
     @Override
-    public void InsertOrderList(int tableid, int foodid, int quantity) {
+    public void InsertOrderList(int tableid, Food food, int quantity, int pos) {
         SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.InsertOrderList(tableid,foodid,quantity).subscribeOn(Schedulers.io())
+        service.InsertOrderList(tableid,food.getIdFood(),quantity).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response->{
                     Log.i("LXT_Log","subscribe: "+response.toString());
                     if (!response.equals("error")) {
-                        Toast.makeText(context, "Thêm thành công", Toast.LENGTH_SHORT).show();
+                        try {
+                            Log.i("LXT_Log","position: "+pos);
+                            food.setStt(Integer.parseInt(response));
+                            food.setCountFood(quantity);
+                            adapterListener.onItemChange(pos, food);
+                            view.onSuccessSetFood();
+                        }catch (Exception e) {
+                            view.onFailSetFood();
+                        }
                     } else {
-                        Toast.makeText(context, "Lỗi không thêm được", Toast.LENGTH_SHORT).show();
+                        view.onFailSetFood();
                     }
                 },throwable -> {
                     Log.e("LXT_Log", throwable.toString());
@@ -74,17 +84,20 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     }
 
     @Override
-    public void UpdateOrderList(int stt, int tableid, int foodid, int quantity) {
+    public void UpdateOrderList(int tableid, Food food, int quantity, int pos) {
         SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.UpdateOrderList(stt, tableid,foodid,quantity).subscribeOn(Schedulers.io())
+        service.UpdateOrderList(food.getStt(), tableid,food.getIdFood(),quantity).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response->{
                     Log.i("LXT_Log","subscribe: "+response.toString());
                     if (!response.equals("error")) {
-                        Toast.makeText(context, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                            Log.i("LXT_Log","position: "+pos);
+                            food.setCountFood(quantity);
+                            adapterListener.onItemChange(pos,food);
+                            view.onSuccessSetFood();
+
                     } else {
-                        Toast.makeText(context, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
-                    }
+                        view.onFailSetFood();                    }
                 },throwable -> {
                     Log.e("LXT_Log", throwable.toString());
                     throwable.printStackTrace();

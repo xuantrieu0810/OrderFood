@@ -8,13 +8,15 @@ import retrofit2.http.POST;
 public interface SetFoodOrderListService {
     @FormUrlEncoded
     @POST("insertOrderList.php")
-    Observable<String> InsertOrderList(@Field("tableid") int tableid
+    Observable<String> InsertOrderList(
+            @Field("tableid") int tableid
             , @Field("foodid") int foodid
             , @Field("quantity") int quantity);
 
     @FormUrlEncoded
     @POST("updateOrderList.php")
-    Observable<String> UpdateOrderList(@Field("stt") int stt
+    Observable<String> UpdateOrderList(
+            @Field("stt") int stt
             ,@Field("tableid") int tableid
             , @Field("foodid") int foodid
             , @Field("quantity") int quantity);
