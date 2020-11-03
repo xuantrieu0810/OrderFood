@@ -5,10 +5,10 @@ import android.util.Log;
 
 import com.lexuantrieu.orderfood.model.Food;
 import com.lexuantrieu.orderfood.network.RestClient;
+import com.lexuantrieu.orderfood.network.Server;
 import com.lexuantrieu.orderfood.presenter.ListFoodCustomPresenter;
 import com.lexuantrieu.orderfood.service.GetFoodByTableService;
 import com.lexuantrieu.orderfood.service.SetFoodOrderListService;
-import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
 import com.lexuantrieu.orderfood.utils.LibraryString;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -17,12 +17,10 @@ import io.reactivex.schedulers.Schedulers;
 public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     private Context context;
     private ListFoodCustomPresenter.View view;
-    private FoodAdapterListener adapterListener;
 
-    public ListFoodCustomPresenterImpl(Context context, ListFoodCustomPresenter.View view, FoodAdapterListener adapterListener) {
+    public ListFoodCustomPresenterImpl(Context context, ListFoodCustomPresenter.View view) {
         this.context = context;
         this.view = view;
-        this.adapterListener = adapterListener;
     }
 
     @Override
@@ -41,6 +39,7 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
 //                    Log.e("LXT_Log",new Gson().toJson(response));
                     if(response != null) {
                         for(Food f:response){
+                            f.setImageFood(Server.urlImage + f.getImageFood());
                             f.setNameFoodNonVN(LibraryString.covertStringToVN(f.getNameFood()));
                         }
                         view.initAdapter(context, response);
@@ -66,11 +65,11 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
                     Log.i("LXT_Log","subscribe: "+response.toString());
                     if (!response.equals("error")) {
                         try {
-                            Log.i("LXT_Log","position: "+pos);
+                            Log.i("LXT_Log", "position: " + pos);
                             food.setStt(Integer.parseInt(response));
                             food.setCountFood(quantity);
-                            adapterListener.onItemChange(pos, food);
-                            view.onSuccessSetFood();
+//                            adapterListener.onItemChange(pos, food);
+                            view.onSuccessSetFood(food, pos);
                         }catch (Exception e) {
                             view.onFailSetFood();
                         }
@@ -91,10 +90,10 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
                 .subscribe(response->{
                     Log.i("LXT_Log","subscribe: "+response.toString());
                     if (!response.equals("error")) {
-                            Log.i("LXT_Log","position: "+pos);
-                            food.setCountFood(quantity);
-                            adapterListener.onItemChange(pos,food);
-                            view.onSuccessSetFood();
+                        Log.i("LXT_Log", "position: " + pos);
+                        food.setCountFood(quantity);
+//                            adapterListener.onItemChange(pos,food);
+                        view.onSuccessSetFood(food, pos);
 
                     } else {
                         view.onFailSetFood();                    }

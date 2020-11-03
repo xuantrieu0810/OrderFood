@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.Food;
 import com.lexuantrieu.orderfood.ui.activity.ListFoodCustom;
-import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
 import com.lexuantrieu.orderfood.utils.LibraryString;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -29,23 +28,26 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable, FoodAdapterListener {
+public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
     static String charConstraint = "";
     private static int TYPE_DEFAULT = 1;
     private static int TYPE_CUSTOM = 2;
-    private ArrayList<Food> arrListFood;
+    private static ArrayList<Food> arrListFood;
     private ArrayList<Food> arrListFoodFull;
-    private static ListFoodCustom mContext;
+    private ListFoodCustom mContext;
 
-    public FoodAdapter(ListFoodCustom context,ArrayList<Food> arrListFood, FoodAdapterListener adapterListener) {
-        mContext = context;
+    public FoodAdapter() {
+    }
+
+    public FoodAdapter(ListFoodCustom context, ArrayList<Food> arrListFood) {
+        this.mContext = context;
         this.arrListFood = arrListFood;
-        arrListFoodFull = new ArrayList<>(arrListFood);
+        this.arrListFoodFull = new ArrayList<>(arrListFood);
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (arrListFood.get(position).getCountFood()>0) {
+        if (arrListFood.get(position).getCountFood() > 0) {
             return TYPE_DEFAULT;
         } else {
             return TYPE_CUSTOM;
@@ -69,8 +71,6 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (getItemViewType(position) == TYPE_DEFAULT) {
             ((FoodAdapter.ViewHolder) holder).setHolderDefault(arrListFood.get(position),position);
-//            Food foods = arrListFood.get(position);
-//            holder.setHolderDefault(foods,position);
         } else {
             ((FoodAdapter.ViewHolderClone) holder).setHolderCustom(arrListFood.get(position),position);
         }
@@ -114,12 +114,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         }
     };
 
-    @Override
-    public void onItemChange(int pos, Food food) {
-        arrListFood.get(pos).setCountFood(food.getCountFood());
-        arrListFood.get(pos).setStt(food.getStt());
-        notifyItemChanged(pos);
-    }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -156,32 +151,16 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
                         @Override
                         public void onError(Exception e) {
-                            Log.d("LXT_Error:","LoadImage: "+food.getNameFood());
+                            Log.d("LXT_Error:", "LoadImage: " + food.getNameFood());
                         }
                     });
             edtCount.setText(String.valueOf(food.getCountFood()));
             //--------------------------------------------------------------------------------------
-            edtCount.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    InputCountFood(food.getNameFood(), position);
-                }
-            });
-            btnAdd.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ClickButtonAdd(position);
-                }
-            });
-            btnSub.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ClickButtonSub(position);
-                }
-            });
+            edtCount.setOnClickListener(v -> InputCountFood(food.getNameFood(), position));
+            btnAdd.setOnClickListener(v -> ClickButtonAdd(position));
+            btnSub.setOnClickListener(v -> ClickButtonSub(position));
 
         }
-        //----------------------------------------------------------------------------------------------
         //----------------------------------------------------------------------------------------------
         private void InputCountFood(String foodName, final int position) {
 
@@ -192,26 +171,18 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             Button btnSubmit = dialog.findViewById(R.id.buttonSubmit_dial);
             Button btnCancel = dialog.findViewById(R.id.buttonCancel_dial);
             txtNameFood.setText(foodName);
-            btnSubmit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if( edtInputCount.getText().toString().equals("")){}
-                    else {
-                        int countTmp = Integer.parseInt(edtInputCount.getText().toString());
-                        if(countTmp>=0 && countTmp<=99) {
-                            SetCountFood(position , countTmp);
-                            dialog.dismiss();
-                        }
-                        else edtInputCount.setError("Số lượng không hợp lệ.");
-                    }
+            btnSubmit.setOnClickListener(v -> {
+                if (edtInputCount.getText().toString().equals("")) {
+                    edtInputCount.setError("Vui lòng nhập số lượng");
+                } else {
+                    int countTmp = Integer.parseInt(edtInputCount.getText().toString());
+                    if (countTmp >= 0 && countTmp <= 99) {
+                        SetCountFood(position, countTmp);
+                        dialog.dismiss();
+                    } else edtInputCount.setError("Số lượng không hợp lệ.");
                 }
             });
-            btnCancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.cancel();
-                }
-            });
+            btnCancel.setOnClickListener(v -> dialog.cancel());
             dialog.show();
         }
         //----------------------------------------------------------------------------------------------
@@ -272,19 +243,11 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                         }
                     });
             //--------------------------------------------------------------------------------------
-            btnChange.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ClickButtonChange(position);
-                }
-            });
-        }
-        private void ClickButtonChange(int position) {
-            arrListFood.get(position).setCountFood(1);
-            SetCountFood(position , 1);
-            notifyItemChanged(position);
+            btnChange.setOnClickListener(v -> SetCountFood(position, 1));
         }
     }//end Class ViewHolderClone
+
+
     private void SetCountFood(int position, int  quantity) {
         mContext.SetCountFood(position,quantity,arrListFood.get(position));
     }

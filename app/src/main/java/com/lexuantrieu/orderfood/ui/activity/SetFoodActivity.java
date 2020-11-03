@@ -166,13 +166,14 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
 
     private void UploadFood() {
         Category catItem = (Category) spnCategory.getSelectedItem();
-        String catid = catItem.getId();
+        int catid = catItem.getId();
         String nameFood = edtNameFood.getText().toString().trim();
         String slug = LibraryString.covertStringToSlug(nameFood);
-        String priceFood = String.valueOf(Float.parseFloat(edtPriceFood.getText().toString().trim()));
-        String number = String.valueOf(Integer.parseInt(edtNumber.getText().toString().trim()));
-        String pricesale = (cbSales.isChecked())?String.valueOf(Float.parseFloat(edtSaleFood.getText().toString().trim())):"NULL";
-        String created_by = "1" ; String status = "1";
+        float priceFood = (Float.parseFloat(edtPriceFood.getText().toString().trim()));
+        int number = (Integer.parseInt(edtNumber.getText().toString().trim()));
+        String pricesale = (cbSales.isChecked()) ? String.valueOf(Float.parseFloat(edtSaleFood.getText().toString().trim())) : "NULL";
+        int created_by = 1;
+        int status = 1;
 
         File file = new File(realPath);
         String file_path = file.getAbsolutePath();
@@ -180,9 +181,9 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         String typeFile = arr1[1];
 //        String path = file_path.substring(0,file_path.lastIndexOf('/'));
 //        file_path = path+"/"+nameImage+"."+typeFile;
-        file_path = slug+"."+typeFile;
+        file_path = slug + "." + typeFile;
 //        file_path = arr1[0]+ System.currentTimeMillis()+"."+arr1[1];
-        Log.d("LXT_Log", "file_path: "+file_path);
+        Log.d("LXT_Log", "file_path: " + file_path);
 
         RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"),file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("upload_file",file_path,requestBody);

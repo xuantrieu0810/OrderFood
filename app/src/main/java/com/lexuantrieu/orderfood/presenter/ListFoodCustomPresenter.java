@@ -19,6 +19,7 @@ public interface ListFoodCustomPresenter {
         void initAdapter(Context context, List<Food> listData);
         void initRecyclerView();
         void onFailSetFood();
-        void onSuccessSetFood();//-1 onUpdateSuccess
+
+        void onSuccessSetFood(Food food, int pos);//-1 onUpdateSuccess
     }
 }

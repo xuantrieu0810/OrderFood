@@ -2,7 +2,6 @@ package com.lexuantrieu.orderfood.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lexuantrieu.orderfood.network.Server;
 
 public class Food {
     @SerializedName("stt")
@@ -74,7 +73,7 @@ public class Food {
     }
 
     public String getImageFood() {
-        return Server.urlImage+imageFood;
+        return imageFood;
     }
 
     public void setImageFood(String imageFood) {
