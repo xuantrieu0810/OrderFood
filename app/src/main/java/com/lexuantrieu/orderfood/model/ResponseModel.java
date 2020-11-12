@@ -4,19 +4,19 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class ResponseModel<T> {
-    @SerializedName("exitcode")
+    @SerializedName("token")
     @Expose
-    private Integer exitcode;
+    private String token;
     @SerializedName("data")
     @Expose
     private T data = null;
 
-    public Integer getExitcode() {
-        return exitcode;
+    public String getToken() {
+        return token;
     }
 
-    public void setExitcode(Integer exitcode) {
-        this.exitcode = exitcode;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public T getData() {
