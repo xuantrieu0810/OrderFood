@@ -1,49 +1,36 @@
 package com.lexuantrieu.orderfood.model;
 
-import com.lexuantrieu.orderfood.network.Server;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-public class Foodold {
-    private int stt;
-    private int idFood;
+public class FoodModel {
+    @SerializedName("stt")
+    @Expose
+    private Integer stt;
+    @SerializedName("id")
+    @Expose
+    private Integer idFood;
+    @SerializedName("name")
+    @Expose
     private String nameFood;
-    private String nameCategory;
-    private Double priceFood;
-    private String imageFood;
-    private int countFood;
-    private String nameFoodNonVN;//tiếng việt không dấu
-    private String commentFood;
-    private int statusFood;
 
-    public Foodold(int stt, int idFood, String nameFood, Double priceFood, String imageFood, int countFood, String commentFood, int statusFood, String nameFoodNonVN) {
-        this.stt = stt;
-        this.idFood = idFood;
-        this.nameFood = nameFood;
-        this.priceFood = priceFood;
-        this.imageFood = Server.urlImage+"product/"+imageFood;
-        this.countFood = countFood;
-        this.commentFood = commentFood;
-        this.statusFood = statusFood;
-        this.nameFoodNonVN = nameFoodNonVN;
-    }
-    public Foodold(int idFood, String nameFood, Double priceFood, String imageFood, int countFood, String commentFood, int statusFood, String nameFoodNonVN) {
-        this.idFood = idFood;
-        this.nameFood = nameFood;
-        this.priceFood = priceFood;
-        this.imageFood = imageFood;
-        this.countFood = countFood;
-        this.commentFood = commentFood;
-        this.statusFood = statusFood;
-        this.nameFoodNonVN = nameFoodNonVN;
-    }
-    public Foodold(int idFood, String nameFood, Double priceFood, String imageFood, int countFood, String commentFood, int statusFood) {
-        this.idFood = idFood;
-        this.nameFood = nameFood;
-        this.priceFood = priceFood;
-        this.imageFood = imageFood;
-        this.countFood = countFood;
-        this.commentFood = commentFood;
-        this.statusFood = statusFood;
-    }
+    private String nameCategory;
+    @SerializedName("price")
+    @Expose
+    private Double priceFood;
+    @SerializedName("image")
+    @Expose
+    private String imageFood;
+    @SerializedName("quantity")
+    @Expose
+    private Integer countFood;
+    private String nameFoodNonVN;//tiếng việt không dấu
+    @SerializedName("comment")
+    @Expose
+    private String commentFood;
+    @SerializedName("status")
+    @Expose
+    private Integer statusFood;
 
     public int getStt() {
         return stt;

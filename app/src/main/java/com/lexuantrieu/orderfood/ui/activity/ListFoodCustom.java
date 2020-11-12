@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lexuantrieu.orderfood.R;
-import com.lexuantrieu.orderfood.model.Food;
+import com.lexuantrieu.orderfood.model.FoodModel;
 import com.lexuantrieu.orderfood.presenter.ListFoodCustomPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.ListFoodCustomPresenterImpl;
 import com.lexuantrieu.orderfood.ui.adapter.FoodAdapter;
@@ -33,7 +33,7 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     ProgressDialog progressDialog;
     int tableID = 9; //default = -1
     RecyclerView recyclerView;
-    ArrayList<Food> arrayFood;
+    ArrayList<FoodModel> arrayFoodModel;
     FoodAdapter adapter;
 //    FoodAdapterListener adapterListener;
 
@@ -136,13 +136,13 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
 //        });
 //    }
 
-    public void SetCountFood(int position, int quantity, Food food) {
-        int foodId = food.getIdFood();
-        int stt = food.getStt();
-        if (stt != -1 && food.getStatusFood() == 0) {
-            presenter.UpdateOrderList(tableID,food, quantity, position);
+    public void SetCountFood(int position, int quantity, FoodModel foodModel) {
+        int foodId = foodModel.getIdFood();
+        int stt = foodModel.getStt();
+        if (stt != -1 && foodModel.getStatusFood() == 0) {
+            presenter.UpdateOrderList(tableID, foodModel, quantity, position);
         } else {
-            presenter.InsertOrderList(tableID,food,quantity, position);
+            presenter.InsertOrderList(tableID, foodModel, quantity, position);
         }
     }
 
@@ -228,9 +228,9 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
 
 
     @Override
-    public void initAdapter(Context context, List<Food> listData) {
-        arrayFood = (ArrayList<Food>) listData;
-        adapter = new FoodAdapter(this, arrayFood);
+    public void initAdapter(Context context, List<FoodModel> listData) {
+        arrayFoodModel = (ArrayList<FoodModel>) listData;
+        adapter = new FoodAdapter(this, arrayFoodModel);
     }
 
     @Override
@@ -245,8 +245,8 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     }
 
     @Override
-    public void onSuccessSetFood(Food food, int pos) {
-        arrayFood.set(pos, food);
+    public void onSuccessSetFood(FoodModel foodModel, int pos) {
+        arrayFoodModel.set(pos, foodModel);
         adapter.notifyItemChanged(pos);
 //        Toast.makeText(this, "Thành công", Toast.LENGTH_SHORT).show();
     }

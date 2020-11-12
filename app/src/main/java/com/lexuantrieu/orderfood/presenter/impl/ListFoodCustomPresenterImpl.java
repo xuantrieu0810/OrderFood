@@ -3,7 +3,7 @@ package com.lexuantrieu.orderfood.presenter.impl;
 import android.content.Context;
 import android.util.Log;
 
-import com.lexuantrieu.orderfood.model.Food;
+import com.lexuantrieu.orderfood.model.FoodModel;
 import com.lexuantrieu.orderfood.network.RestClient;
 import com.lexuantrieu.orderfood.network.Server;
 import com.lexuantrieu.orderfood.presenter.ListFoodCustomPresenter;
@@ -38,7 +38,7 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
                 .subscribe(response->{
 //                    Log.e("LXT_Log",new Gson().toJson(response));
                     if(response != null) {
-                        for(Food f:response){
+                        for (FoodModel f : response) {
                             f.setImageFood(Server.urlImage + f.getImageFood());
                             f.setNameFoodNonVN(LibraryString.covertStringToVN(f.getNameFood()));
                         }
@@ -57,19 +57,19 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     }
 
     @Override
-    public void InsertOrderList(int tableid, Food food, int quantity, int pos) {
+    public void InsertOrderList(int tableid, FoodModel foodModel, int quantity, int pos) {
         SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.InsertOrderList(tableid,food.getIdFood(),quantity).subscribeOn(Schedulers.io())
+        service.InsertOrderList(tableid, foodModel.getIdFood(), quantity).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response->{
-                    Log.i("LXT_Log","subscribe: "+response.toString());
+                .subscribe(response -> {
+                    Log.i("LXT_Log", "subscribe: " + response.toString());
                     if (!response.equals("error")) {
                         try {
                             Log.i("LXT_Log", "position: " + pos);
-                            food.setStt(Integer.parseInt(response));
-                            food.setCountFood(quantity);
+                            foodModel.setStt(Integer.parseInt(response));
+                            foodModel.setCountFood(quantity);
 //                            adapterListener.onItemChange(pos, food);
-                            view.onSuccessSetFood(food, pos);
+                            view.onSuccessSetFood(foodModel, pos);
                         }catch (Exception e) {
                             view.onFailSetFood();
                         }
@@ -83,17 +83,17 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     }
 
     @Override
-    public void UpdateOrderList(int tableid, Food food, int quantity, int pos) {
+    public void UpdateOrderList(int tableid, FoodModel foodModel, int quantity, int pos) {
         SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.UpdateOrderList(food.getStt(), tableid,food.getIdFood(),quantity).subscribeOn(Schedulers.io())
+        service.UpdateOrderList(foodModel.getStt(), tableid, foodModel.getIdFood(), quantity).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response->{
-                    Log.i("LXT_Log","subscribe: "+response.toString());
+                .subscribe(response -> {
+                    Log.i("LXT_Log", "subscribe: " + response.toString());
                     if (!response.equals("error")) {
                         Log.i("LXT_Log", "position: " + pos);
-                        food.setCountFood(quantity);
+                        foodModel.setCountFood(quantity);
 //                            adapterListener.onItemChange(pos,food);
-                        view.onSuccessSetFood(food, pos);
+                        view.onSuccessSetFood(foodModel, pos);
 
                     } else {
                         view.onFailSetFood();                    }

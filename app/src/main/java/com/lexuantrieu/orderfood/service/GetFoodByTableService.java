@@ -1,6 +1,6 @@
 package com.lexuantrieu.orderfood.service;
 
-import com.lexuantrieu.orderfood.model.Food;
+import com.lexuantrieu.orderfood.model.FoodModel;
 
 import java.util.List;
 
@@ -10,5 +10,5 @@ import retrofit2.http.Query;
 
 public interface GetFoodByTableService {
     @GET("getFoodByTable.php")
-    Observable<List<Food>> GetFoodByTable(@Query("tableid") int tableid);
+    Observable<List<FoodModel>> GetFoodByTable(@Query("tableid") int tableid);
 }

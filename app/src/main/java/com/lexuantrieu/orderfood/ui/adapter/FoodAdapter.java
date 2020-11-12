@@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lexuantrieu.orderfood.R;
-import com.lexuantrieu.orderfood.model.Food;
+import com.lexuantrieu.orderfood.model.FoodModel;
 import com.lexuantrieu.orderfood.ui.activity.ListFoodCustom;
 import com.lexuantrieu.orderfood.utils.LibraryString;
 import com.squareup.picasso.Callback;
@@ -32,22 +32,22 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     static String charConstraint = "";
     private static int TYPE_DEFAULT = 1;
     private static int TYPE_CUSTOM = 2;
-    private static ArrayList<Food> arrListFood;
-    private ArrayList<Food> arrListFoodFull;
+    private static ArrayList<FoodModel> arrListFoodModel;
+    private ArrayList<FoodModel> arrListFoodModelFull;
     private ListFoodCustom mContext;
 
     public FoodAdapter() {
     }
 
-    public FoodAdapter(ListFoodCustom context, ArrayList<Food> arrListFood) {
+    public FoodAdapter(ListFoodCustom context, ArrayList<FoodModel> arrListFoodModel) {
         this.mContext = context;
-        this.arrListFood = arrListFood;
-        this.arrListFoodFull = new ArrayList<>(arrListFood);
+        this.arrListFoodModel = arrListFoodModel;
+        this.arrListFoodModelFull = new ArrayList<>(arrListFoodModel);
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (arrListFood.get(position).getCountFood() > 0) {
+        if (arrListFoodModel.get(position).getCountFood() > 0) {
             return TYPE_DEFAULT;
         } else {
             return TYPE_CUSTOM;
@@ -70,15 +70,15 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (getItemViewType(position) == TYPE_DEFAULT) {
-            ((FoodAdapter.ViewHolder) holder).setHolderDefault(arrListFood.get(position),position);
+            ((FoodAdapter.ViewHolder) holder).setHolderDefault(arrListFoodModel.get(position), position);
         } else {
-            ((FoodAdapter.ViewHolderClone) holder).setHolderCustom(arrListFood.get(position),position);
+            ((FoodAdapter.ViewHolderClone) holder).setHolderCustom(arrListFoodModel.get(position), position);
         }
     }
 
     @Override
     public int getItemCount() {
-        return arrListFood.size();
+        return arrListFoodModel.size();
     }
 
     @Override
@@ -90,12 +90,12 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         protected FilterResults performFiltering(CharSequence constraint) {
             charConstraint = constraint.toString().toLowerCase().trim();
             charConstraint = LibraryString.covertStringToVN(charConstraint);
-            ArrayList<Food>  filterList = new ArrayList<>();
+            ArrayList<FoodModel> filterList = new ArrayList<>();
             if(charConstraint.isEmpty()) {
-                filterList.addAll(arrListFoodFull);
+                filterList.addAll(arrListFoodModelFull);
             } else {
-                for (Food foods : arrListFoodFull) {
-                    if(foods.getNameFoodNonVN().toLowerCase().contains(charConstraint)) {
+                for (FoodModel foods : arrListFoodModelFull) {
+                    if (foods.getNameFoodNonVN().toLowerCase().contains(charConstraint)) {
                         filterList.add(foods);
                     }
                 }
@@ -107,9 +107,9 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            arrListFood.clear();
-            arrListFood.addAll((Collection<? extends Food>) results.values);
-            Log.d("LXT_Log","Searched item: "+arrListFood.size());
+            arrListFoodModel.clear();
+            arrListFoodModel.addAll((Collection<? extends FoodModel>) results.values);
+            Log.d("LXT_Log", "Searched item: " + arrListFoodModel.size());
             notifyDataSetChanged();
         }
     };
@@ -130,15 +130,16 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             nameFood = itemView.findViewById(R.id.txtFoodName_itemOrder);
             unitPrice = itemView.findViewById(R.id.txtPriceFood_itemOrder);
             btnAdd = itemView.findViewById(R.id.buttonAdd_itemOrder);
-            btnSub =  itemView.findViewById(R.id.buttonSub_itemOrder);
+            btnSub = itemView.findViewById(R.id.buttonSub_itemOrder);
             edtCount = itemView.findViewById(R.id.edtCountFood_itemOrder);
             btnCmt = itemView.findViewById(R.id.buttonNote_itemOrder);
         }
-        void setHolderDefault(final Food food, final int position) {
-            nameFood.setText(food.getNameFood());
+
+        void setHolderDefault(final FoodModel foodModel, final int position) {
+            nameFood.setText(foodModel.getNameFood());
             DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
-            unitPrice.setText(decimalFormat.format(food.getPriceFood()));
-            String urlImage = food.getImageFood();
+            unitPrice.setText(decimalFormat.format(foodModel.getPriceFood()));
+            String urlImage = foodModel.getImageFood();
             Picasso.get()
                     .load(urlImage)
                     .placeholder(R.drawable.imagepreview)
@@ -151,12 +152,12 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
                         @Override
                         public void onError(Exception e) {
-                            Log.d("LXT_Error:", "LoadImage: " + food.getNameFood());
+                            Log.d("LXT_Error:", "LoadImage: " + foodModel.getNameFood());
                         }
                     });
-            edtCount.setText(String.valueOf(food.getCountFood()));
+            edtCount.setText(String.valueOf(foodModel.getCountFood()));
             //--------------------------------------------------------------------------------------
-            edtCount.setOnClickListener(v -> InputCountFood(food.getNameFood(), position));
+            edtCount.setOnClickListener(v -> InputCountFood(foodModel.getNameFood(), position));
             btnAdd.setOnClickListener(v -> ClickButtonAdd(position));
             btnSub.setOnClickListener(v -> ClickButtonSub(position));
 
@@ -187,7 +188,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         }
         //----------------------------------------------------------------------------------------------
         private void ClickButtonAdd(int position) {
-            int countTmp = arrListFood.get(position).getCountFood();
+            int countTmp = arrListFoodModel.get(position).getCountFood();
             if(countTmp < 99) {
                 countTmp++;
                 SetCountFood(position , countTmp);
@@ -197,7 +198,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         }
         //----------------------------------------------------------------------------------------------
         private void ClickButtonSub(int position) {
-            int countTmp = arrListFood.get(position).getCountFood();
+            int countTmp = arrListFoodModel.get(position).getCountFood();
             if(countTmp > 0) {
                 countTmp--;
                 SetCountFood(position , countTmp);
@@ -215,18 +216,19 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         private TextView unitPrice;
         private ImageButton btnChange;
 
-        public ViewHolderClone (View itemView) {
+        public ViewHolderClone(View itemView) {
             super(itemView);
             imgFood = itemView.findViewById(R.id.imgFood_itemOrder);
             nameFood = itemView.findViewById(R.id.txtFoodName_itemOrder);
             unitPrice = itemView.findViewById(R.id.txtPriceFood_itemOrder);
             btnChange = itemView.findViewById(R.id.buttonChange_itemOrder);
         }
-        void setHolderCustom(final Food food, final int position) {
-            nameFood.setText(food.getNameFood());
+
+        void setHolderCustom(final FoodModel foodModel, final int position) {
+            nameFood.setText(foodModel.getNameFood());
             DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
-            unitPrice.setText(decimalFormat.format(food.getPriceFood()));
-            String urlImage = food.getImageFood();
+            unitPrice.setText(decimalFormat.format(foodModel.getPriceFood()));
+            String urlImage = foodModel.getImageFood();
             Picasso.get()
                     .load(urlImage)
                     .placeholder(R.drawable.imagepreview)
@@ -249,6 +251,6 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
 
     private void SetCountFood(int position, int  quantity) {
-        mContext.SetCountFood(position,quantity,arrListFood.get(position));
+        mContext.SetCountFood(position, quantity, arrListFoodModel.get(position));
     }
 }

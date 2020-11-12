@@ -31,7 +31,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.lexuantrieu.orderfood.R;
-import com.lexuantrieu.orderfood.model.Category;
+import com.lexuantrieu.orderfood.model.CategoryModel;
 import com.lexuantrieu.orderfood.presenter.SetFoodPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.SetFoodPresenterImpl;
 import com.lexuantrieu.orderfood.service.APIUtils;
@@ -66,8 +66,8 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
     Button btnAdd;
     ProgressBar progressBar;
     final int REQUEST_CODE_CAMERA = 123, REQUEST_CODE_FOLDER = 456;
-    ArrayList<Category> arrayList;
-    ArrayAdapter<Category> adapter;
+    ArrayList<CategoryModel> arrayList;
+    ArrayAdapter<CategoryModel> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,7 +165,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
     }
 
     private void UploadFood() {
-        Category catItem = (Category) spnCategory.getSelectedItem();
+        CategoryModel catItem = (CategoryModel) spnCategory.getSelectedItem();
         int catid = catItem.getId();
         String nameFood = edtNameFood.getText().toString().trim();
         String slug = LibraryString.covertStringToSlug(nameFood);
@@ -372,9 +372,9 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
     }
 
     @Override
-    public void initAdapter(Context context, List<Category> listData) {
-        arrayList = (ArrayList<Category>) listData;
-        adapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,arrayList);
+    public void initAdapter(Context context, List<CategoryModel> listData) {
+        arrayList = (ArrayList<CategoryModel>) listData;
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, arrayList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     }
 
