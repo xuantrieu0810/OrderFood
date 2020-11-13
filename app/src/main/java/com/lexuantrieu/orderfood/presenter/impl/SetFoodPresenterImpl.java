@@ -29,9 +29,9 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 /*.filter(data->{
                     List<CategoryModel> list = data.getData();
-                    *//*for(CategoryModel t:list){
+                    for(CategoryModel t:list){
                         //custom data
-                    }*//*
+                    }
                     data.setData(list);
                     return true;
                 })*/

@@ -30,8 +30,8 @@ import java.util.Collection;
 
 public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
     static String charConstraint = "";
-    private static int TYPE_DEFAULT = 1;
-    private static int TYPE_CUSTOM = 2;
+    private static final int TYPE_DEFAULT = 1;
+    private static final int TYPE_CUSTOM = 2;
     private static ArrayList<FoodModel> arrListFoodModel;
     private ArrayList<FoodModel> arrListFoodModelFull;
     private ListFoodCustom mContext;

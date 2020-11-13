@@ -12,9 +12,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -35,6 +33,7 @@ import androidx.fragment.app.FragmentManager;
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.CategoryModel;
 import com.lexuantrieu.orderfood.presenter.SetFoodPresenter;
+import com.lexuantrieu.orderfood.presenter.impl.PriceFoodTextWatcher;
 import com.lexuantrieu.orderfood.presenter.impl.SetFoodPresenterImpl;
 import com.lexuantrieu.orderfood.service.APIUtils;
 import com.lexuantrieu.orderfood.service.DataClient;
@@ -55,7 +54,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SetFoodActivity extends AppCompatActivity implements SetFoodPresenter.View, TextWatcher {
+public class SetFoodActivity extends AppCompatActivity implements SetFoodPresenter.View {
 
     SetFoodPresenter presenter;
     ProgressDialog progressDialog;
@@ -102,6 +101,9 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
                 CheckNameFood();
             }
         });
+        // Create TextWatcher:
+        edtPriceFood.addTextChangedListener( new PriceFoodTextWatcher(this.edtPriceFood,this));
+        edtSaleFood.addTextChangedListener(new PriceFoodTextWatcher(this.edtSaleFood,this));
 
     }//end of onCreate
 
@@ -145,7 +147,6 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
     private void CheckNameFood() {
         String nameFood = edtNameFood.getText().toString().trim();
         String slug = LibraryString.covertStringToSlug(nameFood);
-        final boolean[] check = new boolean[1];
         DataClient dataClient = APIUtils.getData();
         Call<String> callback = dataClient.CheckExistsName(slug);
         callback.enqueue(new Callback<String>() {
@@ -283,10 +284,6 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         return path;
     }
 
-
-
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -386,45 +383,5 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         spnCategory.setAdapter(adapter);
     }
 
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-        try {
-            edtPriceFood.removeTextChangedListener(this);
-            String value = edtPriceFood.getText().toString();
-
-
-            if (value != null && !value.equals("")) {
-
-                if (value.startsWith(".")) {
-                    edtPriceFood.setText("0.");
-                }
-                if (value.startsWith("0") && !value.startsWith("0.")) {
-                    edtPriceFood.setText("");
-
-                }
-
-
-                String str = edtPriceFood.getText().toString().replaceAll(",", "");
-                if (!value.equals(""))
-                    edtPriceFood.setText(getDecimalFormattedString(str));
-                edtPriceFood.setSelection(edtPriceFood.getText().toString().length());
-            }
-            edtPriceFood.addTextChangedListener(this);
-            return;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            edtPriceFood.addTextChangedListener(this);
-        }
-
-    }
 }
