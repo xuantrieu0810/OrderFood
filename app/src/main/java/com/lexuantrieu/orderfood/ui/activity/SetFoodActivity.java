@@ -12,7 +12,9 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -53,7 +55,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SetFoodActivity extends AppCompatActivity implements SetFoodPresenter.View {
+public class SetFoodActivity extends AppCompatActivity implements SetFoodPresenter.View, TextWatcher {
 
     SetFoodPresenter presenter;
     ProgressDialog progressDialog;
@@ -100,6 +102,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
                 CheckNameFood();
             }
         });
+
     }//end of onCreate
 
     private void init() {
@@ -383,4 +386,45 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         spnCategory.setAdapter(adapter);
     }
 
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        try {
+            edtPriceFood.removeTextChangedListener(this);
+            String value = edtPriceFood.getText().toString();
+
+
+            if (value != null && !value.equals("")) {
+
+                if (value.startsWith(".")) {
+                    edtPriceFood.setText("0.");
+                }
+                if (value.startsWith("0") && !value.startsWith("0.")) {
+                    edtPriceFood.setText("");
+
+                }
+
+
+                String str = edtPriceFood.getText().toString().replaceAll(",", "");
+                if (!value.equals(""))
+                    edtPriceFood.setText(getDecimalFormattedString(str));
+                edtPriceFood.setSelection(edtPriceFood.getText().toString().length());
+            }
+            edtPriceFood.addTextChangedListener(this);
+            return;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            edtPriceFood.addTextChangedListener(this);
+        }
+
+    }
 }

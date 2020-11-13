@@ -161,6 +161,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             btnAdd.setOnClickListener(v -> ClickButtonAdd(position));
             btnSub.setOnClickListener(v -> ClickButtonSub(position));
 
+
         }
         //----------------------------------------------------------------------------------------------
         private void InputCountFood(String foodName, final int position) {

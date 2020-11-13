@@ -4,19 +4,19 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class ResponseModel<T> {
-    @SerializedName("token")
+    @SerializedName("error")
     @Expose
-    private String token;
+    private String error;
     @SerializedName("data")
     @Expose
     private T data = null;
 
-    public String getToken() {
-        return token;
+    public String getError() {
+        return error;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setError(String error) {
+        this.error = error;
     }
 
     public T getData() {

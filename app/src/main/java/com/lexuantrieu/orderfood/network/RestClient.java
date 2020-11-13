@@ -17,14 +17,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RestClient {
 
+    private static final String TOKEN_API = "";
     private static final String BASE_URL = Server.localhost;
-    private static Gson gson = new GsonBuilder().setLenient().create();;
+    private static Gson gson = new GsonBuilder().setLenient().create();
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create(gson)).client(getHttpClient().build());
-
+                    .addConverterFactory(GsonConverterFactory.create(gson)).client(getHttpClient().build()
+            );
 
     public static OkHttpClient.Builder getHttpClient() {
 
@@ -33,9 +34,19 @@ public class RestClient {
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);
+//        httpClient.addInterceptor(new Interceptor() {
+//            @NotNull
+//            @Override
+//            public Response intercept(@NotNull Chain chain) throws IOException {
+//                Request newRequest  = chain.request().newBuilder()
+//                        .addHeader("Authorization", "Bearer "+TOKEN_API)
+//                        .build();
+//                return chain.proceed(newRequest);
+//            }
+//        });
         httpClient
-                .readTimeout(5,TimeUnit.SECONDS)
-                .writeTimeout(5,TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .writeTimeout(5, TimeUnit.SECONDS)
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .pingInterval(1, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
@@ -43,17 +54,18 @@ public class RestClient {
                     @Override
                     public void callStart(Call call) {
                         super.callStart(call);
-                        Log.e("Start call", "Start");
+                        Log.e("LXT_Log", "Call Start");
                     }
 
                     @Override
                     public void callEnd(Call call) {
                         super.callEnd(call);
-                        Log.e("Stop call", "End");
+                        Log.e("LXT_Log", "Call End");
                     }
                 });
         return httpClient;
     }
+
 
     private static Retrofit retrofit = builder.build();
 
