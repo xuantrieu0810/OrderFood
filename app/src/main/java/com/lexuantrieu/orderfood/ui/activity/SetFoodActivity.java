@@ -194,6 +194,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
 
         DataClient dataClient = APIUtils.getData();
         Call<String> callback = dataClient.UploadPhoto(body);
+        onStartProcessBar("Đang thêm...");
         SwapStatus(-1);
         callback.enqueue(new Callback<String>() {
             @Override
@@ -212,23 +213,27 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
                             assert response.body() != null;
                             if(response.body().equals("success")){
                                 Toast.makeText(SetFoodActivity.this, "Đã thêm thành công.", Toast.LENGTH_SHORT).show();
+                                onStopProcessBar();
                                 SwapStatus(1);
                                 ClearContent();
                             } else {
                                 Toast.makeText(SetFoodActivity.this, "Xảy ra lỗi. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                                onStopProcessBar();
                                 SwapStatus(1);
                             }
                         }
                         @Override
                         public void onFailure(Call<String> call, Throwable t) {
                             Toast.makeText(SetFoodActivity.this, "Lỗi Network.", Toast.LENGTH_SHORT).show();
-                            Log.e("LXT_Error", "onFailure InsertFood :"+t.getMessage());
+                            Log.e("LXT_Error", "onFailure InsertFood :" + t.getMessage());
+                            onStopProcessBar();
                             SwapStatus(1);
                         }
                     });
                     //
                 } else {
                     Toast.makeText(SetFoodActivity.this, "Xảy ra lỗi. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                    onStopProcessBar();
                     SwapStatus(1);
                 }
             }
@@ -236,7 +241,8 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Toast.makeText(SetFoodActivity.this, "Lỗi Network.", Toast.LENGTH_SHORT).show();
-                Log.e("LXT_Error", "onFailure UploadImage:"+t.getMessage());
+                Log.e("LXT_Error", "onFailure UploadImage:" + t.getMessage());
+                onStopProcessBar();
                 SwapStatus(1);
             }
         });

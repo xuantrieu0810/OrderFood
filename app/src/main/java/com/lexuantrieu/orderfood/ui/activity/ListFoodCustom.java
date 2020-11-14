@@ -35,7 +35,6 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     RecyclerView recyclerView;
     ArrayList<FoodModel> arrayFoodModel;
     FoodAdapter adapter;
-//    FoodAdapterListener adapterListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +46,11 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
         recyclerView.setItemAnimator(null);
         recyclerView.setItemAnimator(null);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
-        if(CheckConnection.isNetworkAvailable(getApplicationContext())) {
+        if (CheckConnection.isNetworkAvailable(getApplicationContext())) {
             presenter.invokeData(tableID);
         } else {
             AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Không có internet", "Kết nối lại", resultOk -> {
-                if(resultOk == Activity.RESULT_OK) {
+                if (resultOk == Activity.RESULT_OK) {
                     presenter.invokeData(tableID);
                 } else {
                     finish();
@@ -63,7 +62,6 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     }
 
     private void init() {
-//        adapterListener = new FoodAdapter();
         presenter = new ListFoodCustomPresenterImpl(this, this);
         recyclerView = findViewById(R.id.recyclerViewSearch);
         progressDialog = new ProgressDialog(this);
@@ -97,7 +95,6 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-
             //-------------------------
             case android.R.id.home:
                 onBackPressed();
@@ -108,36 +105,7 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
         return super.onOptionsItemSelected(item);
     }
 
-//    private void GetDataWebSV(int tableID) {
-//        DataClient dataClient = APIUtils.getData();
-//        Call<List<Food>> callback = dataClient.GetFoodByTable(tableID);
-//        callback.enqueue(new Callback<List<Food>>() {
-//            @Override
-//            public void onResponse(Call<List<Food>> call, retrofit2.Response<List<Food>> response) {
-//                Log.i("LXT_Log", "onResponse GetFoodByTable: "+response.body());
-//                if(response.body() != null) {
-//                    arrayFood = (ArrayList<Food>) response.body();
-//                    for(Food f: arrayFood){
-////                        f.setNameFoodNonVN(covertToString(f.getNameFood()));
-//                    }
-//                    Log.i("LXT_Log", "arrayFood: "+arrayFood.size());
-//                    SetAdapter();
-//                } else {
-//                    Toast.makeText(ListFoodCustom.this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
-////                    ShowDialogConfirm();
-//                }
-////                progressDialog.dismiss();
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<Food>> call, Throwable t) {
-//
-//            }
-//        });
-//    }
-
     public void SetCountFood(int position, int quantity, FoodModel foodModel) {
-        int foodId = foodModel.getIdFood();
         int stt = foodModel.getStt();
         if (stt != -1 && foodModel.getStatusFood() == 0) {
             presenter.UpdateOrderList(tableID, foodModel, quantity, position);
@@ -145,50 +113,6 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
             presenter.InsertOrderList(tableID, foodModel, quantity, position);
         }
     }
-
-    private void InsertOrderList(final int idFood, final int quantity) {
-
-        {
-//        RequestQueue requestQueue = Volley.newRequestQueue(this);
-//        StringRequest stringRequest = new StringRequest(Request.Method.POST, Server.urlInsertOL,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        Log.d("LXT_LOG", "response:" + response.trim());
-//                        if (response.trim().equals("success")) {
-//                            Toast.makeText(ListFoodCustom.this, "Thêm thành công", Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Toast.makeText(ListFoodCustom.this, "Lỗi không thêm được", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        Log.d("LXT_LOG", error.toString());
-//                    }
-//                }
-//        ) {
-//            @Override
-//            protected Map<String, String> getParams() {
-//                Map<String, String> params = new HashMap<>();
-//                Log.d("LXT_LOG", "food: " + idFood + " quality:" + quantity);
-//                params.put("tableid", tableID + "");
-//                params.put("foodid", idFood + "");
-//                params.put("quantity", quantity + "");
-//                Log.d("LXT_LOG", params.toString());
-//                return params;
-//            }
-//        };
-//        Log.d("LXT_LOG", "stringRequest: " + stringRequest.toString());
-//        requestQueue.add(stringRequest);
-    }
-    }
-
-    private void UpdateOrderList(int stt, int idFood, int quantity) {
-
-    }
-
 
     @Override
     public void onInvokeDataSuccess() {
@@ -199,7 +123,7 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     public void onInvokeDataFail() {
         onStopProcessBar();
         AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
-            if(resultOk == Activity.RESULT_OK) {
+            if (resultOk == Activity.RESULT_OK) {
                 presenter.invokeData(tableID);
             } else {
                 finish();
@@ -248,6 +172,5 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     public void onSuccessSetFood(FoodModel foodModel, int pos) {
         arrayFoodModel.set(pos, foodModel);
         adapter.notifyItemChanged(pos);
-//        Toast.makeText(this, "Thành công", Toast.LENGTH_SHORT).show();
     }
 }

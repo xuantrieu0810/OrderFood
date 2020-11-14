@@ -17,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RestClient {
 
-    private static final String TOKEN_API = "";
+//    private static final String TOKEN_API = "";
     private static final String BASE_URL = Server.localhost;
     private static Gson gson = new GsonBuilder().setLenient().create();
     private static Retrofit.Builder builder =

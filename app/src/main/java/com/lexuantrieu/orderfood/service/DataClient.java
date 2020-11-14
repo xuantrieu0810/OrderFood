@@ -27,11 +27,6 @@ public interface DataClient {
             , @Field("status") int status);
 
     @FormUrlEncoded
-    @POST("insertOrderList.php")
-    Call<String> InsertOrderList(@Field("tableid") int tableid
-            , @Field("foodid") int foodid
-            , @Field("quantity") int quantity);
-    @FormUrlEncoded
     @POST("checkNameFood.php")
     Call<String> CheckExistsName(@Field("name") String name);
 }

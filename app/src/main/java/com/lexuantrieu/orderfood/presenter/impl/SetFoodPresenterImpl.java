@@ -15,7 +15,6 @@ import io.reactivex.schedulers.Schedulers;
 public class SetFoodPresenterImpl implements SetFoodPresenter {
     private Context context;
     private View view;
-    private static final String TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIiwiZnVsbG5hbWUiOiJMXHUwMGVhIFh1XHUwMGUybiBUcmlcdTFlYzF1IiwiZW1haWwiOiJ4dWFudHJpZXUwODEwQGdtYWlsLmNvbSIsImNyZWF0ZWRfYXQiOiIyMDIwLTExLTEyIDA1OjQ0OjM4In0.sw6q8HBeIirLwGg0SL_2Bsk7M6zdRyjIpV9UZjFzsd4";
     public SetFoodPresenterImpl(Context context, View view) {
         this.context = context;
         this.view = view;
@@ -25,7 +24,7 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
     public void invokeData() {
         view.onInvokeDataPending();
         GetCategoryService service = RestClient.createService(GetCategoryService.class);
-        service.getCategory("Bearer " + Server.TOKEN, TOKEN).subscribeOn(Schedulers.io())
+        service.getCategory("Bearer " + Server.TOKEN, "TOKEN_STRING_FOR_GET_METHOD").subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 /*.filter(data->{
                     List<CategoryModel> list = data.getData();
