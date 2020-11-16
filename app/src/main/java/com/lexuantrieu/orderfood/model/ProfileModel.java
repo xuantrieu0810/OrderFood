@@ -13,6 +13,17 @@ public class ProfileModel {
     @SerializedName("role")
     @Expose
     private Integer role;
+    @SerializedName("token")
+    @Expose
+    private String token;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     public String getUsername() {
         return username;
