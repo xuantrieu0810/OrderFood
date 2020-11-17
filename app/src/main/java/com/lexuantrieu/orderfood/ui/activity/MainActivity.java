@@ -3,29 +3,97 @@ package com.lexuantrieu.orderfood.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.lexuantrieu.orderfood.R;
+import com.lexuantrieu.orderfood.model.room.User;
+import com.lexuantrieu.orderfood.model.room.database.AppDatabase;
+import com.lexuantrieu.orderfood.presenter.MainActivityPresenter;
+import com.lexuantrieu.orderfood.presenter.impl.MainActivityPresenterImpl;
 
-public class MainActivity extends AppCompatActivity {
-
-    Button btnGet, btnSet;
+public class MainActivity extends AppCompatActivity implements MainActivityPresenter.View {
+    private AppDatabase db;
+    TextView txtUsername, txtFullname, txtRole, txtToken;
+    Button btnGet, btnSet, btnLogout;
+    MainActivityPresenter presenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        btnGet = findViewById(R.id.btnListFood);
-        btnSet = findViewById(R.id.btnSetFood);
-
+        init();
+        presenter.invokeData();
 
         btnSet.setOnClickListener(view -> {
-            Intent intent1 = new Intent(MainActivity.this,SetFoodActivity.class);
-            startActivity(intent1);
+            Intent intent = new Intent(MainActivity.this,SetFoodActivity.class);
+            startActivity(intent);
         });
         btnGet.setOnClickListener(view -> {
-            Intent intent12 = new Intent(MainActivity.this,ListFoodCustom.class);
-            startActivity(intent12);
+            Intent intent = new Intent(MainActivity.this,ListFoodCustom.class);
+            startActivity(intent);
         });
+        btnLogout.setOnClickListener(view -> {
+            presenter.onLogout();
+        });
+    }
+
+    private void init() {
+        db = AppDatabase.getInstance(this);
+        presenter = new MainActivityPresenterImpl(this,this);
+        btnGet = findViewById(R.id.btnListFood);
+        btnSet = findViewById(R.id.btnSetFood);
+        btnLogout = findViewById(R.id.btn_logout);
+        txtUsername = findViewById(R.id.txt_username);
+        txtFullname = findViewById(R.id.txt_fullname);
+        txtRole = findViewById(R.id.txt_role);
+        txtToken = findViewById(R.id.txt_token);
+    }
+
+    @Override
+    public void onLogoutSuccess() {
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onLogoutFail() {
+        Toast.makeText(this, "Không thể đăng xuất", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onInvokeDataSuccess(User user) {
+        txtUsername.setText("Username: "+user.getUsername());
+        txtFullname.setText("Tên: "+user.getFullname());
+        txtToken.setText("Token: "+user.getToken());
+        switch (user.getRole()){
+            case 1:
+                txtRole.setText("Vai trò: Phục vụ");
+                break;
+            case 2:
+                txtRole.setText("Vai trò: Đầu bếp");
+                break;
+            default:
+                txtRole.setText("Vai trò: Quản lý");
+                break;
+        }
+    }
+
+    @Override
+    public void onInvokeDataFail() {
+        Toast.makeText(this, "Lỗi load User", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStartProcessBar(String message) {
+
+    }
+
+    @Override
+    public void onStopProcessBar() {
+
     }
 }

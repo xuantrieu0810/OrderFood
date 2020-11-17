@@ -27,7 +27,7 @@ import com.squareup.picasso.Picasso;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-
+@SuppressWarnings("unchecked")
 public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
     static String charConstraint = "";
     private static final int TYPE_DEFAULT = 1;
@@ -36,8 +36,6 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     private ArrayList<FoodModel> arrListFoodModelFull;
     private ListFoodCustom mContext;
 
-    public FoodAdapter() {
-    }
 
     public FoodAdapter(ListFoodCustom context, ArrayList<FoodModel> arrListFoodModel) {
         this.mContext = context;

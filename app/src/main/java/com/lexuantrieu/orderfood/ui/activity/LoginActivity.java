@@ -12,19 +12,26 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.lexuantrieu.orderfood.R;
+import com.lexuantrieu.orderfood.model.room.database.AppDatabase;
 import com.lexuantrieu.orderfood.presenter.LoginPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.LoginPresenterImpl;
 
 public class LoginActivity extends AppCompatActivity implements LoginPresenter.View {
+
+    private AppDatabase db;
     private ProgressDialog dialog;
     private LoginPresenter loginPresenter;
     private EditText edt_username;
     private EditText edt_password;
     private Button btn_login;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        db = AppDatabase.getInstance(this);
+        loginPresenter = new LoginPresenterImpl(this,this,db);
+        loginPresenter.onCheckToken();
         init();
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -34,6 +41,7 @@ public class LoginActivity extends AppCompatActivity implements LoginPresenter.V
         });
     }
 
+
     @Override
     public void onLoginPending() {
         onStartProcessBar("Đợi chút...");
@@ -41,8 +49,9 @@ public class LoginActivity extends AppCompatActivity implements LoginPresenter.V
 
     @Override
     public void onLoginSuccess() {
-        startActivity(new Intent(LoginActivity.this,MainActivity.class));
-        this.finish();
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -70,8 +79,8 @@ public class LoginActivity extends AppCompatActivity implements LoginPresenter.V
     }
 
     private void init(){
+
         dialog = new ProgressDialog(this);
-        loginPresenter = new LoginPresenterImpl(this,this);
         edt_username=findViewById(R.id.edt_username);
         edt_password=findViewById(R.id.edt_password);
         btn_login=findViewById(R.id.btn_login);

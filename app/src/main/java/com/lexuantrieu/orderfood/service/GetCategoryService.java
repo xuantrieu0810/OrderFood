@@ -8,7 +8,6 @@ import java.util.List;
 import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
-import retrofit2.http.Query;
 
 public interface GetCategoryService {
 /*
@@ -17,8 +16,7 @@ public interface GetCategoryService {
 
     @GET("getCategory.php")
     Observable<ResponseModel<List<CategoryModel>>> getCategory(
-            @Header("Authorization") String authHeader,
-            @Query("tokenGET") String token
+            @Header("Authorization") String authHeader
     );
 /*
     @POST("usersInfo/Authenticate")

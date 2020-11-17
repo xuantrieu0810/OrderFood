@@ -24,7 +24,7 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
     public void invokeData() {
         view.onInvokeDataPending();
         GetCategoryService service = RestClient.createService(GetCategoryService.class);
-        service.getCategory("Bearer " + Server.TOKEN, "TOKEN_STRING_FOR_GET_METHOD").subscribeOn(Schedulers.io())
+        service.getCategory("Bearer " + Server.TOKEN).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 /*.filter(data->{
                     List<CategoryModel> list = data.getData();
