@@ -40,6 +40,12 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_food_custom);
+//        //-----------------------------------------------------------
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.setTitle("Thực đơn");
+//        actionBar.setSubtitle("[Bàn ..]");
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
+//        //-----------------------------------------------------------
         init();
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);

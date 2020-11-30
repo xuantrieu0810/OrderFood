@@ -26,6 +26,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
@@ -74,6 +75,11 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_food);
+        //-----------------------------------------------------------
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Kho hàng");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
+        //-----------------------------------------------------------
         init();
         presenter.invokeData();
         btnCamera.setOnClickListener(v -> ActivityCompat.requestPermissions(
