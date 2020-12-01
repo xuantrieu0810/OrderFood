@@ -45,11 +45,12 @@ public class MainActivityPresenterImpl implements MainActivityPresenter {
 
     @Override
     public void onLogout() {
+        view.onLogoutPending();
         LogoutService service = RestClient.createService(LogoutService.class);
         service.requetLogout("Bearer " + Server.TOKEN, user.getUsername()).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response-> {
-                    Log.e("LXT_Log", response.toString());
+//                    Log.i("LXT_Log", new Gson().toJson(response));
                     if (response.getError().equals("null")) {
                         Server.TOKEN = null;
                         //

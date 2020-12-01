@@ -4,19 +4,24 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
+import com.lexuantrieu.orderfood.R;
+import com.lexuantrieu.orderfood.model.TableModel;
 import com.lexuantrieu.orderfood.network.RestClient;
 import com.lexuantrieu.orderfood.network.Server;
-import com.lexuantrieu.orderfood.presenter.SetFoodPresenter;
-import com.lexuantrieu.orderfood.service.GetCategoryService;
+import com.lexuantrieu.orderfood.presenter.ListTableActivityPresenter;
+import com.lexuantrieu.orderfood.service.GetListTableService;
+
+import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class SetFoodPresenterImpl implements SetFoodPresenter {
+public class ListTableActivityPresenterImpl implements ListTableActivityPresenter {
+
     private Context context;
-    private View view;
-    public SetFoodPresenterImpl(Context context, View view) {
+    private ListTableActivityPresenterImpl.View view;
+
+    public ListTableActivityPresenterImpl(Context context, ListTableActivityPresenterImpl.View view) {
         this.context = context;
         this.view = view;
     }
@@ -24,14 +29,21 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
     @Override
     public void invokeData() {
         view.onInvokeDataPending();
-        GetCategoryService service = RestClient.createService(GetCategoryService.class);
-        service.getCategory("Bearer " + Server.TOKEN).subscribeOn(Schedulers.io())
+        GetListTableService service = RestClient.createService(GetListTableService.class);
+        service.getListTable("Bearer " + Server.TOKEN).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response-> {
-                    Log.e("LXT_Log", new Gson().toJson(response));
+                .filter(data->{
+                    List<TableModel> list = data.getData();
+                    for(TableModel m: list){
+                        m.setImage(R.drawable.imagepreview);
+                    }
+                    return true;
+                })
+                .subscribe(response->{
+//                    Log.e("LXT_Log", new Gson().toJson(response));
                     if (response.getError().equals("null")) {
                         view.initAdapter(context, response.getData());
-                        view.initSpinner();
+                        view.initGridView();
                         view.onInvokeDataSuccess();
                     } else {
                         view.onInvokeDataFail();

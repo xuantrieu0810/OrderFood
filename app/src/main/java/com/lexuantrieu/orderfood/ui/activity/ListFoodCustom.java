@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.FragmentManager;
@@ -31,7 +32,8 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
 
     ListFoodCustomPresenter presenter;
     ProgressDialog progressDialog;
-    int tableID = 9; //default = -1
+    int tableID = -1; //default = -1
+    String tableName;
     RecyclerView recyclerView;
     ArrayList<FoodModel> arrayFoodModel;
     FoodAdapter adapter;
@@ -40,11 +42,21 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_food_custom);
-//        //-----------------------------------------------------------
-//        ActionBar actionBar = getSupportActionBar();
-//        actionBar.setTitle("Thực đơn");
-//        actionBar.setSubtitle("[Bàn ..]");
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
+        //-----------------------------------------------------------
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            tableName = bundle.getString("tableName");
+            tableID = bundle.getInt("tableId");
+        } else {
+            finish();
+            Toast.makeText(this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //-----------------------------------------------------------
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Thực đơn");
+        actionBar.setSubtitle(tableName);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
 //        //-----------------------------------------------------------
         init();
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -90,25 +102,11 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
                 adapter.getFilter().filter(newText);
                 return false;
             }
         });
         return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            //-------------------------
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public void SetCountFood(int position, int quantity, FoodModel foodModel) {
@@ -133,10 +131,11 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
                 presenter.invokeData(tableID);
             } else {
                 finish();
+                onBackPressed();
             }
         });
         FragmentManager fragmentManager = this.getSupportFragmentManager();
-        dialogFragment.show(fragmentManager, "Dialog");
+        dialogFragment.show(fragmentManager, "DialogListFood");
     }
 
     @Override
@@ -179,4 +178,25 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
         arrayFoodModel.set(pos, foodModel);
         adapter.notifyItemChanged(pos);
     }
+
+    //------------------------------------------------------------------------------------
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            //-------------------------
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        onStopProcessBar();
+        presenter.invokeData(tableID);
+    }
+    //------------------------------------------------------------------------------------
 }

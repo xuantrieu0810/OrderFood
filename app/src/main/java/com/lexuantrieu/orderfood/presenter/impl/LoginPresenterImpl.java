@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class LoginPresenterImpl implements LoginPresenter {
@@ -38,20 +37,22 @@ public class LoginPresenterImpl implements LoginPresenter {
 
     @Override
     public void onCheckToken() {
-        Disposable subscribe = db.getUserDao().getListUser().subscribeOn(Schedulers.io())
+        view.onStartProcessBar("Loading...");
+        db.getUserDao().getListUser().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
-                    if (response.size() == 1) {
+                    if (response.get(0).getToken() != null) {
                         Server.TOKEN = response.get(0).getToken();
                         view.onLoginSuccess();
                     }
                 }, throwable -> {
+                    view.onStopProcessBar();
                     throwable.printStackTrace();
                 });
     }
 
     @Override
-    public void onLogin(String username, String password) {
+    public void requestLogin(String username, String password) {
         String passwordSHA1 = null;
         try {
             passwordSHA1 = LibraryString.SHA1(password);
@@ -62,8 +63,6 @@ public class LoginPresenterImpl implements LoginPresenter {
         }
         view.onLoginPending();
         LoginService service = RestClient.createService(LoginService.class);
-        String finalPasswordSHA = passwordSHA1;
-        Log.e("LXT_Log", "pass: " + finalPasswordSHA);
         service.requetLogin(username, passwordSHA1).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
@@ -72,16 +71,14 @@ public class LoginPresenterImpl implements LoginPresenter {
                         User user = new User(mUser.getUsername(),mUser.getFullname(),mUser.getRole(),mUser.getToken());
                         db.getUserDao().insertNote(user);
                         Server.TOKEN = user.getToken();
-                        view.onStopProcessBar();
                         view.onLoginSuccess();
+                        return;
                     } else {
                         view.onLoginFail();
                         Log.e("LXT_Log", "ErrorCode: " + response.getError());
-                        Log.e("LXT_Log", "pass: " + finalPasswordSHA);
                     }
                 }, throwable -> {
                     throwable.printStackTrace();
-                    view.onLoginFail();
                 });
 
     }

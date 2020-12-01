@@ -1,65 +1,71 @@
 package com.lexuantrieu.orderfood.ui.activity;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.lexuantrieu.orderfood.R;
-import com.lexuantrieu.orderfood.model.room.TableModel;
+import com.lexuantrieu.orderfood.model.TableModel;
+import com.lexuantrieu.orderfood.presenter.ListTableActivityPresenter;
+import com.lexuantrieu.orderfood.presenter.impl.ListTableActivityPresenterImpl;
 import com.lexuantrieu.orderfood.ui.adapter.TableAdapter;
+import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class ListTableActivity extends AppCompatActivity {
+public class ListTableActivity extends AppCompatActivity implements ListTableActivityPresenter.View {
 
-    public static int idTableClick = -1;
-    public static String nameTableClick;
-    public static int idBill = -1;
-    GridView gvTable;
+    ListTableActivityPresenter presenter;
+    ProgressDialog progressDialog;
+    GridView gridView;
     ArrayList<TableModel> arrayTable;
-    TableAdapter tableAdapter;
+    TableAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_table);
-        //-----------------------------------------------
+        //---------------------------------------------------------------
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("Bàn ăn");
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
-        //----------------------------------------------------------
-        //------------------------------------------------------------------------------------------
-        gvTable = (GridView) findViewById(R.id.gridviewTable);
-        arrayTable = new ArrayList<>();
-        tableAdapter = new TableAdapter(this, R.layout.item_table_cell, arrayTable);
-        gvTable.setAdapter(tableAdapter);
-        GetListTable();//Set Database into GridView
-        tableAdapter.notifyDataSetChanged();
-        //------------------------------------------------------------------------------------------
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
+        //---------------------------------------------------------------
+        init();
+        presenter.invokeData();
+        //---------------------------------------------------------------
         //Event click on GridView
-        gvTable.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(ListTableActivity.this, OrderActivity.class);
-                idTableClick = arrayTable.get(position).getIdTable();
-                nameTableClick = arrayTable.get(position).getNameTable();
+                Intent intent = new Intent(ListTableActivity.this, ListFoodCustom.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("tableId",arrayTable.get(position).getId());
+                bundle.putString("tableName",arrayTable.get(position).getName());
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
-        registerForContextMenu(gvTable);
+        registerForContextMenu(gridView);
     }//end onCreate
+    private void init() {
+        presenter = new ListTableActivityPresenterImpl(this, this);
+        progressDialog = new ProgressDialog(this);
+        gridView = (GridView) findViewById(R.id.gridviewTable);
+    }
     //----------------------------------------------------------------------------------------------
+    /*
     private void GetListTable() {
         Cursor cursor = MainActivity.database.GetData("SELECT * FROM TableFood");
         arrayTable.clear();
@@ -82,9 +88,11 @@ public class ListTableActivity extends AppCompatActivity {
                     break;
             }
         }
-        tableAdapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
     }
+    */
     //----------------------------------------------------------------------------------------------
+    /*
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -149,44 +157,84 @@ public class ListTableActivity extends AppCompatActivity {
         return super.onContextItemSelected(item);
     }
 
-    //Create menu on MainActivity
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_in_gridtable, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
+    */
+
+//    //Create menu on MainActivity
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_in_gridtable, menu);
+//        return super.onCreateOptionsMenu(menu);
+//    }
     //----------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
+
+
+    @Override
+    public void onInvokeDataSuccess() {
+        onStopProcessBar();
+    }
+
+    @Override
+    public void onInvokeDataFail() {
+        onStopProcessBar();
+        AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
+            if (resultOk == Activity.RESULT_OK) {
+                presenter.invokeData();
+            } else {
+                finish();
+                onBackPressed();
+            }
+        });
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+        dialogFragment.show(fragmentManager, "DialogListTable");
+    }
+
+    @Override
+    public void onInvokeDataPending() {
+        onStartProcessBar("Chờ chút...");
+    }
+
+    @Override
+    public void onStartProcessBar(String message) {
+        progressDialog.setMessage(message);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    @Override
+    public void onStopProcessBar() {
+        progressDialog.dismiss();
+    }
+
+
+    @Override
+    public void initAdapter(Context context, List<TableModel> listData) {
+        arrayTable = (ArrayList<TableModel>) listData;
+        adapter = new TableAdapter(this, arrayTable);
+    }
+
+    @Override
+    public void initGridView() {
+        gridView.setAdapter(adapter);
+    }
+    //------------------------------------------------------------------------------------
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menuRefreshTable:
-                CheckStatusTable();
-                Toast.makeText(this, "Refresh", Toast.LENGTH_SHORT).show();
+            //-------------------------
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
-
-    private void CheckStatusTable() {
-        MainActivity.database.QueryData("UPDATE TableFood SET Status = 0");
-
-        MainActivity.database.QueryData("UPDATE TableFood SET Status = 3 WHERE Status = 0 AND idTable IN (SELECT idTable FROM Bill WHERE statusBill = 0)");
-        Cursor cursor = MainActivity.database.GetData("SELECT idTable, idBill FROM Bill WHERE statusBill = 0");
-        while (cursor.moveToNext()) {
-
-            MainActivity.database.QueryData("UPDATE TableFood SET Status = 2 " +
-                    "WHERE idTable = "+cursor.getInt(0)+" AND  EXISTS (SELECT * FROM OrderedDetails  " +
-                    "WHERE idBill = "+cursor.getInt(1)+" AND Status > 0 AND Status < 4)");
-            MainActivity.database.QueryData("UPDATE TableFood SET Status = 1 " +
-                    "WHERE idTable = "+cursor.getInt(0)+" AND NOT EXISTS (SELECT * FROM OrderedDetails  " +
-                    "WHERE idBill = "+cursor.getInt(1)+" AND Status > 0)");
-        }
-        GetListTable();
-    }
-    //----------------------------------------------------------------------------------------------
     @Override
     protected void onResume() {
         super.onResume();
-        GetListTable();
+        onStopProcessBar();
+        presenter.invokeData();
     }
+    //------------------------------------------------------------------------------------
 }

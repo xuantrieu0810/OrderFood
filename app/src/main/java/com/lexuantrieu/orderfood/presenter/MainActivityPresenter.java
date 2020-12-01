@@ -6,6 +6,7 @@ public interface MainActivityPresenter {
     void invokeData();
     void onLogout();
     interface View{
+        void onLogoutPending();
         void onLogoutSuccess();
         void onLogoutFail();
         void onInvokeDataSuccess(User user);

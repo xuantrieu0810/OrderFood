@@ -3,6 +3,7 @@ package com.lexuantrieu.orderfood.ui.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,39 +19,41 @@ import com.lexuantrieu.orderfood.presenter.impl.LoginPresenterImpl;
 
 public class LoginActivity extends AppCompatActivity implements LoginPresenter.View {
 
+    public static int counttmp = 0;
     private AppDatabase db;
     private ProgressDialog dialog;
     private LoginPresenter loginPresenter;
     private EditText edt_username;
     private EditText edt_password;
     private Button btn_login;
+    private Intent intentMain;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        db = AppDatabase.getInstance(this);
-        loginPresenter = new LoginPresenterImpl(this,this,db);
-        loginPresenter.onCheckToken();
         init();
+        loginPresenter.onCheckToken();// check token local
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestLogin(edt_username.getText().toString(),edt_password.getText().toString());
+                loginPresenter.requestLogin(edt_username.getText().toString(),edt_password.getText().toString());
             }
         });
     }
 
-
     @Override
-    public void onLoginPending() {
-        onStartProcessBar("Đợi chút...");
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("LXT_Log","finish LoginActivity");
     }
 
     @Override
     public void onLoginSuccess() {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
+        onStopProcessBar();
+        Log.e("LXT_Log","start MainActivity");
+
+        startActivity(new Intent(LoginActivity.this, MainActivity.class));
         finish();
     }
 
@@ -58,6 +61,11 @@ public class LoginActivity extends AppCompatActivity implements LoginPresenter.V
     public void onLoginFail() {
         onStopProcessBar();
         Toast.makeText(this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onLoginPending() {
+        onStartProcessBar("Đang đăng nhập...");
     }
 
     @Override
@@ -72,14 +80,9 @@ public class LoginActivity extends AppCompatActivity implements LoginPresenter.V
         dialog.dismiss();
     }
 
-    @Override
-    public void requestLogin(String username, String password) {
-        loginPresenter.onLogin(username,password);
-
-    }
-
     private void init(){
-
+        db = AppDatabase.getInstance(this);
+        loginPresenter = new LoginPresenterImpl(this,this,db);
         dialog = new ProgressDialog(this);
         edt_username=findViewById(R.id.edt_username);
         edt_password=findViewById(R.id.edt_password);

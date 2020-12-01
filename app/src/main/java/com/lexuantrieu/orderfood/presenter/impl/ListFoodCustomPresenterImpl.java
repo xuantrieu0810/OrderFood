@@ -2,6 +2,7 @@ package com.lexuantrieu.orderfood.presenter.impl;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.lexuantrieu.orderfood.model.FoodModel;
 import com.lexuantrieu.orderfood.network.RestClient;
@@ -47,7 +48,9 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
                         view.onInvokeDataSuccess();
                     }
                     else {
+
                         view.onInvokeDataFail();
+                        Toast.makeText(context, "ErrorCode: " + response, Toast.LENGTH_SHORT).show();
                     }
                 },throwable -> {
                     view.onInvokeDataFail();

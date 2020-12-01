@@ -2,6 +2,7 @@ package com.lexuantrieu.orderfood.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +16,7 @@ import com.lexuantrieu.orderfood.presenter.MainActivityPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.MainActivityPresenterImpl;
 
 public class MainActivity extends AppCompatActivity implements MainActivityPresenter.View {
+
     private AppDatabase db;
     TextView txtUsername, txtFullname, txtRole, txtToken;
     Button btnGet, btnSet, btnLogout;
@@ -24,14 +26,14 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
-        presenter.invokeData();
+        presenter.invokeData();// kiem tra user trong database local
 
         btnSet.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this,SetFoodActivity.class);
             startActivity(intent);
         });
         btnGet.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this,ListFoodCustom.class);
+            Intent intent = new Intent(MainActivity.this,ListTableActivity.class);
             startActivity(intent);
         });
         btnLogout.setOnClickListener(view -> {
@@ -52,16 +54,29 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
     }
 
     @Override
+    public void onLogoutPending() {
+        onStartProcessBar("Đang đăng xuất...");
+    }
+
+    @Override
     public void onLogoutSuccess() {
+        onStopProcessBar();
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+        Log.e("LXT_Log","start LoginActivity");
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("LXT_Log","finish MainActivity");
     }
 
     @Override
     public void onLogoutFail() {
-        Toast.makeText(this, "Không thể đăng xuất", Toast.LENGTH_SHORT).show();
+        onStopProcessBar();
+        Toast.makeText(this, "Lỗi đăng xuất", Toast.LENGTH_SHORT).show();
     }
 
     @Override
