@@ -8,7 +8,6 @@ import com.lexuantrieu.orderfood.model.ProfileModel;
 import com.lexuantrieu.orderfood.model.room.User;
 import com.lexuantrieu.orderfood.model.room.database.AppDatabase;
 import com.lexuantrieu.orderfood.network.RestClient;
-import com.lexuantrieu.orderfood.network.Server;
 import com.lexuantrieu.orderfood.presenter.LoginPresenter;
 import com.lexuantrieu.orderfood.service.LoginService;
 import com.lexuantrieu.orderfood.utils.LibraryString;
@@ -42,9 +41,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     if (response.get(0).getToken() != null) {
-                        Server.TOKEN = response.get(0).getToken();
-                        view.onLoginSuccess();
-                    }
+                        view.onLoginSuccess();                    }
                 }, throwable -> {
                     view.onStopProcessBar();
                     throwable.printStackTrace();
@@ -70,7 +67,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                         ProfileModel mUser = response.getData();
                         User user = new User(mUser.getUsername(),mUser.getFullname(),mUser.getRole(),mUser.getToken());
                         db.getUserDao().insertNote(user);
-                        Server.TOKEN = user.getToken();
+                        //Luu token
                         view.onLoginSuccess();
                         return;
                     } else {

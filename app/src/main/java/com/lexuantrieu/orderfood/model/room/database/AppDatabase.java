@@ -2,12 +2,9 @@ package com.lexuantrieu.orderfood.model.room.database;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.room.migration.Migration;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.lexuantrieu.orderfood.model.room.User;
 import com.lexuantrieu.orderfood.model.room.dao.UserDao;
@@ -35,7 +32,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 .build();
 
     }
-
+/*
     private static Migration Migration_1_to_2 = new Migration(1,2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -62,4 +59,6 @@ public abstract class AppDatabase extends RoomDatabase {
                     + " ADD COLUMN ableToDelete INTEGER NOT NULL DEFAULT 0");
         }
     };
+
+ */
 }

@@ -6,7 +6,6 @@ import android.util.Log;
 import com.lexuantrieu.orderfood.model.room.User;
 import com.lexuantrieu.orderfood.model.room.database.AppDatabase;
 import com.lexuantrieu.orderfood.network.RestClient;
-import com.lexuantrieu.orderfood.network.Server;
 import com.lexuantrieu.orderfood.presenter.MainActivityPresenter;
 import com.lexuantrieu.orderfood.service.LogoutService;
 
@@ -47,13 +46,12 @@ public class MainActivityPresenterImpl implements MainActivityPresenter {
     public void onLogout() {
         view.onLogoutPending();
         LogoutService service = RestClient.createService(LogoutService.class);
-        service.requetLogout("Bearer " + Server.TOKEN, user.getUsername()).subscribeOn(Schedulers.io())
+        service.requetLogout("Bearer " + user.getToken(), user.getUsername()).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response-> {
 //                    Log.i("LXT_Log", new Gson().toJson(response));
                     if (response.getError().equals("null")) {
-                        Server.TOKEN = null;
-                        //
+                        //Xoa token
                         db.getUserDao().deleteUserById(user.getId()).subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(res->{

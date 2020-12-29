@@ -5,8 +5,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.lexuantrieu.orderfood.model.room.User;
+import com.lexuantrieu.orderfood.model.room.database.AppDatabase;
 import com.lexuantrieu.orderfood.network.RestClient;
-import com.lexuantrieu.orderfood.network.Server;
 import com.lexuantrieu.orderfood.presenter.SetFoodPresenter;
 import com.lexuantrieu.orderfood.service.GetCategoryService;
 
@@ -24,8 +25,29 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
     @Override
     public void invokeData() {
         view.onInvokeDataPending();
+        //Lay token
+        AppDatabase db = AppDatabase.getInstance(context);
+        db.getUserDao().getListUser().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(response -> {
+                    User user = (User) response.get(0);
+                    if(user != null){
+                        CallService(user.getToken());
+                    } else {
+                        view.onInvokeDataFail();
+                        Log.e("LXT_Log", "ErrorCode: " + response);
+                        Toast.makeText(context, "ErrorCode: " + response, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                });
+        //-end
+    }
+
+    private void CallService(String token) {
         GetCategoryService service = RestClient.createService(GetCategoryService.class);
-        service.getCategory("Bearer " + Server.TOKEN).subscribeOn(Schedulers.io())
+        service.getCategory("Bearer " + token).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response-> {
                     Log.e("LXT_Log", new Gson().toJson(response));
@@ -37,6 +59,7 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
                         view.onInvokeDataFail();
                         Log.e("LXT_Log", "ErrorCode: " + response.getError());
                         Toast.makeText(context, "ErrorCode: " + response.getError(), Toast.LENGTH_SHORT).show();
+                        return;
                     }
                 },throwable -> {
                     view.onInvokeDataFail();
