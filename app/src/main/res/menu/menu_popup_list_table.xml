@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--    <item-->
+    <!--        android:title="Hoá đơn"-->
+    <!--        android:id="@+id/menu_showBill"/>-->
+    <item
+        android:title="@string/pay"
+        android:id="@+id/menu_pay"/>
+    <item
+        android:title="@string/ordered"
+        android:id="@+id/menu_ordered"/>
+    <item
+        android:title="@string/mark_empty"
+        android:id="@+id/menu_table_empty"/>
+
+
+</menu>

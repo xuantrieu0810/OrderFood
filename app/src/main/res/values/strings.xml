@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Đặt món</string>
+    <string name="pay">Thanh toán</string>
+    <string name="ordered">Món đã đặt</string>
+    <string name="mark_empty">Đánh dấu bàn trống</string>
+    <string name="name_rest">XT-Food</string>
+    <string name="account">Tài khoản</string>
+    <string name="admin">admin</string>
+    <string name="password">Mật khẩu</string>
+    <string name="login">Login</string>
 </resources>

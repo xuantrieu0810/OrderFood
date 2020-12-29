@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -32,7 +33,9 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
     GridView gridView;
     ArrayList<TableModel> arrayTable;
     TableAdapter adapter;
-
+//
+    int idTableSelected;
+    String nameTableSelected;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,23 +49,20 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
         presenter.invokeData();
         //---------------------------------------------------------------
         //Event click on GridView
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(ListTableActivity.this, ListFoodCustom.class);
-                Bundle bundle = new Bundle();
-                bundle.putInt("tableId",arrayTable.get(position).getId());
-                bundle.putString("tableName",arrayTable.get(position).getName());
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
+        gridView.setOnItemClickListener((parent, view, position, id) -> {
+            Intent intent = new Intent(ListTableActivity.this, ListFoodCustom.class);
+            Bundle bundle = new Bundle();
+            bundle.putInt("tableId",arrayTable.get(position).getId());
+            bundle.putString("tableName",arrayTable.get(position).getName());
+            intent.putExtras(bundle);
+            startActivity(intent);
         });
         registerForContextMenu(gridView);
     }//end onCreate
     private void init() {
         presenter = new ListTableActivityPresenterImpl(this, this);
         progressDialog = new ProgressDialog(this);
-        gridView = (GridView) findViewById(R.id.gridviewTable);
+        gridView = findViewById(R.id.gridviewTable);
     }
     //----------------------------------------------------------------------------------------------
     /*
@@ -92,72 +92,80 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
     }
     */
     //----------------------------------------------------------------------------------------------
-    /*
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        getMenuInflater().inflate(R.menu.menu_popup_in_gridview, menu);
+        getMenuInflater().inflate(R.menu.menu_popup_list_table, menu);
         // Get the list item position
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int position = info.position;
-        idTableClick = arrayTable.get(position).getIdTable();
-        nameTableClick = arrayTable.get(position).getNameTable();
-        menu.setHeaderTitle(arrayTable.get(position).getNameTable());
+
+        menu.setHeaderTitle(arrayTable.get(position).getName());
     }
 
-    @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
-        Intent intent;
-        Cursor cursor = MainActivity.database.GetData("SELECT idBill FROM Bill WHERE idTable = " + idTableClick+" AND statusBill = 0");
-        if(!cursor.moveToFirst()) {
-            Toast.makeText(this, "Vui lòng chọn bàn và đặt món", Toast.LENGTH_SHORT).show();
-            return super.onContextItemSelected(item);
-        }
-        else {
-            idBill = cursor.getInt(0);
-            cursor.close();
-            int check =0;
-            cursor = MainActivity.database.GetData("SELECT * FROM OrderedDetails WHERE idBill = " + idBill + " AND status > 0");
-            if (cursor.moveToFirst()) {
-                check = 1;
-                cursor.close();
-            }
+//    @Override
+//    public boolean onContextItemSelected(@NonNull MenuItem item) {
+//        Intent intent;
+//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+//        int position = info.position;
+//
+////        idTableSelected = arrayTable.get(position).getId();
+////        nameTableSelected = arrayTable.get(position).getName();
+//        if(!CheckOrderListOfTable(arrayTable.get(position).getId())) {
+//            Toast.makeText(this, "Vui lòng chọn bàn và đặt món", Toast.LENGTH_SHORT).show();
+//            return super.onContextItemSelected(item);
+//        }
+//        else {
+//            idBill = cursor.getInt(0);
+//            cursor.close();
+//            int check =0;
+//            cursor = MainActivity.database.GetData("SELECT * FROM OrderedDetails WHERE idBill = " + idBill + " AND status > 0");
+//            if (cursor.moveToFirst()) {
+//                check = 1;
+//                cursor.close();
+//            }
+//
+//            switch (item.getItemId()) {
+//                case R.id.menu_ordered:
+//                    if(check != 0) {
+//                        intent = new Intent(this, ListOrderedActivity.class);
+//                        startActivity(intent);
+//                    }
+//                    else
+//                        Toast.makeText(this, "Vui lòng đặt món", Toast.LENGTH_SHORT).show();
+//                    break;
+//                case R.id.menu_pay:
+//                    if(check != 0 ){
+//                        intent = new Intent(this, BillActivity.class);
+//                        startActivity(intent);
+//                    } else
+//                        Toast.makeText(this, "Bạn chưa có đơn hàng nào", Toast.LENGTH_SHORT).show();
+//                    break;
+//                case R.id.menu_table_empty:
+//                    if(check != 0 ){
+//                        Toast.makeText(this, "KHÔNG THỂ XÓA", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        MainActivity.database.QueryData("DELETE FROM OrderedDetails WHERE idBill = " + idBill);
+//                        MainActivity.database.QueryData("DELETE FROM Bill WHERE idBill = " + idBill);
+//                        MainActivity.database.QueryData("UPDATE TableFood SET Status = 0 WHERE idTable = " + idTableClick);
+//                        Toast.makeText(this, "ĐÃ XÓA", Toast.LENGTH_SHORT).show();
+//                        GetListTable();
+//                    }
+//                    break;
+//
+//
+//            }
+//        }
+//        return super.onContextItemSelected(item);
+//    }
 
-            switch (item.getItemId()) {
-                case R.id.menu_ordered:
-                    if(check != 0) {
-                        intent = new Intent(this, ListOrderedActivity.class);
-                        startActivity(intent);
-                    }
-                    else
-                        Toast.makeText(this, "Vui lòng đặt món", Toast.LENGTH_SHORT).show();
-                    break;
-                case R.id.menu_pay:
-                    if(check != 0 ){
-                        intent = new Intent(this, BillActivity.class);
-                        startActivity(intent);
-                    } else
-                        Toast.makeText(this, "Bạn chưa có đơn hàng nào", Toast.LENGTH_SHORT).show();
-                    break;
-                case R.id.menu_delete:
-                    if(check != 0 ){
-                        Toast.makeText(this, "KHÔNG THỂ XÓA", Toast.LENGTH_SHORT).show();
-                    } else {
-                        MainActivity.database.QueryData("DELETE FROM OrderedDetails WHERE idBill = " + idBill);
-                        MainActivity.database.QueryData("DELETE FROM Bill WHERE idBill = " + idBill);
-                        MainActivity.database.QueryData("UPDATE TableFood SET Status = 0 WHERE idTable = " + idTableClick);
-                        Toast.makeText(this, "ĐÃ XÓA", Toast.LENGTH_SHORT).show();
-                        GetListTable();
-                    }
-                    break;
+    private boolean CheckOrderListOfTable(Integer tableId) {
 
 
-            }
-        }
-        return super.onContextItemSelected(item);
+        return false;
     }
 
-    */
 
 //    //Create menu on MainActivity
 //    @Override
