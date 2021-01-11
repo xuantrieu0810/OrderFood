@@ -2,12 +2,14 @@ package com.lexuantrieu.orderfood.presenter.impl;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.lexuantrieu.orderfood.model.room.User;
 import com.lexuantrieu.orderfood.model.room.database.AppDatabase;
 import com.lexuantrieu.orderfood.network.RestClient;
 import com.lexuantrieu.orderfood.presenter.MainActivityPresenter;
 import com.lexuantrieu.orderfood.service.LogoutService;
+import com.lexuantrieu.orderfood.service.SetFoodOrderListService;
 import com.lexuantrieu.orderfood.utils.Utils;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -74,5 +76,23 @@ public class MainActivityPresenterImpl implements MainActivityPresenter {
                         Log.e("LXT_Log", "ErrorCode: " + response.getError());
                     }
                 }, Throwable::printStackTrace);
+    }
+
+    @Override
+    public void checkTableStatus() {
+        SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
+        service.CheckTableStatus().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(response -> {
+                    Log.i("LXT_Log", "subscribe: " + response.toString());
+                    if (!response.equals("error")) {
+                        Toast.makeText(context, "Đã Update", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(context, "LỖI", Toast.LENGTH_SHORT).show();
+                    }
+                },throwable -> {
+                    Log.e("LXT_Log", throwable.toString());
+                    throwable.printStackTrace();
+                });
     }
 }

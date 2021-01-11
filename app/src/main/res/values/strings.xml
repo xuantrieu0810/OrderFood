@@ -8,4 +8,5 @@
     <string name="admin">admin</string>
     <string name="password">Mật khẩu</string>
     <string name="login">Login</string>
+    <string name="mark_active">Đánh dấu bàn có người</string>
 </resources>

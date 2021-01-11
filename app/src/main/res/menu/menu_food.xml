@@ -11,6 +11,12 @@
         app:showAsAction="always"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         />
+    <item
+        android:id="@+id/itemCart"
+        android:icon="@drawable/ic_shopping_cart_free"
+        android:orderInCategory="101"
+        android:title="Đặt món"
+        app:showAsAction="always" />
 </menu>
 
     <!--    android:checkable="true"-->

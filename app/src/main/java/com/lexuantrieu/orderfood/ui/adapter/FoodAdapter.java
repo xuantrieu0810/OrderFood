@@ -1,6 +1,7 @@
 package com.lexuantrieu.orderfood.ui.adapter;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.FoodModel;
-import com.lexuantrieu.orderfood.ui.activity.ListFoodCustom;
+import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
 import com.lexuantrieu.orderfood.utils.LibraryString;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -27,20 +28,22 @@ import com.squareup.picasso.Picasso;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-@SuppressWarnings("unchecked")
+
 public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
     static String charConstraint = "";
     private static final int TYPE_DEFAULT = 1;
     private static final int TYPE_CUSTOM = 2;
     private static ArrayList<FoodModel> arrListFoodModel;
     private ArrayList<FoodModel> arrListFoodModelFull;
-    private ListFoodCustom mContext;
+    private Context mContext;
+    private FoodAdapterListener listener;
 
 
-    public FoodAdapter(ListFoodCustom context, ArrayList<FoodModel> arrListFoodModel) {
+    public FoodAdapter(Context context, ArrayList<FoodModel> arrListFoodModel, FoodAdapterListener listener) {
         this.mContext = context;
         this.arrListFoodModel = arrListFoodModel;
         this.arrListFoodModelFull = new ArrayList<>(arrListFoodModel);
+        this.listener = listener;
     }
 
     @Override
@@ -76,7 +79,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     @Override
     public int getItemCount() {
-        return arrListFoodModel.size();
+        return arrListFoodModel==null?0:arrListFoodModel.size();
     }
 
     @Override
@@ -250,6 +253,6 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
 
     private void SetCountFood(int position, int  quantity) {
-        mContext.SetCountFood(position, quantity, arrListFoodModel.get(position));
+        listener.ChangeFoodQuantity(position, quantity, arrListFoodModel.get(position));
     }
 }

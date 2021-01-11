@@ -30,7 +30,7 @@ import com.lexuantrieu.orderfood.utils.CheckConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomPresenter.View, FoodAdapterListener{
+public class SearchActivity extends AppCompatActivity implements ListFoodCustomPresenter.View , FoodAdapterListener {
 
     ListFoodCustomPresenter presenter;
     ProgressDialog progressDialog;
@@ -44,17 +44,6 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!CheckConnection.isNetworkAvailable(getApplicationContext())) {
-            AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Không có internet", "Kết nối lại", resultOk -> {
-                if (resultOk == Activity.RESULT_OK) {
-                    onRestart();
-                } else {
-                    finish();
-                }
-            });
-            FragmentManager fragmentManager = this.getSupportFragmentManager();
-            dialogFragment.show(fragmentManager, "Dialog");
-        }
         setContentView(R.layout.activity_list_food_custom);
         //-----------------------------------------------------------
         Bundle bundle = getIntent().getExtras();
@@ -74,12 +63,24 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
 //        //-----------------------------------------------------------
         init();
-        presenter.invokeData(tableID);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(null);
+        recyclerView.setItemAnimator(null);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
-
+        if (CheckConnection.isNetworkAvailable(getApplicationContext())) {
+            presenter.invokeData(tableID);
+        } else {
+            AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Không có internet", "Kết nối lại", resultOk -> {
+                if (resultOk == Activity.RESULT_OK) {
+                    presenter.invokeData(tableID);
+                } else {
+                    finish();
+                }
+            });
+            FragmentManager fragmentManager = this.getSupportFragmentManager();
+            dialogFragment.show(fragmentManager, "Dialog");
+        }
     }
 
     private void init() {
@@ -163,7 +164,7 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     @Override
     public void initAdapter(Context context, List<FoodModel> listData) {
         arrayFoodModel = (ArrayList<FoodModel>) listData;
-        adapter = new FoodAdapter(this, arrayFoodModel, (FoodAdapterListener) this);
+        adapter = new FoodAdapter(this, arrayFoodModel, this);
     }
 
     @Override
@@ -193,7 +194,7 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
                 return true;
             case R.id.itemCart:
                 //check sl orderlist
-                Intent intent = new Intent(ListFoodCustom.this, ListOrderedActivity.class);
+                Intent intent = new Intent(SearchActivity.this, ListOrderedActivity.class);
                 startActivity(intent);
                 break;
             default:
@@ -208,5 +209,6 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
         presenter.invokeData(tableID);
     }
     //------------------------------------------------------------------------------------
+
     //------------------------------------------------------------------------------------
 }

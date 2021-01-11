@@ -65,32 +65,7 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
         gridView = findViewById(R.id.gridviewTable);
     }
     //----------------------------------------------------------------------------------------------
-    /*
-    private void GetListTable() {
-        Cursor cursor = MainActivity.database.GetData("SELECT * FROM TableFood");
-        arrayTable.clear();
-        while (cursor.moveToNext()) {
-            int id = cursor.getInt(0);//idTable
-            String nameTable = cursor.getString(1);//nameTable
-            int status = cursor.getInt(2);//statusTable
-            switch (status) {
-                case 0:
-                    arrayTable.add(new Table(id, nameTable, R.drawable.tablefree, status));
-                    break;
-                case 1:
-                    arrayTable.add(new Table(id, nameTable, R.drawable.tablebusy, status));
-                    break;
-                case 2:
-                    arrayTable.add(new Table(id, nameTable, R.drawable.tablewait, status));
-                    break;
-                case 3:
-                    arrayTable.add(new Table(id, nameTable, R.drawable.tableeating, status));
-                    break;
-            }
-        }
-        adapter.notifyDataSetChanged();
-    }
-    */
+
     //----------------------------------------------------------------------------------------------
 
     @Override
@@ -100,65 +75,68 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
         // Get the list item position
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int position = info.position;
-
+        if(arrayTable.get(position).getStatus() == 0)
+            menu.getItem(3).setEnabled(false);
+        else
+            menu.getItem(2).setEnabled(false);
         menu.setHeaderTitle(arrayTable.get(position).getName());
     }
 
-//    @Override
-//    public boolean onContextItemSelected(@NonNull MenuItem item) {
-//        Intent intent;
-//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-//        int position = info.position;
-//
-////        idTableSelected = arrayTable.get(position).getId();
-////        nameTableSelected = arrayTable.get(position).getName();
-//        if(!CheckOrderListOfTable(arrayTable.get(position).getId())) {
-//            Toast.makeText(this, "Vui lòng chọn bàn và đặt món", Toast.LENGTH_SHORT).show();
-//            return super.onContextItemSelected(item);
-//        }
-//        else {
-//            idBill = cursor.getInt(0);
-//            cursor.close();
-//            int check =0;
-//            cursor = MainActivity.database.GetData("SELECT * FROM OrderedDetails WHERE idBill = " + idBill + " AND status > 0");
-//            if (cursor.moveToFirst()) {
-//                check = 1;
-//                cursor.close();
-//            }
-//
-//            switch (item.getItemId()) {
-//                case R.id.menu_ordered:
-//                    if(check != 0) {
-//                        intent = new Intent(this, ListOrderedActivity.class);
-//                        startActivity(intent);
-//                    }
-//                    else
-//                        Toast.makeText(this, "Vui lòng đặt món", Toast.LENGTH_SHORT).show();
-//                    break;
-//                case R.id.menu_pay:
-//                    if(check != 0 ){
-//                        intent = new Intent(this, BillActivity.class);
-//                        startActivity(intent);
-//                    } else
-//                        Toast.makeText(this, "Bạn chưa có đơn hàng nào", Toast.LENGTH_SHORT).show();
-//                    break;
-//                case R.id.menu_table_empty:
-//                    if(check != 0 ){
-//                        Toast.makeText(this, "KHÔNG THỂ XÓA", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        MainActivity.database.QueryData("DELETE FROM OrderedDetails WHERE idBill = " + idBill);
-//                        MainActivity.database.QueryData("DELETE FROM Bill WHERE idBill = " + idBill);
-//                        MainActivity.database.QueryData("UPDATE TableFood SET Status = 0 WHERE idTable = " + idTableClick);
-//                        Toast.makeText(this, "ĐÃ XÓA", Toast.LENGTH_SHORT).show();
-//                        GetListTable();
-//                    }
-//                    break;
-//
-//
-//            }
-//        }
-//        return super.onContextItemSelected(item);
-//    }
+    /*@Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        Intent intent;
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int position = info.position;
+
+//        idTableSelected = arrayTable.get(position).getId();
+//        nameTableSelected = arrayTable.get(position).getName();
+        *//*if(item.getItemId()< 2 && !CheckOrderListOfTable(arrayTable.get(position).getId())) {
+            Toast.makeText(this, "Vui lòng chọn bàn và đặt món", Toast.LENGTH_SHORT).show();
+            return super.onContextItemSelected(item);
+        }
+        else *//*{
+            idBill = cursor.getInt(0);
+            cursor.close();
+            int check =0;
+            cursor = MainActivity.database.GetData("SELECT * FROM OrderedDetails WHERE idBill = " + idBill + " AND status > 0");
+            if (cursor.moveToFirst()) {
+                check = 1;
+                cursor.close();
+            }
+
+            switch (item.getItemId()) {
+                case R.id.menu_ordered:
+                    if(check != 0) {
+                        intent = new Intent(this, ListOrderedActivity.class);
+                        startActivity(intent);
+                    }
+                    else
+                        Toast.makeText(this, "Vui lòng đặt món", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.menu_pay:
+                    if(check != 0 ){
+                        intent = new Intent(this, BillActivity.class);
+                        startActivity(intent);
+                    } else
+                        Toast.makeText(this, "Bạn chưa có đơn hàng nào", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.menu_table_empty:
+                    if(check != 0 ){
+                        Toast.makeText(this, "KHÔNG THỂ XÓA", Toast.LENGTH_SHORT).show();
+                    } else {
+                        MainActivity.database.QueryData("DELETE FROM OrderedDetails WHERE idBill = " + idBill);
+                        MainActivity.database.QueryData("DELETE FROM Bill WHERE idBill = " + idBill);
+                        MainActivity.database.QueryData("UPDATE TableFood SET Status = 0 WHERE idTable = " + idTableClick);
+                        Toast.makeText(this, "ĐÃ XÓA", Toast.LENGTH_SHORT).show();
+                        GetListTable();
+                    }
+                    break;
+
+
+            }
+        }
+        return super.onContextItemSelected(item);
+    }*/
 
     private boolean CheckOrderListOfTable(Integer tableId) {
 

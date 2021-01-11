@@ -10,6 +10,9 @@
         android:title="@string/ordered"
         android:id="@+id/menu_ordered"/>
     <item
+        android:title="@string/mark_active"
+        android:id="@+id/menu_table_active"/>
+    <item
         android:title="@string/mark_empty"
         android:id="@+id/menu_table_empty"/>
 

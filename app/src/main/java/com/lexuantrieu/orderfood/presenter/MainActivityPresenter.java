@@ -5,6 +5,9 @@ import com.lexuantrieu.orderfood.model.room.User;
 public interface MainActivityPresenter {
     void invokeData();
     void onLogout();
+
+    void checkTableStatus();
+
     interface View{
         void onLogoutPending();
         void onLogoutSuccess();

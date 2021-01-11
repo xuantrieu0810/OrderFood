@@ -60,13 +60,13 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     }
 
     @Override
-    public void InsertOrderList(int tableid, FoodModel foodModel, int quantity, int pos) {
+    public void InsertOrderList(int bill_id, int table_id, FoodModel foodModel, int quantity, int pos) {
         SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.InsertOrderList(tableid, foodModel.getIdFood(), quantity).subscribeOn(Schedulers.io())
+        service.InsertOrderList(bill_id, table_id, foodModel.getIdFood(), quantity).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     Log.i("LXT_Log", "subscribe: " + response.toString());
-                    if (!response.equals("error")) {
+                    if (response.equals("success")) {
                         try {
                             Log.i("LXT_Log", "position: " + pos);
                             foodModel.setStt(Integer.parseInt(response));
@@ -86,9 +86,9 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     }
 
     @Override
-    public void UpdateOrderList(int tableid, FoodModel foodModel, int quantity, int pos) {
+    public void UpdateOrderList(int bill_id, int table_id, FoodModel foodModel, int quantity, int pos) {
         SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.UpdateOrderList(foodModel.getStt(), tableid, foodModel.getIdFood(), quantity).subscribeOn(Schedulers.io())
+        service.UpdateOrderList(foodModel.getStt(), bill_id, table_id, foodModel.getIdFood(), quantity).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     Log.i("LXT_Log", "subscribe: " + response.toString());

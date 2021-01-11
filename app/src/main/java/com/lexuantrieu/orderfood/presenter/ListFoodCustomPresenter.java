@@ -9,9 +9,9 @@ import java.util.List;
 public interface ListFoodCustomPresenter {
     void invokeData(int tableid);
 
-    void InsertOrderList(int tabeID, FoodModel foodModel, int quantity, int pos);
+    void InsertOrderList(int bill_id, int table_id, FoodModel foodModel, int quantity, int pos);
 
-    void UpdateOrderList(int tableID, FoodModel foodModel, int quantity, int pos);
+    void UpdateOrderList(int bill_id, int table_id, FoodModel foodModel, int quantity, int pos);
 
     interface View {
         void onInvokeDataSuccess();
