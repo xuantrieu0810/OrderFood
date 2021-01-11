@@ -60,18 +60,16 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     }
 
     @Override
-    public void InsertOrderList(int bill_id, int table_id, FoodModel foodModel, int quantity, int pos) {
+    public void InsertOrderList(int bill_id, int table_id, int pos, FoodModel foodModel) {
         SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.InsertOrderList(bill_id, table_id, foodModel.getIdFood(), quantity).subscribeOn(Schedulers.io())
+        service.InsertOrderList(bill_id, table_id, foodModel.getIdFood(), foodModel.getCountFood()).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     Log.i("LXT_Log", "subscribe: " + response.toString());
-                    if (response.equals("success")) {
+                    if (!response.equals("fail")) {
                         try {
                             Log.i("LXT_Log", "position: " + pos);
                             foodModel.setStt(Integer.parseInt(response));
-                            foodModel.setCountFood(quantity);
-//                            adapterListener.onItemChange(pos, food);
                             view.onSuccessSetFood(foodModel, pos);
                         }catch (Exception e) {
                             view.onFailSetFood();
@@ -86,18 +84,15 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     }
 
     @Override
-    public void UpdateOrderList(int bill_id, int table_id, FoodModel foodModel, int quantity, int pos) {
+    public void UpdateOrderList(int bill_id, int table_id, int pos, FoodModel foodModel) {
         SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.UpdateOrderList(foodModel.getStt(), bill_id, table_id, foodModel.getIdFood(), quantity).subscribeOn(Schedulers.io())
+        service.UpdateOrderList(foodModel.getStt(), bill_id, table_id, foodModel.getIdFood(), foodModel.getCountFood(), foodModel.getCommentFood()).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     Log.i("LXT_Log", "subscribe: " + response.toString());
                     if (!response.equals("error")) {
                         Log.i("LXT_Log", "position: " + pos);
-                        foodModel.setCountFood(quantity);
-//                            adapterListener.onItemChange(pos,food);
                         view.onSuccessSetFood(foodModel, pos);
-
                     } else {
                         view.onFailSetFood();                    }
                 },throwable -> {

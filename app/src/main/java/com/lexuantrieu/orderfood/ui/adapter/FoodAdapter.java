@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,40 +19,40 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.FoodModel;
 import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
-import com.lexuantrieu.orderfood.utils.LibraryString;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 
-public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
-    static String charConstraint = "";
-    private static final int TYPE_DEFAULT = 1;
-    private static final int TYPE_CUSTOM = 2;
+public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private final int TYPE_DEFAULT = 1;
+    private final int TYPE_CUSTOM = 2;
+
+    private Context mContext;
     private static ArrayList<FoodModel> arrListFoodModel;
     private ArrayList<FoodModel> arrListFoodModelFull;
-    private Context mContext;
     private FoodAdapterListener listener;
 
-
+    //    public FoodAdapter(Context context, ArrayList<FoodModel> arrListFoodModel) {
+//        this.mContext = context;
+//        this.arrListFoodModel = arrListFoodModel;
+//    }
     public FoodAdapter(Context context, ArrayList<FoodModel> arrListFoodModel, FoodAdapterListener listener) {
         this.mContext = context;
         this.arrListFoodModel = arrListFoodModel;
-        this.arrListFoodModelFull = new ArrayList<>(arrListFoodModel);
         this.listener = listener;
+    }
+    @Override
+    public int getItemCount() {
+        return arrListFoodModel == null ? 0 : arrListFoodModel.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (arrListFoodModel.get(position).getCountFood() > 0) {
-            return TYPE_DEFAULT;
-        } else {
-            return TYPE_CUSTOM;
-        }
+        return (arrListFoodModel.get(position).getCountFood()>0)?TYPE_DEFAULT:TYPE_CUSTOM;
     }
-    @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView;
@@ -67,55 +65,14 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             return new ViewHolderClone(itemView);
         }
     }
-
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (getItemViewType(position) == TYPE_DEFAULT) {
-            ((FoodAdapter.ViewHolder) holder).setHolderDefault(arrListFoodModel.get(position), position);
+            ((ViewHolder) holder).setHolderDefault(arrListFoodModel.get(position),position);
         } else {
-            ((FoodAdapter.ViewHolderClone) holder).setHolderCustom(arrListFoodModel.get(position), position);
+            ((ViewHolderClone) holder).setHolderCustom(arrListFoodModel.get(position),position);
         }
     }
-
-    @Override
-    public int getItemCount() {
-        return arrListFoodModel==null?0:arrListFoodModel.size();
-    }
-
-    @Override
-    public Filter getFilter() {
-        return filter;
-    }
-    Filter filter = new Filter() {
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            charConstraint = constraint.toString().toLowerCase().trim();
-            charConstraint = LibraryString.covertStringToVN(charConstraint);
-            ArrayList<FoodModel> filterList = new ArrayList<>();
-            if(charConstraint.isEmpty()) {
-                filterList.addAll(arrListFoodModelFull);
-            } else {
-                for (FoodModel foods : arrListFoodModelFull) {
-                    if (foods.getNameFoodNonVN().toLowerCase().contains(charConstraint)) {
-                        filterList.add(foods);
-                    }
-                }
-            }
-            FilterResults filterResults = new FilterResults();
-            filterResults.values = filterList;
-            return filterResults;
-        }
-
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            arrListFoodModel.clear();
-            arrListFoodModel.addAll((Collection<? extends FoodModel>) results.values);
-            Log.d("LXT_Log", "Searched item: " + arrListFoodModel.size());
-            notifyDataSetChanged();
-        }
-    };
-
-
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -127,19 +84,19 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
         public ViewHolder(View itemView) {
             super(itemView);
-            imgFood = itemView.findViewById(R.id.imgFood_itemOrder);
-            nameFood = itemView.findViewById(R.id.txtFoodName_itemOrder);
-            unitPrice = itemView.findViewById(R.id.txtPriceFood_itemOrder);
-            btnAdd = itemView.findViewById(R.id.buttonAdd_itemOrder);
-            btnSub = itemView.findViewById(R.id.buttonSub_itemOrder);
-            edtCount = itemView.findViewById(R.id.edtCountFood_itemOrder);
-            btnCmt = itemView.findViewById(R.id.buttonNote_itemOrder);
+            imgFood =  itemView.findViewById(R.id.imgFood_itemOrder);
+            nameFood =  itemView.findViewById(R.id.txtFoodName_itemOrder);
+            unitPrice =  itemView.findViewById(R.id.txtPriceFood_itemOrder);
+            btnAdd =  itemView.findViewById(R.id.buttonAdd_itemOrder);
+            btnSub =  itemView.findViewById(R.id.buttonSub_itemOrder);
+            edtCount =  itemView.findViewById(R.id.edtCountFood_itemOrder);
+            btnCmt =  itemView.findViewById(R.id.buttonNote_itemOrder);
         }
-
-        void setHolderDefault(final FoodModel foodModel, final int position) {
+        void setHolderDefault(FoodModel foodModel, int position) {
             nameFood.setText(foodModel.getNameFood());
             DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
             unitPrice.setText(decimalFormat.format(foodModel.getPriceFood()));
+            edtCount.setText(String.valueOf(foodModel.getCountFood()));
             String urlImage = foodModel.getImageFood();
             Picasso.get()
                     .load(urlImage)
@@ -147,40 +104,35 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                     .error(R.drawable.ic_sync_error)
                     .into(imgFood, new Callback() {
                         @Override
-                        public void onSuccess() {
-
-                        }
-
+                        public void onSuccess() { }
                         @Override
                         public void onError(Exception e) {
                             Log.d("LXT_Error:", "LoadImage: " + foodModel.getNameFood());
                         }
                     });
-            edtCount.setText(String.valueOf(foodModel.getCountFood()));
-            //--------------------------------------------------------------------------------------
-            edtCount.setOnClickListener(v -> InputCountFood(foodModel.getNameFood(), position));
-            btnAdd.setOnClickListener(v -> ClickButtonAdd(position));
-            btnSub.setOnClickListener(v -> ClickButtonSub(position));
-
-
+            //Button Click event
+            edtCount.setOnClickListener(v -> InputCountFood(foodModel, position));
+            btnAdd.setOnClickListener(v -> ClickButtonAdd(foodModel, position));
+            btnSub.setOnClickListener(v -> ClickButtonSub(foodModel, position));
+            btnCmt.setOnClickListener(v -> InputCommentFood(foodModel, position));
         }
         //----------------------------------------------------------------------------------------------
-        private void InputCountFood(String foodName, final int position) {
-
-            final Dialog dialog = new Dialog(mContext);
+        private void InputCountFood(FoodModel foodModel, int position) {
+            Dialog dialog = new Dialog(mContext);
             dialog.setContentView(R.layout.dialog_input_count_food);
-            final TextView txtNameFood = dialog.findViewById(R.id.txtNameFood_dial);//Title
-            final EditText edtInputCount = dialog.findViewById(R.id.edtCountFood_dial);//Input
+            TextView txtNameFood = dialog.findViewById(R.id.txtNameFood_dial);//Title
+            EditText edtInputCount = dialog.findViewById(R.id.edtCountFood_dial);//Input
             Button btnSubmit = dialog.findViewById(R.id.buttonSubmit_dial);
             Button btnCancel = dialog.findViewById(R.id.buttonCancel_dial);
-            txtNameFood.setText(foodName);
+            txtNameFood.setText(foodModel.getNameFood());
             btnSubmit.setOnClickListener(v -> {
                 if (edtInputCount.getText().toString().equals("")) {
                     edtInputCount.setError("Vui lòng nhập số lượng");
                 } else {
                     int countTmp = Integer.parseInt(edtInputCount.getText().toString());
                     if (countTmp >= 0 && countTmp <= 99) {
-                        SetCountFood(position, countTmp);
+                        foodModel.setCountFood(countTmp);
+                        SetCountFood(position, foodModel);
                         dialog.dismiss();
                     } else edtInputCount.setError("Số lượng không hợp lệ.");
                 }
@@ -189,28 +141,49 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             dialog.show();
         }
         //----------------------------------------------------------------------------------------------
-        private void ClickButtonAdd(int position) {
+        private void InputCommentFood(FoodModel foodModel, int position) {
+            Dialog dialog = new Dialog(mContext);
+            dialog.setContentView(R.layout.dialog_input_comment);
+            TextView txtNameFood = dialog.findViewById(R.id.txtNameFood_dial);//Title
+            EditText edtInputComment = dialog.findViewById(R.id.editCommentFood_dial);//Input
+            Button btnSubmit = dialog.findViewById(R.id.buttonSubmit_dial);
+            Button btnCancel = dialog.findViewById(R.id.buttonCancel_dial);
+            txtNameFood.setText(foodModel.getNameFood());
+            edtInputComment.setText(foodModel.getCommentFood());
+            btnSubmit.setOnClickListener(v -> {
+                String cmtFood = edtInputComment.getText().toString().trim();
+                if(foodModel.getStt() !=0){
+                    foodModel.setCommentFood(cmtFood);
+                    SetCountFood(position,foodModel);
+                    dialog.dismiss();
+                }
+                else Toast.makeText(mContext, "Không thể cập nhật", Toast.LENGTH_SHORT).show();
+            });
+            btnCancel.setOnClickListener(v -> dialog.cancel());
+            dialog.show();
+        }
+        //----------------------------------------------------------------------------------------------
+        private void ClickButtonAdd(FoodModel foodModel, int position) {
             int countTmp = arrListFoodModel.get(position).getCountFood();
             if(countTmp < 99) {
-                countTmp++;
-                SetCountFood(position , countTmp);
+                foodModel.setCountFood(countTmp+1);
+                SetCountFood(position, foodModel);
             }
             else
                 Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
         }
         //----------------------------------------------------------------------------------------------
-        private void ClickButtonSub(int position) {
+        private void ClickButtonSub(FoodModel foodModel, int position) {
             int countTmp = arrListFoodModel.get(position).getCountFood();
             if(countTmp > 0) {
-                countTmp--;
-                SetCountFood(position , countTmp);
+                foodModel.setCountFood(countTmp-1);
+                SetCountFood(position , foodModel);
             }
             else
                 Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
         }
-    }// end Class ViewHolderDefault
+    }
 
-    //----------------------------------------------------------------------------------------------
     public class ViewHolderClone extends RecyclerView.ViewHolder {
 
         private ImageView imgFood;
@@ -218,15 +191,14 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         private TextView unitPrice;
         private ImageButton btnChange;
 
-        public ViewHolderClone(View itemView) {
+        public ViewHolderClone (View itemView) {
             super(itemView);
-            imgFood = itemView.findViewById(R.id.imgFood_itemOrder);
+            imgFood =  itemView.findViewById(R.id.imgFood_itemOrder);
             nameFood = itemView.findViewById(R.id.txtFoodName_itemOrder);
             unitPrice = itemView.findViewById(R.id.txtPriceFood_itemOrder);
             btnChange = itemView.findViewById(R.id.buttonChange_itemOrder);
         }
-
-        void setHolderCustom(final FoodModel foodModel, final int position) {
+        void setHolderCustom(FoodModel foodModel, int position) {
             nameFood.setText(foodModel.getNameFood());
             DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
             unitPrice.setText(decimalFormat.format(foodModel.getPriceFood()));
@@ -247,12 +219,23 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                         }
                     });
             //--------------------------------------------------------------------------------------
-            btnChange.setOnClickListener(v -> SetCountFood(position, 1));
+
+            btnChange.setOnClickListener(v -> {
+
+                        ClickCreate(position, foodModel);
+                    }
+            );
         }
-    }//end Class ViewHolderClone
 
-
-    private void SetCountFood(int position, int  quantity) {
-        listener.ChangeFoodQuantity(position, quantity, arrListFoodModel.get(position));
+        private void ClickCreate(int position, FoodModel foodModel) {
+            foodModel.setCountFood(1);
+            SetCountFood(position,foodModel);
+        }
     }
+    
+    //Fucntion of adapter
+    private void SetCountFood(int position, FoodModel foodModel) {
+        listener.ChangeFoodQuantity(position, foodModel);
+    }
+
 }

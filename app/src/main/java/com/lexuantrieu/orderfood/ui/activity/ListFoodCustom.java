@@ -22,7 +22,7 @@ import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.FoodModel;
 import com.lexuantrieu.orderfood.presenter.ListFoodCustomPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.ListFoodCustomPresenterImpl;
-import com.lexuantrieu.orderfood.ui.adapter.FoodAdapter;
+import com.lexuantrieu.orderfood.ui.adapter.FoodSearchAdapter;
 import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
 import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import com.lexuantrieu.orderfood.utils.CheckConnection;
@@ -39,7 +39,7 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     String tableName;
     RecyclerView recyclerView;
     ArrayList<FoodModel> arrayFoodModel;
-    FoodAdapter adapter;
+    FoodSearchAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,12 +113,12 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     }
 
     @Override
-    public void ChangeFoodQuantity(int position, int quantity, FoodModel foodModel) {
+    public void ChangeFoodQuantity(int position, FoodModel foodModel) {
         int stt = foodModel.getStt();
         if (stt != -1 && foodModel.getStatusFood() == 0) {
-            presenter.UpdateOrderList(billID, tableID, foodModel, quantity, position);
+            presenter.UpdateOrderList(billID, tableID, position, foodModel);
         } else {
-            presenter.InsertOrderList(billID, tableID, foodModel, quantity, position);
+            presenter.InsertOrderList(billID, tableID, position, foodModel);
         }
     }
 
@@ -163,7 +163,7 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     @Override
     public void initAdapter(Context context, List<FoodModel> listData) {
         arrayFoodModel = (ArrayList<FoodModel>) listData;
-        adapter = new FoodAdapter(this, arrayFoodModel, (FoodAdapterListener) this);
+        adapter = new FoodSearchAdapter(this, arrayFoodModel, this);
     }
 
     @Override

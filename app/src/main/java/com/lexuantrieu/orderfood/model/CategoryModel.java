@@ -11,6 +11,7 @@ public class CategoryModel {
     @SerializedName("name")
     @Expose
     private String name;
+    private String image;
 
     public int getId() {
         return id;
@@ -26,6 +27,14 @@ public class CategoryModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String name) {
+        this.image = image;
     }
 
     @Override

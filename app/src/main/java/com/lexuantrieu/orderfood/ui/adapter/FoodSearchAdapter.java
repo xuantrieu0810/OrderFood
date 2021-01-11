@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,38 +21,43 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.FoodModel;
 import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
+import com.lexuantrieu.orderfood.utils.LibraryString;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 
-public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
+    static String charConstraint = "";
 
     private final int TYPE_DEFAULT = 1;
     private final int TYPE_CUSTOM = 2;
 
     private Context mContext;
-    private ArrayList<FoodModel> arrListFood;
+    private static ArrayList<FoodModel> arrListFoodModel;
+    private ArrayList<FoodModel> arrListFoodModelFull;
     private FoodAdapterListener listener;
 
-//    public AllFoodAdapter(Context context, ArrayList<FoodModel> arrListFood) {
+    //    public FoodAdapter(Context context, ArrayList<FoodModel> arrListFoodModel) {
 //        this.mContext = context;
-//        this.arrListFood = arrListFood;
+//        this.arrListFoodModel = arrListFoodModel;
 //    }
-    public AllFoodAdapter(Context context, ArrayList<FoodModel> arrListFood, FoodAdapterListener listener) {
+    public FoodSearchAdapter(Context context, ArrayList<FoodModel> arrListFoodModel, FoodAdapterListener listener) {
         this.mContext = context;
-        this.arrListFood = arrListFood;
+        this.arrListFoodModel = arrListFoodModel;
+        this.arrListFoodModelFull = new ArrayList<>(arrListFoodModel);
         this.listener = listener;
     }
     @Override
     public int getItemCount() {
-        return arrListFood == null ? 0 : arrListFood.size();
+        return arrListFoodModel == null ? 0 : arrListFoodModel.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return (arrListFood.get(position).getCountFood()>0)?TYPE_DEFAULT:TYPE_CUSTOM;
+        return (arrListFoodModel.get(position).getCountFood()>0)?TYPE_DEFAULT:TYPE_CUSTOM;
     }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -67,9 +74,9 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (getItemViewType(position) == TYPE_DEFAULT) {
-            ((ViewHolder) holder).setHolderDefault(arrListFood.get(position),position);
+            ((ViewHolder) holder).setHolderDefault(arrListFoodModel.get(position),position);
         } else {
-            ((ViewHolderClone) holder).setHolderCustom(arrListFood.get(position),position);
+            ((ViewHolderClone) holder).setHolderCustom(arrListFoodModel.get(position),position);
         }
     }
 
@@ -163,7 +170,7 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
         //----------------------------------------------------------------------------------------------
         private void ClickButtonAdd(FoodModel foodModel, int position) {
-            int countTmp = arrListFood.get(position).getCountFood();
+            int countTmp = arrListFoodModel.get(position).getCountFood();
             if(countTmp < 99) {
                 foodModel.setCountFood(countTmp+1);
                 SetCountFood(position, foodModel);
@@ -173,7 +180,7 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
         //----------------------------------------------------------------------------------------------
         private void ClickButtonSub(FoodModel foodModel, int position) {
-            int countTmp = arrListFood.get(position).getCountFood();
+            int countTmp = arrListFoodModel.get(position).getCountFood();
             if(countTmp > 0) {
                 foodModel.setCountFood(countTmp-1);
                 SetCountFood(position , foodModel);
@@ -221,8 +228,8 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             btnChange.setOnClickListener(v -> {
 
-                ClickCreate(position, foodModel);
-            }
+                        ClickCreate(position, foodModel);
+                    }
             );
         }
 
@@ -231,10 +238,42 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             SetCountFood(position,foodModel);
         }
     }
-
-
+    
     //Fucntion of adapter
     private void SetCountFood(int position, FoodModel foodModel) {
         listener.ChangeFoodQuantity(position, foodModel);
     }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
+    Filter filter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            charConstraint = constraint.toString().toLowerCase().trim();
+            charConstraint = LibraryString.covertStringToVN(charConstraint);
+            ArrayList<FoodModel> filterList = new ArrayList<>();
+            if(charConstraint.isEmpty()) {
+                filterList.addAll(arrListFoodModelFull);
+            } else {
+                for (FoodModel foods : arrListFoodModelFull) {
+                    if (foods.getNameFoodNonVN().toLowerCase().contains(charConstraint)) {
+                        filterList.add(foods);
+                    }
+                }
+            }
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filterList;
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            arrListFoodModel.clear();
+            arrListFoodModel.addAll((Collection<? extends FoodModel>) results.values);
+            Log.d("LXT_Log", "Searched item: " + arrListFoodModel.size());
+            notifyDataSetChanged();
+        }
+    };
 }

@@ -23,6 +23,7 @@ import com.lexuantrieu.orderfood.model.FoodModel;
 import com.lexuantrieu.orderfood.presenter.ListFoodCustomPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.ListFoodCustomPresenterImpl;
 import com.lexuantrieu.orderfood.ui.activity.ListOrderedActivity;
+import com.lexuantrieu.orderfood.ui.activity.OrderActivity;
 import com.lexuantrieu.orderfood.ui.adapter.FoodAdapter;
 import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
 import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
@@ -30,8 +31,9 @@ import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentPopular extends Fragment implements ListFoodCustomPresenter.View, FoodAdapterListener{
+public class FragmentPopular extends Fragment implements ListFoodCustomPresenter.View, FoodAdapterListener {
 
+    Context mContext;
     ListFoodCustomPresenter presenter;
     ProgressDialog progressDialog;
     int tableID = -1; //default = -1
@@ -40,152 +42,48 @@ public class FragmentPopular extends Fragment implements ListFoodCustomPresenter
     RecyclerView recyclerView;
     ArrayList<FoodModel> arrayFoodModel;
     FoodAdapter adapter;
-
-    Context mContext;
     View viewFrag;
-    //    ArrayList<FoodModel> arrayFood;
-//    AllFoodAdapter adapter;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        billID = OrderActivity.billID;
+        tableID = OrderActivity.tableID;
+        tableName = OrderActivity.tableName;
     }
     public FragmentPopular() {}
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mContext = container.getContext();
-        viewFrag = inflater.inflate(R.layout.fragment_popular,container,false);
-//        recyclerView = (RecyclerView) viewFrag.findViewById(R.id.recyclerViewFood_FragAllFood);
+        viewFrag = inflater.inflate(R.layout.fragment_all_food,container,false);
         init();
-        recyclerView = (RecyclerView) viewFrag.findViewById(R.id.recyclerViewFood_FragPopular);
-        presenter = new ListFoodCustomPresenterImpl(mContext, this);
+        presenter = new ListFoodCustomPresenterImpl(this.getContext(), this);
         progressDialog = new ProgressDialog(mContext);
         arrayFoodModel = new ArrayList<>();
-        adapter = new FoodAdapter(mContext,arrayFoodModel, this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(null);
-//        recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
-
         presenter.invokeData(tableID);
         return viewFrag;
     }
-    //----------------------------------------------------------------------------------------------
-    private void init() {
 
+    private void init() {
+        recyclerView = viewFrag.findViewById(R.id.recyclerViewFood_FragAllFood);
     }
 
     //----------------------------------------------------------------------------------------------
     @Override
-    public void ChangeFoodQuantity(int position, int quantity, FoodModel foodModel) {
+    public void ChangeFoodQuantity(int position, FoodModel foodModel) {
         int stt = foodModel.getStt();
         if (stt != -1 && foodModel.getStatusFood() == 0) {
-            presenter.UpdateOrderList(billID, tableID, foodModel, quantity, position);
+            presenter.UpdateOrderList(billID, tableID, position, foodModel);
         } else {
-            presenter.InsertOrderList(billID, tableID, foodModel, quantity, position);
+            presenter.InsertOrderList(billID, tableID, position, foodModel);
         }
     }
-//    private void SetCountFood(int position, int  quantity) {
-//        MainActivity.database.SetCountFood(position,quantity,arrayFood.get(position));
-//        GetListFood();
-//        adapter.notifyItemChanged(position);
-//    }
-/*
-
     //----------------------------------------------------------------------------------------------
-    public void InputCountFood(String foodName, final int position) {
-
-        final Dialog dialog = new Dialog(mContext);
-        dialog.setContentView(R.layout.dialog_input_count_food);
-        final TextView txtNameFood = dialog.findViewById(R.id.txtNameFood_dial);//Title
-        final EditText edtInputCount = dialog.findViewById(R.id.edtCountFood_dial);//Input
-        Button btnSubmit = dialog.findViewById(R.id.buttonSubmit_dial);
-        Button btnCancel = dialog.findViewById(R.id.buttonCancel_dial);
-        txtNameFood.setText(foodName);
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if( edtInputCount.getText().toString().equals("")){}
-                else {
-                    int countTmp = Integer.parseInt(edtInputCount.getText().toString());
-                    if(countTmp>=0 && countTmp<=99) {
-                        SetCountFood(position , countTmp);
-
-                        dialog.dismiss();
-                    }
-                    else Toast.makeText(mContext, "Giá trị không hợp lệ", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-            }
-        });
-        dialog.show();
-    }
-    //----------------------------------------------------------------------------------------------
-    public void ClickButtonAdd(int position) {
-        int countTmp = arrayFood.get(position).getCountFood();
-        if(countTmp < 99) {
-            countTmp++;
-            SetCountFood(position , countTmp);
-
-        }
-        else
-            Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
-    }
-    //----------------------------------------------------------------------------------------------
-    public void ClickButtonSub(int position) {
-        int countTmp = arrayFood.get(position).getCountFood();
-        if(countTmp > 0) {
-            countTmp--;
-            SetCountFood(position , countTmp);
-
-        }
-        else
-            Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
-    }
-    //----------------------------------------------------------------------------------------------
-    public void ClickButtonChange(int position) {
-        SetCountFood(position , 1);
-
-    }
-    //----------------------------------------------------------------------------------------------
-    public void InputCommentFood(String foodName, final int position, String cmt) {
-        final Dialog dialog = new Dialog(mContext);
-        dialog.setContentView(R.layout.dialog_input_comment);
-        final TextView txtNameFood = dialog.findViewById(R.id.txtNameFood_dial);//Title
-        final EditText edtInputComment = dialog.findViewById(R.id.editCommentFood_dial);//Input
-        Button btnSubmit = dialog.findViewById(R.id.buttonSubmit_dial);
-        Button btnCancel = dialog.findViewById(R.id.buttonCancel_dial);
-        txtNameFood.setText(foodName);
-        edtInputComment.setText(cmt);
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String cmtFood = edtInputComment.getText().toString().trim();
-                if(arrayFood.get(position).getStt()!=0){
-                    arrayFood.get(position).setCommentFood(cmtFood);
-                    MainActivity.database.InsertCommentFood(arrayFood.get(position).getStt(), cmtFood);
-//                    adapter.notifyItemChanged(position);
-                    dialog.dismiss();
-                }
-                else Toast.makeText(mContext, "Khong the cap nhat", Toast.LENGTH_SHORT).show();
-            }
-        });
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-            }
-        });
-        dialog.show();
-    }
-    //----------------------------------------------------------------------------------------------
-*/
 
     @Override
     public void onInvokeDataSuccess() {
@@ -231,7 +129,6 @@ public class FragmentPopular extends Fragment implements ListFoodCustomPresenter
 
     @Override
     public void initRecyclerView() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         recyclerView.setAdapter(adapter);
     }
 
