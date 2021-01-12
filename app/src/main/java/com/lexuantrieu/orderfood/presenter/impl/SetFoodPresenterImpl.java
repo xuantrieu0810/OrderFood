@@ -22,7 +22,7 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
     }
 
     @Override
-    public void invokeData() {
+    public void invokeData(int func) {
         view.onInvokeDataPending();
         //Lay token
         String token = Utils.GetTokenLocal(context);
@@ -33,7 +33,7 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
         }
         //
         GetCategoryService service = RestClient.createService(GetCategoryService.class);
-        service.getCategory("Bearer " + token).subscribeOn(Schedulers.io())
+        service.getCategory("Bearer " + token, func).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response-> {
                     Log.e("LXT_Log", new Gson().toJson(response));

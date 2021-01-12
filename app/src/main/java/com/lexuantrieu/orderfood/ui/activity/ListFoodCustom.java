@@ -74,7 +74,8 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
 //        //-----------------------------------------------------------
         init();
-        presenter.invokeData(tableID);
+        onStartProcessBar("Đang load...");
+        presenter.invokeData(tableID,0);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(null);
@@ -132,7 +133,7 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
         onStopProcessBar();
         AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
             if (resultOk == Activity.RESULT_OK) {
-                presenter.invokeData(tableID);
+                presenter.invokeData(tableID,0);
             } else {
                 finish();
                 onBackPressed();
@@ -142,10 +143,6 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
         dialogFragment.show(fragmentManager, "DialogListFood");
     }
 
-    @Override
-    public void onInvokeDataPending() {
-        onStartProcessBar("Chờ chút...");
-    }
 
     @Override
     public void onStartProcessBar(String message) {
@@ -156,7 +153,7 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
 
     @Override
     public void onStopProcessBar() {
-        progressDialog.dismiss();
+        if(progressDialog.isShowing()) progressDialog.dismiss();
     }
 
 
@@ -205,7 +202,7 @@ public class ListFoodCustom extends AppCompatActivity implements ListFoodCustomP
     protected void onResume() {
         super.onResume();
         onStopProcessBar();
-        presenter.invokeData(tableID);
+        presenter.invokeData(tableID,0);
     }
     //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------

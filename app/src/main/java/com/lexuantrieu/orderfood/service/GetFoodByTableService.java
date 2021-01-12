@@ -5,10 +5,14 @@ import com.lexuantrieu.orderfood.model.FoodModel;
 import java.util.List;
 
 import io.reactivex.Observable;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.POST;
 
 public interface GetFoodByTableService {
-    @GET("getFoodByTable.php")
-    Observable<List<FoodModel>> GetFoodByTable(@Query("tableid") int tableid);
+    @FormUrlEncoded
+    @POST("getFoodByTable.php")
+    Observable<List<FoodModel>> GetFoodByTable(
+            @Field("table_id") int tableid,
+            @Field("FUNC") int func );
 }

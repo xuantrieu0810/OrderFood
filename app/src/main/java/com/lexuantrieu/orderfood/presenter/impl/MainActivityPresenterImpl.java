@@ -55,7 +55,7 @@ public class MainActivityPresenterImpl implements MainActivityPresenter {
         view.onLogoutPending();
         //
         LogoutService service = RestClient.createService(LogoutService.class);
-        service.requetLogout("Bearer " + token, user.getUsername()).subscribeOn(Schedulers.io())
+        service.requetLogout(user.getUsername()).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response-> {
 //                    Log.i("LXT_Log", new Gson().toJson(response));

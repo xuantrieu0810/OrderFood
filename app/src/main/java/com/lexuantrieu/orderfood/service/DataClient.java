@@ -16,13 +16,13 @@ public interface DataClient {
 
     @FormUrlEncoded
     @POST("insertFood.php")
-    Call<String> InsertFood(@Field("catid") int catid
+    Call<String> InsertFood(@Field("cat_id") int catid
             , @Field("name") String name
             , @Field("slug") String slug
             , @Field("image") String image
             , @Field("number") int number
             , @Field("price") float price
-            , @Field("pricesale") String pricesale
+            , @Field("price_sale") String price_sale
             , @Field("created_by") int created_by
             , @Field("status") int status);
 

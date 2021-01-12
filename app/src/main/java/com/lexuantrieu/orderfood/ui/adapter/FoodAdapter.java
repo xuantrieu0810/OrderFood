@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.FoodModel;
@@ -29,7 +30,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final int TYPE_DEFAULT = 1;
     private final int TYPE_CUSTOM = 2;
-
+    SwipeRefreshLayout sdd;
     private Context mContext;
     private static ArrayList<FoodModel> arrListFoodModel;
     private ArrayList<FoodModel> arrListFoodModelFull;

@@ -25,10 +25,9 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     }
 
     @Override
-    public void invokeData(int tableid) {
-        view.onInvokeDataPending();
+    public void invokeData(int tableid, int func) {
         GetFoodByTableService service = RestClient.createService(GetFoodByTableService.class);
-        service.GetFoodByTable(tableid).subscribeOn(Schedulers.io())
+        service.GetFoodByTable(tableid, func).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 //                .filter(data->{
 //                    for(Food f:data){
@@ -40,7 +39,7 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
 //                    Log.e("LXT_Log",new Gson().toJson(response));
                     if(response != null) {
                         for (FoodModel f : response) {
-                            f.setImageFood(Server.urlImage + f.getImageFood());
+                            f.setImageFood(Server.urlImageProduct + f.getImageFood());
                             f.setNameFoodNonVN(LibraryString.covertStringToVN(f.getNameFood()));
                         }
                         view.initAdapter(context, response);

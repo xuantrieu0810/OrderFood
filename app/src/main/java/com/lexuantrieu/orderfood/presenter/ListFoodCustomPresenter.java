@@ -7,7 +7,7 @@ import com.lexuantrieu.orderfood.model.FoodModel;
 import java.util.List;
 
 public interface ListFoodCustomPresenter {
-    void invokeData(int tableid);
+    void invokeData(int tableid, int func);
 
     void InsertOrderList(int bill_id, int table_id, int pos, FoodModel foodModel);
 
@@ -17,8 +17,6 @@ public interface ListFoodCustomPresenter {
         void onInvokeDataSuccess();
 
         void onInvokeDataFail();
-
-        void onInvokeDataPending();
 
         void onStartProcessBar(String message);
 

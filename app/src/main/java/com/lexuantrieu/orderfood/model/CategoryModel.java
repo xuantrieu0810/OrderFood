@@ -11,6 +11,8 @@ public class CategoryModel {
     @SerializedName("name")
     @Expose
     private String name;
+    @SerializedName("image")
+    @Expose
     private String image;
 
     public int getId() {

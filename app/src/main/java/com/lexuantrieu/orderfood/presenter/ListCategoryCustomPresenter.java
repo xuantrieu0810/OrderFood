@@ -7,14 +7,12 @@ import com.lexuantrieu.orderfood.model.CategoryModel;
 import java.util.List;
 
 public interface ListCategoryCustomPresenter {
-    void invokeData();
+    void invokeData(int func);
 
     interface View {
         void onInvokeDataSuccess();
 
         void onInvokeDataFail();
-
-        void onInvokeDataPending();
 
         void onStartProcessBar(String message);
 

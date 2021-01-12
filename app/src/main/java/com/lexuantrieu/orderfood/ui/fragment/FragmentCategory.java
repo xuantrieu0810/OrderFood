@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.CategoryModel;
@@ -32,7 +33,7 @@ import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentCategory extends Fragment implements ListCategoryCustomPresenter.View, ItemClickListener {
+public class FragmentCategory extends Fragment implements ListCategoryCustomPresenter.View, ItemClickListener , SwipeRefreshLayout.OnRefreshListener{
 
     Context mContext;
     ListCategoryCustomPresenter presenter;
@@ -43,6 +44,7 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
     RecyclerView recyclerView;
     ArrayList<CategoryModel> arrayCatModel;
     CategoryAdapter adapter;
+    SwipeRefreshLayout refreshLayout;
     View viewFrag;
 
     @Override
@@ -72,16 +74,21 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.HORIZONTAL));
         //recyclerView.setHasFixedSize(true);//ds không thêm/ bớt
         //recyclerView.addItemDecoration(new SpacesItemDecoration(20));
-        presenter.invokeData();
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        onStartProcessBar("Đang load...");
+        presenter.invokeData(1);
         return viewFrag;
     }
 
     private void init() {
         recyclerView = viewFrag.findViewById(R.id.recyclerViewCategory_FragCategory);
+        refreshLayout = viewFrag.findViewById(R.id.swipe_rf_frag_category);
     }
 
     @Override
     public void onInvokeDataSuccess() {
+        if(refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
         onStopProcessBar();
     }
 
@@ -90,17 +97,12 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
         onStopProcessBar();
         AlertDialogFragment dialogFragment = new AlertDialogFragment(mContext, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
             if (resultOk == Activity.RESULT_OK) {
-                presenter.invokeData();
+                presenter.invokeData(1);
             } else {
                 getActivity().getFragmentManager().popBackStack();
             }
         });
         dialogFragment.show(getFragmentManager(), "Dialog");
-    }
-
-    @Override
-    public void onInvokeDataPending() {
-        onStartProcessBar("Chờ chút...");
     }
 
     @Override
@@ -112,7 +114,7 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
 
     @Override
     public void onStopProcessBar() {
-        progressDialog.dismiss();
+        if(progressDialog.isShowing()) progressDialog.dismiss();
     }
 
 
@@ -160,6 +162,18 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
         } else {
             Toast.makeText(mContext, ""+arrayCatModel.get(position).getName(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        presenter.invokeData(1);
+//        Handler handler = new Handler();
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                refreshLayout.setRefreshing(false);
+//            }
+//        }, 5000);
     }
 }
 

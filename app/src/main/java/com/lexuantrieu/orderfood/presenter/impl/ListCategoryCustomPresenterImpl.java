@@ -5,7 +5,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.lexuantrieu.orderfood.model.CategoryModel;
 import com.lexuantrieu.orderfood.network.RestClient;
+import com.lexuantrieu.orderfood.network.Server;
 import com.lexuantrieu.orderfood.presenter.ListCategoryCustomPresenter;
 import com.lexuantrieu.orderfood.service.GetCategoryService;
 import com.lexuantrieu.orderfood.utils.Utils;
@@ -24,8 +26,7 @@ public class ListCategoryCustomPresenterImpl implements ListCategoryCustomPresen
 
 
     @Override
-    public void invokeData() {
-        view.onInvokeDataPending();
+    public void invokeData(int func) {
         //Lay token
         String token = Utils.GetTokenLocal(context);
         if(token.isEmpty()) {
@@ -35,11 +36,15 @@ public class ListCategoryCustomPresenterImpl implements ListCategoryCustomPresen
         }
         //
         GetCategoryService service = RestClient.createService(GetCategoryService.class);
-        service.getCategory("Bearer " + token).subscribeOn(Schedulers.io())
+        service.getCategory("Bearer " + token, func).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+
                 .subscribe(response-> {
                     Log.e("LXT_Log", new Gson().toJson(response));
                     if (response.getError().equals("null")) {
+                        for (CategoryModel c : response.getData()) {
+                            c.setImage(Server.urlImageCat + c.getImage());
+                        }
                         view.initAdapter(context, response.getData());
                         view.initRecyclerView();
                         view.onInvokeDataSuccess();

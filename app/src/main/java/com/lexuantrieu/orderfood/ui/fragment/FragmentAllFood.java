@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.FoodModel;
@@ -31,7 +32,7 @@ import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter.View, FoodAdapterListener {
+public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter.View, FoodAdapterListener , SwipeRefreshLayout.OnRefreshListener{
 
     Context mContext;
     ListFoodCustomPresenter presenter;
@@ -42,6 +43,7 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
     RecyclerView recyclerView;
     ArrayList<FoodModel> arrayFoodModel;
     FoodAdapter adapter;
+    SwipeRefreshLayout refreshLayout;
     View viewFrag;
 
     @Override
@@ -65,12 +67,16 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(null);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
-        presenter.invokeData(tableID);
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        onStartProcessBar("Đang load...");
+        presenter.invokeData(tableID,0);
         return viewFrag;
     }
 
     private void init() {
         recyclerView = viewFrag.findViewById(R.id.recyclerViewFood_FragAllFood);
+        refreshLayout = viewFrag.findViewById(R.id.swipe_rf_frag_allfood);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -87,6 +93,7 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
 
     @Override
     public void onInvokeDataSuccess() {
+        if(refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
         onStopProcessBar();
     }
 
@@ -95,17 +102,12 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
         onStopProcessBar();
         AlertDialogFragment dialogFragment = new AlertDialogFragment(mContext, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
             if (resultOk == Activity.RESULT_OK) {
-                presenter.invokeData(tableID);
+                presenter.invokeData(tableID,0);
             } else {
                 getActivity().getFragmentManager().popBackStack();
             }
         });
         dialogFragment.show(getFragmentManager(), "Dialog");
-    }
-
-    @Override
-    public void onInvokeDataPending() {
-        onStartProcessBar("Chờ chút...");
     }
 
     @Override
@@ -117,7 +119,7 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
 
     @Override
     public void onStopProcessBar() {
-        progressDialog.dismiss();
+        if(progressDialog.isShowing()) progressDialog.dismiss();
     }
 
 
@@ -165,8 +167,12 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
     @Override
     public void onResume() {
         super.onResume();
-        presenter.invokeData(tableID);
-        onStopProcessBar();
+        presenter.invokeData(tableID,0);
+    }
+
+    @Override
+    public void onRefresh() {
+        presenter.invokeData(tableID,0);
     }
 }
 

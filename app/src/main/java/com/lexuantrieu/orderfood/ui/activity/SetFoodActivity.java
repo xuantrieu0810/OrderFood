@@ -81,7 +81,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
         //-----------------------------------------------------------
         init();
-        presenter.invokeData();
+        presenter.invokeData(0);
         btnCamera.setOnClickListener(v -> ActivityCompat.requestPermissions(
                 SetFoodActivity.this,
                 new String[]{Manifest.permission.CAMERA},
@@ -356,7 +356,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
        // Create YesNoDialogFragment
         AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
             if(resultOk == Activity.RESULT_OK) {
-                presenter.invokeData();
+                presenter.invokeData(0);
             } else {//if(resultCode == Activity.RESULT_CANCELED) {
                 finish();
             }

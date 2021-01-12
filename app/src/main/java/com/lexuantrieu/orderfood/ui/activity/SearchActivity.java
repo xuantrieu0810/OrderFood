@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.FoodModel;
@@ -30,8 +31,9 @@ import com.lexuantrieu.orderfood.utils.CheckConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchActivity extends AppCompatActivity implements ListFoodCustomPresenter.View, FoodAdapterListener{
+public class SearchActivity extends AppCompatActivity implements ListFoodCustomPresenter.View, FoodAdapterListener, SwipeRefreshLayout.OnRefreshListener{
 
+    String keySearch;
     ListFoodCustomPresenter presenter;
     ProgressDialog progressDialog;
     int tableID = -1; //default = -1
@@ -40,6 +42,8 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
     RecyclerView recyclerView;
     ArrayList<FoodModel> arrayFoodModel;
     FoodSearchAdapter adapter;
+    SwipeRefreshLayout refreshLayout;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +78,10 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
 //        //-----------------------------------------------------------
         init();
-        presenter.invokeData(tableID);
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        onStartProcessBar("Đang load...");
+        presenter.invokeData(tableID,0);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(null);
@@ -85,6 +92,7 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
     private void init() {
         presenter = new ListFoodCustomPresenterImpl(this, this);
         recyclerView = findViewById(R.id.recyclerViewSearch);
+        refreshLayout = findViewById(R.id.swipe_rf_search);
         progressDialog = new ProgressDialog(this);
     }
 
@@ -92,7 +100,7 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_food, menu);
         MenuItem item = menu.findItem(R.id.actionSearch);
-        SearchView searchView = (SearchView) item.getActionView();
+        searchView = (SearchView) item.getActionView();
         searchView.setIconifiedByDefault(true);
         searchView.setIconified(true);
         searchView.setFocusable(false);
@@ -105,7 +113,8 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
+                keySearch = newText;
+                adapter.getFilter().filter(keySearch);
                 return false;
             }
         });
@@ -124,6 +133,13 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
 
     @Override
     public void onInvokeDataSuccess() {
+        if(refreshLayout.isRefreshing()) {
+            adapter.getFilter().filter(keySearch);
+
+
+
+            refreshLayout.setRefreshing(false);
+        }
         onStopProcessBar();
     }
 
@@ -132,7 +148,7 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
         onStopProcessBar();
         AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
             if (resultOk == Activity.RESULT_OK) {
-                presenter.invokeData(tableID);
+                presenter.invokeData(tableID,0);
             } else {
                 finish();
                 onBackPressed();
@@ -142,10 +158,6 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
         dialogFragment.show(fragmentManager, "DialogListFood");
     }
 
-    @Override
-    public void onInvokeDataPending() {
-        onStartProcessBar("Chờ chút...");
-    }
 
     @Override
     public void onStartProcessBar(String message) {
@@ -156,7 +168,7 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
 
     @Override
     public void onStopProcessBar() {
-        progressDialog.dismiss();
+        if(progressDialog.isShowing()) progressDialog.dismiss();
     }
 
 
@@ -205,7 +217,12 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
     protected void onResume() {
         super.onResume();
         onStopProcessBar();
-        presenter.invokeData(tableID);
+        presenter.invokeData(tableID,0);
+    }
+
+    @Override
+    public void onRefresh() {
+        presenter.invokeData(tableID,0);
     }
     //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
