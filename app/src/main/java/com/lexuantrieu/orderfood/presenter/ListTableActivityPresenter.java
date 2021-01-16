@@ -10,6 +10,9 @@ public interface ListTableActivityPresenter {
     void invokeData();
     //
     boolean CheckOrderListOfTable(int tableId);
+
+    void checkTableStatus();
+
     interface View {
         void onInvokeDataSuccess();
 

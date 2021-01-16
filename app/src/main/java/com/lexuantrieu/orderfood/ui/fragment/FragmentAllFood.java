@@ -69,7 +69,7 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
-        onStartProcessBar("Đang load...");
+//        onStartProcessBar("Đang load...");
         presenter.invokeData(tableID,0);
         return viewFrag;
     }
@@ -81,10 +81,25 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
 
     //----------------------------------------------------------------------------------------------
     @Override
-    public void ChangeFoodQuantity(int position, FoodModel foodModel) {
+    public void ChangeFoodItem(int position, FoodModel foodModel) {
         int stt = foodModel.getStt();
-        if (stt != -1 && foodModel.getStatusFood() == 0) {
-            presenter.UpdateOrderList(billID, tableID, position, foodModel);
+        int quantity = foodModel.getCountFood();
+        int status = foodModel.getStatusFood();
+        if (stt != -1 && status == 0) {
+            if(quantity == 0){
+                AlertDialogFragment dialogFragment = new AlertDialogFragment(mContext, "Hủy chọn món đã đặt", "[ "+foodModel.getNameFood()+"]"+
+                        "\nBạn có chắc không?", resultOk -> {
+                    if (resultOk == Activity.RESULT_OK) {
+                        onStartProcessBar("Đang xóa...");
+                        presenter.UpdateOrderList(billID, tableID, position, foodModel);
+                    } else {
+                        getActivity().getSupportFragmentManager().popBackStack();
+                    }
+                });
+                dialogFragment.show(getFragmentManager(), "Dialog");
+            } else {
+                presenter.UpdateOrderList(billID, tableID, position, foodModel);
+            }
         } else {
             presenter.InsertOrderList(billID, tableID, position, foodModel);
         }
@@ -141,6 +156,7 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
 
     @Override
     public void onSuccessSetFood(FoodModel foodModel, int pos) {
+        onStopProcessBar();
         arrayFoodModel.set(pos, foodModel);
         adapter.notifyItemChanged(pos);
     }

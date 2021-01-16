@@ -1,5 +1,8 @@
 package com.lexuantrieu.orderfood.ui.activity;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
@@ -16,6 +20,7 @@ import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.presenter.OrderPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.OrderPresenterImpl;
 import com.lexuantrieu.orderfood.ui.adapter.ViewPagerAdapter;
+import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 
 public class OrderActivity extends AppCompatActivity implements OrderPresenter.View{
 
@@ -26,12 +31,14 @@ public class OrderActivity extends AppCompatActivity implements OrderPresenter.V
     private TabLayout tablayout;
     private ViewPager viewPager;
     private ViewPagerAdapter adapter;
-
+    ProgressDialog progressDialog;
+    Context context;
     OrderPresenter presenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //-----------------------------------------------------------
+        this.context = this;
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             tableName = bundle.getString("tableName");
@@ -60,14 +67,15 @@ public class OrderActivity extends AppCompatActivity implements OrderPresenter.V
         tablayout = (TabLayout) findViewById(R.id.tabLayout);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
 
-        adapter = new ViewPagerAdapter(this,getSupportFragmentManager());
+        progressDialog = new ProgressDialog(context);
+        adapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         //add frag
         viewPager.setAdapter(adapter);
         tablayout.setupWithViewPager(viewPager);
 
-        tablayout.getTabAt(0).setIcon(R.drawable.ic_popular);
-        tablayout.getTabAt(1).setIcon(R.drawable.ic_category);
-        tablayout.getTabAt(2).setIcon(R.drawable.ic_all_food);
+//        tablayout.getTabAt(0).setIcon(R.drawable.ic_popular);
+//        tablayout.getTabAt(1).setIcon(R.drawable.ic_category);
+//        tablayout.getTabAt(2).setIcon(R.drawable.ic_all_food);
     }
 
     //Create menu on Activity
@@ -82,19 +90,25 @@ public class OrderActivity extends AppCompatActivity implements OrderPresenter.V
     //----------------------------------------------------------------------------------------------
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent;
+        Bundle bundle;
         switch (item.getItemId()) {
             case R.id.menuItemCart:
-//                String sql = "SELECT * FROM OrderedDetails WHERE idBill = " + idBill ;
-//                Cursor cursor = MainActivity.database.GetData(sql);
-//                if(cursor.moveToFirst()) {
-                Intent intent = new Intent(OrderActivity.this, ListOrderedActivity.class);
+                intent = new Intent(OrderActivity.this, ListOrderedActivity.class);
+                bundle = new Bundle();
+                bundle.putInt("tableId",tableID);
+                bundle.putString("tableName",tableName);
+                bundle.putInt("billId",billID);
+                intent.putExtras(bundle);
                 startActivity(intent);
-//                }
-//                else
-//                    Toast.makeText(this, "VUI CHỌN MÓN", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.menuItemSearch:
                 intent = new Intent(OrderActivity.this, SearchActivity.class);
+                bundle = new Bundle();
+                bundle.putInt("tableId",tableID);
+                bundle.putString("tableName",tableName);
+                bundle.putInt("billId",billID);
+                intent.putExtras(bundle);
                 startActivity(intent);
                 break;
             //-------------------------
@@ -106,48 +120,41 @@ public class OrderActivity extends AppCompatActivity implements OrderPresenter.V
         return super.onOptionsItemSelected(item);
     }
 
-
-    @Override
-    public void onInvokeDataSuccess() {
-
-    }
-
-    @Override
-    public void onInvokeDataFail() {
-
-    }
-
     @Override
     public void getBillIdSuccess(int bill_id) {
+        onStopProcessBar();
         this.billID = bill_id;
-//        presenter.invokeData();
         initAdapter();
     }
 
     @Override
     public void getBillIdFail() {
-        Toast.makeText(this, "Xảy ra lỗi. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
-        this.finish();
-    }
-
-    @Override
-    public void onInvokeDataPending() {
-
+        onStopProcessBar();
+        AlertDialogFragment dialogFragment = new AlertDialogFragment(context, "Chưa có dữ liệu Bill", "Tải lại", resultOk -> {
+            if (resultOk == Activity.RESULT_OK) {
+                presenter.getBillId(tableID);
+            } else {
+                this.getSupportFragmentManager().popBackStack();
+                this.finish();
+            }
+        });
+        dialogFragment.show(this.getSupportFragmentManager(), "Dialog");
     }
 
     @Override
     public void onStartProcessBar(String message) {
-
+        progressDialog.setMessage(message);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
     }
 
     @Override
     public void onStopProcessBar() {
-
+        if(progressDialog.isShowing()) progressDialog.dismiss();
     }
 
     @Override
     public void initAdapter() {
         viewPager.setAdapter(adapter);
-
     }
 }

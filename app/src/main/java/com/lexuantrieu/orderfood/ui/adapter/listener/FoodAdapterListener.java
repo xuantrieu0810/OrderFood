@@ -4,5 +4,5 @@ import com.lexuantrieu.orderfood.model.FoodModel;
 
 public interface FoodAdapterListener {
 
-    void ChangeFoodQuantity(int pos, FoodModel foodModel);
+    void ChangeFoodItem(int pos, FoodModel foodModel);
 }

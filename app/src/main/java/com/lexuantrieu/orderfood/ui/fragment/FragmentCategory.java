@@ -23,9 +23,9 @@ import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.CategoryModel;
 import com.lexuantrieu.orderfood.presenter.ListCategoryCustomPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.ListCategoryCustomPresenterImpl;
+import com.lexuantrieu.orderfood.ui.activity.FoodByCatActivity;
 import com.lexuantrieu.orderfood.ui.activity.ListOrderedActivity;
 import com.lexuantrieu.orderfood.ui.activity.OrderActivity;
-import com.lexuantrieu.orderfood.ui.activity.SearchActivity;
 import com.lexuantrieu.orderfood.ui.adapter.CategoryAdapter;
 import com.lexuantrieu.orderfood.ui.adapter.listener.ItemClickListener;
 import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
@@ -76,7 +76,7 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
         //recyclerView.addItemDecoration(new SpacesItemDecoration(20));
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
-        onStartProcessBar("Đang load...");
+//        onStartProcessBar("Đang load...");
         presenter.invokeData(1);
         return viewFrag;
     }
@@ -95,11 +95,13 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
     @Override
     public void onInvokeDataFail() {
         onStopProcessBar();
+//        FragmentManager manager = getActivity().getSupportFragmentManager();
         AlertDialogFragment dialogFragment = new AlertDialogFragment(mContext, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
             if (resultOk == Activity.RESULT_OK) {
                 presenter.invokeData(1);
             } else {
-                getActivity().getFragmentManager().popBackStack();
+                getActivity().getSupportFragmentManager().popBackStack();
+//                getActivity().getFragmentManager().popBackStack();
             }
         });
         dialogFragment.show(getFragmentManager(), "Dialog");
@@ -153,10 +155,12 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
     @Override
     public void onClick(View view, int position, boolean isLongClick) {
         if (!isLongClick){
-            Intent intent = new Intent(mContext, SearchActivity.class);
+            Intent intent = new Intent(mContext, FoodByCatActivity.class);
             Bundle bundle = new Bundle();
             bundle.putInt("tableId",tableID);
             bundle.putString("tableName",tableName);
+            bundle.putInt("billId",billID);
+            bundle.putInt("catId",arrayCatModel.get(position).getId());
             intent.putExtras(bundle);
             startActivity(intent);
         } else {

@@ -15,6 +15,10 @@ public class CategoryModel {
     @Expose
     private String image;
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }
@@ -35,7 +39,7 @@ public class CategoryModel {
         return image;
     }
 
-    public void setImage(String name) {
+    public void setImage(String image) {
         this.image = image;
     }
 

@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
 
     private AppDatabase db;
     TextView txtUsername, txtFullname, txtRole, txtToken;
-    Button btnGet, btnSet, btnLogout, btnTab, btnCheck;
+    Button btnLogout, btnSet, btnKitChen, btnWaiter;
     MainActivityPresenter presenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,34 +32,22 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
             Intent intent = new Intent(MainActivity.this,SetFoodActivity.class);
             startActivity(intent);
         });
-        btnGet.setOnClickListener(view -> {
+        btnWaiter.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this,ListTableActivity.class);
             startActivity(intent);
         });
         btnLogout.setOnClickListener(view -> {
             presenter.onLogout();
         });
-        btnTab.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this,OrderActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putInt("tableId",7);
-            bundle.putInt("billId",2);
-            bundle.putString("tableName","Bàn số 7");
-            intent.putExtras(bundle);
-            startActivity(intent);
-        });
-        btnCheck.setOnClickListener(view -> {
-            presenter.checkTableStatus();
-        });
+
     }
 
     private void init() {
         db = AppDatabase.getInstance(this);
         presenter = new MainActivityPresenterImpl(this,this);
-        btnGet = findViewById(R.id.btnListFood);
+        btnKitChen = findViewById(R.id.btnKitchen);
+        btnWaiter = findViewById(R.id.btnWaiter);
         btnSet = findViewById(R.id.btnSetFood);
-        btnTab = findViewById(R.id.btnTabLayout);
-        btnCheck = findViewById(R.id.btnCheck);
         btnLogout = findViewById(R.id.btn_logout);
         txtUsername = findViewById(R.id.txt_username);
         txtFullname = findViewById(R.id.txt_fullname);

@@ -1,48 +1,43 @@
 package com.lexuantrieu.orderfood.ui.activity;
-//
-//import androidx.appcompat.app.ActionBar;
-//import androidx.appcompat.app.AppCompatActivity;
-//
-//import android.app.Dialog;
-//import android.content.DialogInterface;
-//import android.database.Cursor;
-//import android.os.Bundle;
-//import android.view.MenuItem;
-//import android.view.View;
-//import android.widget.Button;
-//import android.widget.EditText;
-//import android.widget.ListView;
-//import android.widget.TextView;
-//import android.widget.Toast;
-//
-//import com.lexuantrieu.orderfood.R;
-//import com.lexuantrieu.orderfood.model.FoodModel;
-//import com.lexuantrieu.orderfood.ui.adapter.ListOrderedAdapter;
-//
-//import java.util.ArrayList;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.FoodModel;
+import com.lexuantrieu.orderfood.presenter.ListFoodCustomPresenter;
+import com.lexuantrieu.orderfood.presenter.impl.ListFoodCustomPresenterImpl;
 import com.lexuantrieu.orderfood.ui.adapter.ListOrderedAdapter;
+import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
+import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class ListOrderedActivity extends AppCompatActivity {
+public class ListOrderedActivity extends AppCompatActivity implements ListFoodCustomPresenter.View, FoodAdapterListener, SwipeRefreshLayout.OnRefreshListener {
 
+    ListFoodCustomPresenter presenter;
+    ProgressDialog progressDialog;
+    SwipeRefreshLayout refreshLayout;
     String tableName;
-    int tableId=-1, billId =-1;
+    int tableID=-1, billID =-1;
     TextView txtTotal;
-    ListView lvCart;
+    ListView listViewCart;
     ArrayList<FoodModel> arrayCart;
-    ListOrderedAdapter cartAdapter;
+    ListOrderedAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,8 +45,15 @@ public class ListOrderedActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             tableName = bundle.getString("tableName");
-            tableId= bundle.getInt("tableId");
-            billId = bundle.getInt("billId");
+            tableID= bundle.getInt("tableId");
+            billID = bundle.getInt("billId");
+            if(tableID==-1|| billID==-1){
+
+                Log.d("LXT_Log", "table_id: "+tableID+"- bill_id: "+billID);
+                finish();
+                Toast.makeText(this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
+                return;
+            }
         } else {
             finish();
             Toast.makeText(this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
@@ -64,13 +66,133 @@ public class ListOrderedActivity extends AppCompatActivity {
         actionBar.setSubtitle(tableName);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
         //----------------------------------------------------------
-        lvCart = findViewById(R.id.listViewCart);
+//        init();
+        presenter = new ListFoodCustomPresenterImpl(this, this);
+        refreshLayout = findViewById(R.id.swipe_rf_list_ordered);
+        progressDialog = new ProgressDialog(this);
+        listViewCart = findViewById(R.id.listViewCart);
         txtTotal = findViewById(R.id.txtTotalCart);
         arrayCart = new ArrayList<>();
-        cartAdapter = new ListOrderedAdapter(this,R.layout.item_list_ordered,arrayCart);
-        lvCart.setAdapter(cartAdapter);
+        adapter = new ListOrderedAdapter(this, R.layout.item_list_ordered, arrayCart, this);
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        //---
+        onStartProcessBar("Đang load...");
+        presenter.invokeData(tableID,-3);
+
 //        GetListInfoBill();
     }//end of onCreate
+
+    @Override
+    public void onInvokeDataSuccess() {
+        onStopProcessBar();
+    }
+
+    @Override
+    public void onInvokeDataFail() {
+        onStopProcessBar();
+        AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
+            if (resultOk == Activity.RESULT_OK) {
+                presenter.invokeData(tableID,-3);
+            } else {
+                finish();
+                onBackPressed();
+            }
+        });
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+        dialogFragment.show(fragmentManager, "DialogListFood");
+    }
+
+    @Override
+    public void onStartProcessBar(String message) {
+        progressDialog.setMessage(message);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    @Override
+    public void onStopProcessBar() {
+        if(refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
+        if(progressDialog.isShowing()) progressDialog.dismiss();
+    }
+
+    @Override
+    public void initAdapter(Context context, List<FoodModel> listData) {
+        arrayCart = (ArrayList<FoodModel>) listData;
+        adapter = new ListOrderedAdapter(this, R.layout.item_list_ordered, arrayCart, this);
+    }
+
+    @Override
+    public void initRecyclerView() {
+        listViewCart.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onFailSetFood() {
+        onStopProcessBar();
+        Toast.makeText(this, "Xảy ra lỗi", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSuccessSetFood(FoodModel foodModel, int pos) {
+        if(foodModel.getCountFood()==0)
+            arrayCart.clear();
+        arrayCart.set(pos, foodModel);
+        adapter.notifyDataSetChanged();
+        onStopProcessBar();
+    }
+
+    //------------------------------------------------------------------------------------
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            //-------------------------
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        presenter.invokeData(tableID,-3);
+        onStopProcessBar();
+    }
+
+    @Override
+    public void onRefresh() {
+        presenter.invokeData(tableID,-3);
+    }
+
+    @Override
+    public void ChangeFoodItem(int position, FoodModel foodModel) {
+        int stt = foodModel.getStt();
+        int quantity = foodModel.getCountFood();
+        int status = foodModel.getStatusFood();
+        if (stt != -1 && status == 0) {
+            if(quantity == 0){
+                AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Hủy chọn món đã đặt", "[ "+foodModel.getNameFood()+"]"+
+                        "\nBạn có chắc không?", resultOk -> {
+                    if (resultOk == Activity.RESULT_OK) {
+                        onStartProcessBar("Đang xóa...");
+                        presenter.UpdateOrderList(billID, tableID, position, foodModel);
+                    } else {
+                        getSupportFragmentManager().popBackStack();
+                    }
+                });
+                dialogFragment.show(getSupportFragmentManager(), "Dialog");
+            } else {
+                presenter.UpdateOrderList(billID, tableID, position, foodModel);
+            }
+        } else {
+            presenter.InsertOrderList(billID, tableID, position, foodModel);
+        }
+    }
+
 //
 //    private void CheckOut() {
 //        if(arrayCart.size()>0) {
@@ -105,7 +227,7 @@ public class ListOrderedActivity extends AppCompatActivity {
 //            ));
 //        }
 //        SetTotalPrice();
-//        cartAdapter.notifyDataSetChanged();
+//        adapter.notifyDataSetChanged();
 //    }
 //
 //    private void SetTotalPrice() {
@@ -163,7 +285,7 @@ public class ListOrderedActivity extends AppCompatActivity {
 //    }
 //    //----------------------------------------------------------------------------------------------
 //    public void ClickButtonAdd(int position) {
-//        View view = cartAdapter.getView(position,null,null);
+//        View view = adapter.getView(position,null,null);
 //        EditText edtCount = view.findViewById(R.id.editTextCount_SubCart);
 //        int countTmp = Integer.parseInt(edtCount.getText().toString());
 //        if(countTmp < 99) {
@@ -175,7 +297,7 @@ public class ListOrderedActivity extends AppCompatActivity {
 //    }
 //    //----------------------------------------------------------------------------------------------
 //    public void ClickButtonSub(int position) {
-//        View view = cartAdapter.getView(position,null,null);
+//        View view = adapter.getView(position,null,null);
 //        EditText edtCount = view.findViewById(R.id.editTextCount_SubCart);
 //        int countTmp = Integer.parseInt(edtCount.getText().toString());
 //        if(countTmp > 0) {

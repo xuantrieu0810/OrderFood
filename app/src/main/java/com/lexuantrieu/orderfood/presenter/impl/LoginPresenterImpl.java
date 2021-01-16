@@ -105,6 +105,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                         Log.e("LXT_Log", "ErrorCode: " + response.getError());
                     }
                 }, throwable -> {
+                    Log.e("LXT_Log_Error","Response Login: "+throwable.getMessage());
                     throwable.printStackTrace();
                 });
 

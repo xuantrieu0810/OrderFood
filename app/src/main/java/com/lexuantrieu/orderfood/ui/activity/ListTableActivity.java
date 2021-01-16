@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.TableModel;
@@ -26,8 +27,9 @@ import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListTableActivity extends AppCompatActivity implements ListTableActivityPresenter.View {
+public class ListTableActivity extends AppCompatActivity implements ListTableActivityPresenter.View , SwipeRefreshLayout.OnRefreshListener{
 
+    SwipeRefreshLayout refreshLayout;
     ListTableActivityPresenter presenter;
     ProgressDialog progressDialog;
     GridView gridView;
@@ -46,11 +48,13 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
         //---------------------------------------------------------------
         init();
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
         presenter.invokeData();
         //---------------------------------------------------------------
         //Event click on GridView
         gridView.setOnItemClickListener((parent, view, position, id) -> {
-            Intent intent = new Intent(ListTableActivity.this, ListFoodCustom.class);
+            Intent intent = new Intent(ListTableActivity.this, OrderActivity.class);
             Bundle bundle = new Bundle();
             bundle.putInt("tableId",arrayTable.get(position).getId());
             bundle.putString("tableName",arrayTable.get(position).getName());
@@ -60,6 +64,7 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
         registerForContextMenu(gridView);
     }//end onCreate
     private void init() {
+        refreshLayout = findViewById(R.id.swipe_rf_list_table);
         presenter = new ListTableActivityPresenterImpl(this, this);
         progressDialog = new ProgressDialog(this);
         gridView = findViewById(R.id.gridviewTable);
@@ -189,7 +194,8 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
 
     @Override
     public void onStopProcessBar() {
-        progressDialog.dismiss();
+        if(refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
+        if(progressDialog.isShowing()) progressDialog.dismiss();
     }
 
 
@@ -220,6 +226,13 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
     protected void onResume() {
         super.onResume();
         onStopProcessBar();
+        presenter.invokeData();
+    }
+
+    @Override
+    public void onRefresh() {
+
+        presenter.checkTableStatus();
         presenter.invokeData();
     }
     //------------------------------------------------------------------------------------

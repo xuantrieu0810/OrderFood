@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <TextView
+        android:id="@+id/txtFood_kc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="#Tên món"
+        android:textSize="18sp"
+        android:textStyle="normal|bold"
+        app:layout_constraintEnd_toStartOf="@+id/txtCount_kc"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtCount_kc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="#10"
+        android:textColor="@android:color/primary_text_light_nodisable"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/txtFood_kc"
+        app:layout_constraintEnd_toStartOf="@+id/txtTable_kc" />
+
+    <TextView
+        android:id="@+id/txtTable_kc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="Bàn số #"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/txtCount_kc"
+        app:layout_constraintEnd_toStartOf="@+id/imageView_kc" />
+
+    <ImageView
+        android:id="@+id/imageView_kc"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/border"
+        android:onClick="OnClickStatus"
+        app:layout_constraintBottom_toBottomOf="@+id/txtComment_kc"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/txtTable_kc"
+        app:layout_constraintVertical_bias="0.5"
+        app:srcCompat="@android:drawable/checkbox_off_background" />
+
+    <TextView
+        android:id="@+id/txtComment_kc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:inputType="textMultiLine"
+        android:lines="3"
+        android:text="TextView"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/txtTable_kc"
+        app:layout_constraintStart_toStartOf="@+id/txtFood_kc"
+        app:layout_constraintTop_toBottomOf="@+id/txtFood_kc" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,44 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient"
     tools:context=".ui.activity.MainActivity">
 
     <Button
-        android:id="@+id/btnListFood"
+        android:id="@+id/btnWaiter"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="240dp"
         android:layout_marginEnd="24dp"
-        android:text="List Food"
+        android:text="Phục vụ"
         app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/transparent_bg_bordered"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/btnKitchen"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="56dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/transparent_bg_bordered"
+        android:text="Nhà bếp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnWaiter" />
+
+    <Button
         android:id="@+id/btnSetFood"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="76dp"
-        android:text="Set Food"
-        app:layout_constraintEnd_toEndOf="@+id/btnListFood"
-        app:layout_constraintStart_toStartOf="@+id/btnListFood"
-        app:layout_constraintTop_toBottomOf="@+id/btnListFood" />
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="68dp"
+        android:layout_marginEnd="100dp"
+        android:background="@drawable/transparent_bg_bordered"
+        android:text="Thiết lập kho hàng"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnKitchen" />
 
     <Button
         android:id="@+id/btn_logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="84dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/transparent_bg_bordered"
         android:text="Log out"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnSetFood" />
+        app:layout_constraintTop_toBottomOf="@+id/btnSetFood"
+        app:layout_constraintVertical_bias="0.936" />
 
     <TextView
         android:id="@+id/txt_username"
@@ -80,23 +105,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txt_role" />
 
-    <Button
-        android:id="@+id/btnCheck"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="72dp"
-        android:layout_marginTop="44dp"
-        android:text="Check"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnSetFood" />
 
-    <Button
-        android:id="@+id/btnTabLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:text="Tab"
-        app:layout_constraintStart_toEndOf="@+id/btnCheck"
-        app:layout_constraintTop_toTopOf="@+id/btnCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

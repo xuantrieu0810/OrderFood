@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.activity.SearchActivity"></activity>
+        <activity android:name=".ui.activity.KitchenActivity"></activity>
+        <activity android:name=".ui.activity.SearchActivity" />
         <activity android:name=".ui.activity.OrderActivity" />
         <activity android:name=".ui.activity.ListOrderedActivity" />
         <activity android:name=".ui.activity.ListTableActivity" />

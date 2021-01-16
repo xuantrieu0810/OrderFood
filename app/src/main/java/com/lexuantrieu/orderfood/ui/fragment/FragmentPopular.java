@@ -58,7 +58,7 @@ public class FragmentPopular extends Fragment implements ListFoodCustomPresenter
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mContext = container.getContext();
-        viewFrag = inflater.inflate(R.layout.fragment_all_food,container,false);
+        viewFrag = inflater.inflate(R.layout.fragment_popular,container,false);
         init();
         presenter = new ListFoodCustomPresenterImpl(this.getContext(), this);
         progressDialog = new ProgressDialog(mContext);
@@ -69,22 +69,37 @@ public class FragmentPopular extends Fragment implements ListFoodCustomPresenter
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
-        onStartProcessBar("Đang load...");
-        presenter.invokeData(tableID,0);
+//        onStartProcessBar("Đang load...");
+        presenter.invokeData(tableID, -2);
         return viewFrag;
     }
 
     private void init() {
-        recyclerView = viewFrag.findViewById(R.id.recyclerViewFood_FragAllFood);
-        refreshLayout = viewFrag.findViewById(R.id.swipe_rf_frag_allfood);
+        recyclerView = viewFrag.findViewById(R.id.recyclerViewFood_FragPopular);
+        refreshLayout = viewFrag.findViewById(R.id.swipe_rf_frag_popular);
     }
 
     //----------------------------------------------------------------------------------------------
     @Override
-    public void ChangeFoodQuantity(int position, FoodModel foodModel) {
+    public void ChangeFoodItem(int position, FoodModel foodModel) {
         int stt = foodModel.getStt();
-        if (stt != -1 && foodModel.getStatusFood() == 0) {
-            presenter.UpdateOrderList(billID, tableID, position, foodModel);
+        int quantity = foodModel.getCountFood();
+        int status = foodModel.getStatusFood();
+        if (stt != -1 && status == 0) {
+            if(quantity == 0){
+                AlertDialogFragment dialogFragment = new AlertDialogFragment(mContext, "Hủy chọn món đã đặt", "[ "+foodModel.getNameFood()+"]"+
+                        "\nBạn có chắc không?", resultOk -> {
+                    if (resultOk == Activity.RESULT_OK) {
+                        onStartProcessBar("Đang xóa...");
+                        presenter.UpdateOrderList(billID, tableID, position, foodModel);
+                    } else {
+                        getActivity().getSupportFragmentManager().popBackStack();
+                    }
+                });
+                dialogFragment.show(getFragmentManager(), "Dialog");
+            } else {
+                presenter.UpdateOrderList(billID, tableID, position, foodModel);
+            }
         } else {
             presenter.InsertOrderList(billID, tableID, position, foodModel);
         }
@@ -102,7 +117,7 @@ public class FragmentPopular extends Fragment implements ListFoodCustomPresenter
         onStopProcessBar();
         AlertDialogFragment dialogFragment = new AlertDialogFragment(mContext, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
             if (resultOk == Activity.RESULT_OK) {
-                presenter.invokeData(tableID,0);
+                presenter.invokeData(tableID, -2);
             } else {
                 getActivity().getFragmentManager().popBackStack();
             }
@@ -143,6 +158,7 @@ public class FragmentPopular extends Fragment implements ListFoodCustomPresenter
     public void onSuccessSetFood(FoodModel foodModel, int pos) {
         arrayFoodModel.set(pos, foodModel);
         adapter.notifyItemChanged(pos);
+        onStopProcessBar();
     }
 
     //------------------------------------------------------------------------------------
@@ -167,11 +183,12 @@ public class FragmentPopular extends Fragment implements ListFoodCustomPresenter
     @Override
     public void onResume() {
         super.onResume();
-        presenter.invokeData(tableID,0);
+        presenter.invokeData(tableID, -2);
+        onStopProcessBar();
     }
 
     @Override
     public void onRefresh() {
-        presenter.invokeData(tableID,0);
+        presenter.invokeData(tableID, -2);
     }
 }

@@ -75,7 +75,9 @@ public class MainActivityPresenterImpl implements MainActivityPresenter {
                         view.onLogoutFail();
                         Log.e("LXT_Log", "ErrorCode: " + response.getError());
                     }
-                }, Throwable::printStackTrace);
+                }, throwable -> {
+                    Log.e("LXT_Log_Error","Response Logout: "+throwable.getMessage());
+                });
     }
 
     @Override

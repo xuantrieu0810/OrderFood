@@ -3,7 +3,6 @@ package com.lexuantrieu.orderfood.presenter.impl;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.lexuantrieu.orderfood.network.RestClient;
 import com.lexuantrieu.orderfood.presenter.OrderPresenter;
 import com.lexuantrieu.orderfood.service.BillService;
@@ -28,7 +27,7 @@ public class OrderPresenterImpl implements OrderPresenter {
         //get token
         String token = Utils.GetTokenLocal(context);
         if(token.isEmpty()) {
-            view.onInvokeDataFail();
+            view.getBillIdFail();
             Log.e("LXT_Log", "Token null");
             return;
         }
@@ -38,23 +37,24 @@ public class OrderPresenterImpl implements OrderPresenter {
         service.GetBillId("Bearer " + token, table_id).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response-> {
-                    Log.e("LXT_Log", new Gson().toJson(response));
-                    if (response.getError().equals("null")) {
-                        view.getBillIdSuccess(Integer.parseInt(response.getData()));
+//                    Log.e("LXT_Log","Response GetBillID: "+ new Gson().toJson(response));
+                    int idBill = -1;
+                    try {
+                        idBill= Integer.parseInt(response.getData());
+                    }catch (Exception e) {
+                        Log.e("LXT_Log", "Error parseInt: " + e.getMessage());
+                    }
+                    if (response.getError().equals("null")&& idBill!=-1) {
+                        view.getBillIdSuccess(idBill);
                     } else {
                         view.getBillIdFail();
                         Log.e("LXT_Log", "ErrorCode: " + response.getError());
                     }
 
                 },throwable -> {
-                    view.onInvokeDataFail();
+                    Log.e("LXT_Log_Error","Response GetBillID: "+throwable.toString());
                     throwable.printStackTrace();
 
                 });
-    }
-
-    @Override
-    public void invokeData() {
-
     }
 }

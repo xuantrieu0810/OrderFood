@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -26,7 +27,6 @@ import com.lexuantrieu.orderfood.presenter.impl.ListFoodCustomPresenterImpl;
 import com.lexuantrieu.orderfood.ui.adapter.FoodSearchAdapter;
 import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
 import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
-import com.lexuantrieu.orderfood.utils.CheckConnection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,17 +48,17 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!CheckConnection.isNetworkAvailable(getApplicationContext())) {
-            AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Không có internet", "Kết nối lại", resultOk -> {
-                if (resultOk == Activity.RESULT_OK) {
-                    onRestart();
-                } else {
-                    finish();
-                }
-            });
-            FragmentManager fragmentManager = this.getSupportFragmentManager();
-            dialogFragment.show(fragmentManager, "Dialog");
-        }
+//        if (!CheckConnection.isNetworkAvailable(getApplicationContext())) {
+//            AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Không có internet", "Kết nối lại", resultOk -> {
+//                if (resultOk == Activity.RESULT_OK) {
+//                    onRestart();
+//                } else {
+//                    finish();
+//                }
+//            });
+//            FragmentManager fragmentManager = this.getSupportFragmentManager();
+//            dialogFragment.show(fragmentManager, "Dialog");
+//        }
         setContentView(R.layout.activity_list_food_custom);
         //-----------------------------------------------------------
         Bundle bundle = getIntent().getExtras();
@@ -66,6 +66,13 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
             tableName = bundle.getString("tableName");
             tableID = bundle.getInt("tableId");
             billID = bundle.getInt("billId");
+            if(tableID==-1|| billID==-1){
+
+                Log.d("LXT_Log", "table_id: "+tableID+"- bill_id: "+billID);
+                finish();
+                Toast.makeText(this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
+                return;
+            }
         } else {
             finish();
             Toast.makeText(this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
@@ -86,7 +93,6 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(null);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
-
     }
 
     private void init() {
@@ -102,8 +108,8 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
         MenuItem item = menu.findItem(R.id.actionSearch);
         searchView = (SearchView) item.getActionView();
         searchView.setIconifiedByDefault(true);
-        searchView.setIconified(true);
-        searchView.setFocusable(false);
+        searchView.setFocusable(true);
+        searchView.setIconified(false);
         searchView.requestFocusFromTouch();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -121,11 +127,27 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
         return super.onCreateOptionsMenu(menu);
     }
 
+
     @Override
-    public void ChangeFoodQuantity(int position, FoodModel foodModel) {
+    public void ChangeFoodItem(int position, FoodModel foodModel) {
         int stt = foodModel.getStt();
-        if (stt != -1 && foodModel.getStatusFood() == 0) {
-            presenter.UpdateOrderList(billID, tableID, position, foodModel);
+        int quantity = foodModel.getCountFood();
+        int status = foodModel.getStatusFood();
+        if (stt != -1 && status == 0) {
+            if(quantity == 0){
+                AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Hủy chọn món đã đặt", "[ "+foodModel.getNameFood()+"]"+
+                        "\nBạn có chắc không?", resultOk -> {
+                    if (resultOk == Activity.RESULT_OK) {
+                        onStartProcessBar("Đang xóa...");
+                        presenter.UpdateOrderList(billID, tableID, position, foodModel);
+                    } else {
+                        getSupportFragmentManager().popBackStack();
+                    }
+                });
+                dialogFragment.show(getSupportFragmentManager(), "Dialog");
+            } else {
+                presenter.UpdateOrderList(billID, tableID, position, foodModel);
+            }
         } else {
             presenter.InsertOrderList(billID, tableID, position, foodModel);
         }
@@ -135,9 +157,6 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
     public void onInvokeDataSuccess() {
         if(refreshLayout.isRefreshing()) {
             adapter.getFilter().filter(keySearch);
-
-
-
             refreshLayout.setRefreshing(false);
         }
         onStopProcessBar();
@@ -193,6 +212,7 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
     public void onSuccessSetFood(FoodModel foodModel, int pos) {
         arrayFoodModel.set(pos, foodModel);
         adapter.notifyItemChanged(pos);
+        onStopProcessBar();
     }
 
     //------------------------------------------------------------------------------------
@@ -216,8 +236,8 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
     @Override
     protected void onResume() {
         super.onResume();
-        onStopProcessBar();
         presenter.invokeData(tableID,0);
+        onStopProcessBar();
     }
 
     @Override

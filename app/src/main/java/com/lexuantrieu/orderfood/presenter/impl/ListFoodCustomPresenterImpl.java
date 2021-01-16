@@ -36,7 +36,7 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
 //                    return true;
 //                })
                 .subscribe(response->{
-//                    Log.e("LXT_Log",new Gson().toJson(response));
+//                    Log.e("LXT_Log", "Response GetFoodByTable: "+new Gson().toJson(response));
                     if(response != null) {
                         for (FoodModel f : response) {
                             f.setImageFood(Server.urlImageProduct + f.getImageFood());
@@ -52,8 +52,7 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
                         Toast.makeText(context, "ErrorCode: " + response, Toast.LENGTH_SHORT).show();
                     }
                 },throwable -> {
-                    view.onInvokeDataFail();
-                    Log.e("LXT_Log", throwable.toString());
+                    Log.e("LXT_Log_Error","Response GetFoodByTable: "+throwable.getMessage());
                     throwable.printStackTrace();
                 });
     }
@@ -65,14 +64,16 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     Log.i("LXT_Log", "subscribe: " + response.toString());
-                    if (!response.equals("fail")) {
-                        try {
-                            Log.i("LXT_Log", "position: " + pos);
-                            foodModel.setStt(Integer.parseInt(response));
-                            view.onSuccessSetFood(foodModel, pos);
-                        }catch (Exception e) {
-                            view.onFailSetFood();
-                        }
+                    int stt = -1;
+                    try {
+                        stt = (Integer.parseInt(response));
+                    }catch (Exception e) {
+                        Log.e("LXT_Log", e.toString());
+                    }
+                    if (!response.equals("fail") && stt!=-1) {
+                        Log.i("LXT_Log", "position: " + pos);
+                        foodModel.setStt(stt);
+                        view.onSuccessSetFood(foodModel, pos);
                     } else {
                         view.onFailSetFood();
                     }
@@ -85,7 +86,8 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     @Override
     public void UpdateOrderList(int bill_id, int table_id, int pos, FoodModel foodModel) {
         SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.UpdateOrderList(foodModel.getStt(), bill_id, table_id, foodModel.getIdFood(), foodModel.getCountFood(), foodModel.getCommentFood()).subscribeOn(Schedulers.io())
+        service.UpdateOrderList(foodModel.getStt(), bill_id, table_id, foodModel.getIdFood(), foodModel.getCountFood(), foodModel.getCommentFood())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     Log.i("LXT_Log", "subscribe: " + response.toString());

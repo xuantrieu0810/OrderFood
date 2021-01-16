@@ -32,7 +32,7 @@ public class AlertDialogFragment extends DialogFragment{
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("OK", (dialog, which) -> buttonOkClick())
+                .setPositiveButton("Có", (dialog, which) -> buttonOkClick())
                 .setNegativeButton("Hủy", (dialog, which) -> buttonNoClick())
                 .create();
     }

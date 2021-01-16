@@ -235,6 +235,6 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     //Fucntion of adapter
     private void SetCountFood(int position, FoodModel foodModel) {
-        listener.ChangeFoodQuantity(position, foodModel);
+        listener.ChangeFoodItem(position, foodModel);
     }
 }

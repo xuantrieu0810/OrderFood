@@ -132,8 +132,8 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 } else {
                     int countTmp = Integer.parseInt(edtInputCount.getText().toString());
                     if (countTmp >= 0 && countTmp <= 99) {
-                        foodModel.setCountFood(countTmp);
-                        SetCountFood(position, foodModel);
+//                        FoodModel model = new FoodModel(foodModel);
+                        SetCountFood(position, foodModel , countTmp, "");
                         dialog.dismiss();
                     } else edtInputCount.setError("Số lượng không hợp lệ.");
                 }
@@ -154,8 +154,7 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             btnSubmit.setOnClickListener(v -> {
                 String cmtFood = edtInputComment.getText().toString().trim();
                 if(foodModel.getStt() !=0){
-                    foodModel.setCommentFood(cmtFood);
-                    SetCountFood(position,foodModel);
+                    SetCountFood(position,foodModel, foodModel.getCountFood() ,cmtFood);
                     dialog.dismiss();
                 }
                 else Toast.makeText(mContext, "Không thể cập nhật", Toast.LENGTH_SHORT).show();
@@ -165,20 +164,18 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
         //----------------------------------------------------------------------------------------------
         private void ClickButtonAdd(FoodModel foodModel, int position) {
-            int countTmp = arrListFoodModel.get(position).getCountFood();
+            int countTmp = foodModel.getCountFood();
             if(countTmp < 99) {
-                foodModel.setCountFood(countTmp+1);
-                SetCountFood(position, foodModel);
+                SetCountFood(position, foodModel, countTmp+1, "");
             }
             else
                 Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
         }
         //----------------------------------------------------------------------------------------------
         private void ClickButtonSub(FoodModel foodModel, int position) {
-            int countTmp = arrListFoodModel.get(position).getCountFood();
+            int countTmp = foodModel.getCountFood();
             if(countTmp > 0) {
-                foodModel.setCountFood(countTmp-1);
-                SetCountFood(position , foodModel);
+                SetCountFood(position , foodModel, countTmp-1, "");
             }
             else
                 Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
@@ -229,14 +226,17 @@ public class FoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         private void ClickCreate(int position, FoodModel foodModel) {
-            foodModel.setCountFood(1);
-            SetCountFood(position,foodModel);
+
+            SetCountFood(position,foodModel , 1, "");
         }
     }
     
     //Fucntion of adapter
-    private void SetCountFood(int position, FoodModel foodModel) {
-        listener.ChangeFoodQuantity(position, foodModel);
+    private void SetCountFood(int position, FoodModel foodModel, int countTmp ,String cmt) {
+        FoodModel model = new FoodModel(foodModel);
+        model.setCountFood(countTmp);
+        model.setCommentFood(cmt);
+        listener.ChangeFoodItem(position, model);
     }
 
 }

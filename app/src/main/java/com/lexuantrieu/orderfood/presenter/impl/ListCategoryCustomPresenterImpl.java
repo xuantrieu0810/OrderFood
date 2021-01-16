@@ -1,10 +1,10 @@
 package com.lexuantrieu.orderfood.presenter.impl;
 
+
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.lexuantrieu.orderfood.model.CategoryModel;
 import com.lexuantrieu.orderfood.network.RestClient;
 import com.lexuantrieu.orderfood.network.Server;
@@ -38,23 +38,25 @@ public class ListCategoryCustomPresenterImpl implements ListCategoryCustomPresen
         GetCategoryService service = RestClient.createService(GetCategoryService.class);
         service.getCategory("Bearer " + token, func).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-
                 .subscribe(response-> {
-                    Log.e("LXT_Log", new Gson().toJson(response));
+//                    Log.e("LXT_Log","Response GetCategory: "+ new Gson().toJson(response));
                     if (response.getError().equals("null")) {
-                        for (CategoryModel c : response.getData()) {
-                            c.setImage(Server.urlImageCat + c.getImage());
+//                        List<CategoryModel> listRes = response.getData();
+                        for (CategoryModel cat : response.getData()) {
+                            cat.setImage(Server.urlImageCat + cat.getImage());
                         }
                         view.initAdapter(context, response.getData());
                         view.initRecyclerView();
                         view.onInvokeDataSuccess();
-                    } else {
+                    }
+                    else
+                    {
                         view.onInvokeDataFail();
                         Log.e("LXT_Log", "ErrorCode: " + response.getError());
                         Toast.makeText(context, "ErrorCode: " + response.getError(), Toast.LENGTH_SHORT).show();
                     }
                 },throwable -> {
-                    view.onInvokeDataFail();
+                    Log.e("LXT_Log_Error","Response GetCategory: "+throwable.getMessage());
                     throwable.printStackTrace();
                 });
     }
