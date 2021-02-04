@@ -231,9 +231,8 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
 
     @Override
     public void onRefresh() {
-
         presenter.checkTableStatus();
-        presenter.invokeData();
+        onStopProcessBar();
     }
     //------------------------------------------------------------------------------------
 }

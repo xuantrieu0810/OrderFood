@@ -13,7 +13,7 @@ import com.lexuantrieu.orderfood.model.room.User;
 import com.lexuantrieu.orderfood.model.room.database.AppDatabase;
 import com.lexuantrieu.orderfood.network.RestClient;
 import com.lexuantrieu.orderfood.presenter.LoginPresenter;
-import com.lexuantrieu.orderfood.service.LoginService;
+import com.lexuantrieu.orderfood.service.UserService;
 import com.lexuantrieu.orderfood.utils.LibraryString;
 import com.lexuantrieu.orderfood.utils.Utils;
 
@@ -33,17 +33,19 @@ import javax.crypto.CipherOutputStream;
 import javax.security.auth.x500.X500Principal;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class LoginPresenterImpl implements LoginPresenter {
 
+    private CompositeDisposable compositeDisposable;
     private final Context context;
     private final LoginPresenter.View view;
     private AppDatabase db;
     private KeyStore keyStore;
 
     public LoginPresenterImpl(Context context, LoginPresenter.View view, AppDatabase db) {
-
+        compositeDisposable = new CompositeDisposable();
         this.context = context;
         this.view = view;
         this.db = db;
@@ -63,18 +65,7 @@ public class LoginPresenterImpl implements LoginPresenter {
         String token = Utils.GetTokenLocal(context);
         if(!token.isEmpty()) {
             view.onLoginSuccess();
-            return;
         }
-
-        /*db.getUserDao().getListUser().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                    if (response.get(0).getToken() != null) {
-                        view.onLoginSuccess();                    }
-                }, throwable -> {
-                    view.onStopProcessBar();
-                    throwable.printStackTrace();
-                });*/
     }
 
     @Override
@@ -88,18 +79,17 @@ public class LoginPresenterImpl implements LoginPresenter {
             e.printStackTrace();
         }
         view.onLoginPending();
-        LoginService service = RestClient.createService(LoginService.class);
-        service.requetLogin(username, passwordSHA1).subscribeOn(Schedulers.io())
+        UserService service = RestClient.createService(UserService.class);
+        compositeDisposable.add(service.requetLogin(username, passwordSHA1).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     if (response.getError().equals("null")) {
                         ProfileModel mUser = response.getData();
-                        User user = new User(mUser.getUsername(),mUser.getFullname(),mUser.getRole(),"Not here!");
+                        User user = new User(mUser.getUsername(),mUser.getFullname(),mUser.getAccess(),"Not here!");
                         db.getUserDao().insertNote(user);
                         //Luu token
-//                        view.onLoginSuccess();
                         createNewKeys("TOKEN", mUser.getToken());
-                        return;
+                        view.onLoginSuccess();
                     } else {
                         view.onLoginFail();
                         Log.e("LXT_Log", "ErrorCode: " + response.getError());
@@ -107,11 +97,15 @@ public class LoginPresenterImpl implements LoginPresenter {
                 }, throwable -> {
                     Log.e("LXT_Log_Error","Response Login: "+throwable.getMessage());
                     throwable.printStackTrace();
-                });
-
+                })
+        );
     }
 
-
+    @Override
+    public void onDisCompositeDisposable() {
+        if(compositeDisposable != null && !compositeDisposable.isDisposed())
+        compositeDisposable.dispose();
+    }
 
     public void createNewKeys(String alias, String token) {
 
@@ -162,7 +156,6 @@ public class LoginPresenterImpl implements LoginPresenter {
         try {
             keyStore.deleteEntry(alias);
         } catch (KeyStoreException e) {
-            Toast.makeText(context, "Exception " + e.getMessage() + " occured", Toast.LENGTH_LONG).show();//Call fail
             Log.e("LXT_Log", Log.getStackTraceString(e));
         }
     }
@@ -190,11 +183,8 @@ public class LoginPresenterImpl implements LoginPresenter {
             editor.apply();
 
         } catch (Exception e) {
-            Toast.makeText(context, "Exception " + e.getMessage() + " occured", Toast.LENGTH_LONG).show();
             Log.e("LXT_Log", Log.getStackTraceString(e));
             view.onLoginFail();
-            return;
         }
-        view.onLoginSuccess();
     }
 }

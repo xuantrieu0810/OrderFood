@@ -11,13 +11,13 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 
-public interface GetCategoryService {
+public interface CategoryService {
 /*
     @GET("getCategory.php")
     Observable<List<CategoryModel>> getCategory();*/
 
     @FormUrlEncoded
-    @POST("getCategory.php")
+    @POST("categorylist.php?method=getall")
     Observable<ResponseModel<List<CategoryModel>>> getCategory(
             @Header("Authorization") String authHeader,
             @Field("FUNC") int func

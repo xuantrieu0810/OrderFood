@@ -1,5 +1,10 @@
 package com.lexuantrieu.orderfood.service;
 
+import com.lexuantrieu.orderfood.model.FoodModel;
+
+import java.util.List;
+
+import io.reactivex.Observable;
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -8,7 +13,15 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 
-public interface DataClient {
+public interface FoodListService {
+
+    @FormUrlEncoded
+    @POST("getFoodByTable.php")
+    Observable<List<FoodModel>> GetFoodByTable(
+            @Field("table_id") int tableid,
+            @Field("FUNC") int func );
+
+    //
 
     @Multipart
     @POST("uploadImage.php")

@@ -8,11 +8,19 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
-public interface LoginService {
+public interface UserService {
+
 
     @FormUrlEncoded
-    @POST("loginUser.php")
+    @POST("userlist.php?method=login")
     Observable<ResponseModel<ProfileModel>> requetLogin(
             @Field("username") String username
             , @Field("password") String password );
+
+    @FormUrlEncoded
+    @POST("userlist.php?method=logout")
+
+    Observable<ResponseModel<String>> requetLogout(
+//            @Header("Authorization") String authHeader,
+            @Field("username") String username );
 }

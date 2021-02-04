@@ -10,9 +10,9 @@ public class ProfileModel {
     @SerializedName("fullname")
     @Expose
     private String fullname;
-    @SerializedName("role")
+    @SerializedName("access")
     @Expose
-    private Integer role;
+    private Integer access;
     @SerializedName("token")
     @Expose
     private String token;
@@ -41,11 +41,11 @@ public class ProfileModel {
         this.fullname = fullname;
     }
 
-    public Integer getRole() {
-        return role;
+    public Integer getAccess() {
+        return access;
     }
 
-    public void setRole(Integer role) {
-        this.role = role;
+    public void setAccess(Integer access) {
+        this.access = access;
     }
 }

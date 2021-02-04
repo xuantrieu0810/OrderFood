@@ -8,21 +8,23 @@ import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.TableModel;
 import com.lexuantrieu.orderfood.network.RestClient;
 import com.lexuantrieu.orderfood.presenter.ListTableActivityPresenter;
-import com.lexuantrieu.orderfood.service.GetListTableService;
-import com.lexuantrieu.orderfood.service.SetFoodOrderListService;
+import com.lexuantrieu.orderfood.service.TableListService;
 import com.lexuantrieu.orderfood.utils.Utils;
 
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class ListTableActivityPresenterImpl implements ListTableActivityPresenter {
 
+    private CompositeDisposable compositeDisposable;
     private Context context;
     private ListTableActivityPresenterImpl.View view;
 
     public ListTableActivityPresenterImpl(Context context, ListTableActivityPresenterImpl.View view) {
+        compositeDisposable = new CompositeDisposable();
         this.context = context;
         this.view = view;
     }
@@ -37,8 +39,8 @@ public class ListTableActivityPresenterImpl implements ListTableActivityPresente
             Log.e("LXT_Log", "Token null");
             return;
         }
-        GetListTableService service = RestClient.createService(GetListTableService.class);
-        service.getListTable("Bearer " + token).subscribeOn(Schedulers.io())
+        TableListService service = RestClient.createService(TableListService.class);
+        compositeDisposable.add(service.getListTable("Bearer " + token).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(data->{
                     List<TableModel> list = data.getData();
@@ -74,7 +76,8 @@ public class ListTableActivityPresenterImpl implements ListTableActivityPresente
                 },throwable -> {
                     view.onInvokeDataFail();
                     throwable.printStackTrace();
-                });
+                })
+        );
         //-end
     }
 
@@ -88,8 +91,8 @@ public class ListTableActivityPresenterImpl implements ListTableActivityPresente
             Log.e("LXT_Log", "Token null");
             return false;
         }
-        GetListTableService service = RestClient.createService(GetListTableService.class);
-        service.getListTable("Bearer "+ token).subscribeOn(Schedulers.io())
+        TableListService service = RestClient.createService(TableListService.class);
+        compositeDisposable.add(service.getListTable("Bearer "+ token).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(data->{
                     List<TableModel> list = data.getData();
@@ -125,27 +128,28 @@ public class ListTableActivityPresenterImpl implements ListTableActivityPresente
                 },throwable -> {
                     Log.e("LXT_Log_Error","Response GetListTable: "+throwable.getMessage());
                     throwable.printStackTrace();
-                });
+                })
+        );
 //    }
         return false;
     }
 
     @Override
     public void checkTableStatus() {
-        SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.CheckTableStatus().subscribeOn(Schedulers.io())
+        TableListService service = RestClient.createService(TableListService.class);
+        compositeDisposable.add(service.checkTableStatus().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     Log.i("LXT_Log", "subscribe: " + response.toString());
                     if (!response.equals("error")) {
+                        invokeData();
                         Toast.makeText(context, "Đã Update", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(context, "LỖI", Toast.LENGTH_SHORT).show();
                     }
                 },throwable -> {
                     Log.e("LXT_Log", throwable.toString());
                     throwable.printStackTrace();
-                });
+                })
+        );
     }
 
 }

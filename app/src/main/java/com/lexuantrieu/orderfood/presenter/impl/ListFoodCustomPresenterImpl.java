@@ -5,29 +5,33 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.lexuantrieu.orderfood.model.FoodModel;
+import com.lexuantrieu.orderfood.network.ConfigServer;
 import com.lexuantrieu.orderfood.network.RestClient;
-import com.lexuantrieu.orderfood.network.Server;
 import com.lexuantrieu.orderfood.presenter.ListFoodCustomPresenter;
-import com.lexuantrieu.orderfood.service.GetFoodByTableService;
-import com.lexuantrieu.orderfood.service.SetFoodOrderListService;
+import com.lexuantrieu.orderfood.service.FoodListService;
+import com.lexuantrieu.orderfood.service.OrderListService;
 import com.lexuantrieu.orderfood.utils.LibraryString;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
+
+    private CompositeDisposable compositeDisposable;
     private Context context;
     private ListFoodCustomPresenter.View view;
 
     public ListFoodCustomPresenterImpl(Context context, ListFoodCustomPresenter.View view) {
+        compositeDisposable = new CompositeDisposable();
         this.context = context;
         this.view = view;
     }
 
     @Override
     public void invokeData(int tableid, int func) {
-        GetFoodByTableService service = RestClient.createService(GetFoodByTableService.class);
-        service.GetFoodByTable(tableid, func).subscribeOn(Schedulers.io())
+        FoodListService service = RestClient.createService(FoodListService.class);
+        compositeDisposable.add(service.GetFoodByTable(tableid, func).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 //                .filter(data->{
 //                    for(Food f:data){
@@ -39,7 +43,7 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
 //                    Log.e("LXT_Log", "Response GetFoodByTable: "+new Gson().toJson(response));
                     if(response != null) {
                         for (FoodModel f : response) {
-                            f.setImageFood(Server.urlImageProduct + f.getImageFood());
+                            f.setImageFood(ConfigServer.urlImageProduct + f.getImageFood());
                             f.setNameFoodNonVN(LibraryString.covertStringToVN(f.getNameFood()));
                         }
                         view.initAdapter(context, response);
@@ -54,13 +58,14 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
                 },throwable -> {
                     Log.e("LXT_Log_Error","Response GetFoodByTable: "+throwable.getMessage());
                     throwable.printStackTrace();
-                });
+                })
+        );
     }
 
     @Override
     public void InsertOrderList(int bill_id, int table_id, int pos, FoodModel foodModel) {
-        SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.InsertOrderList(bill_id, table_id, foodModel.getIdFood(), foodModel.getCountFood()).subscribeOn(Schedulers.io())
+        OrderListService service = RestClient.createService(OrderListService.class);
+        compositeDisposable.add(service.AddItemOrderList(bill_id, table_id, foodModel.getIdFood(), foodModel.getCountFood()).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     Log.i("LXT_Log", "subscribe: " + response.toString());
@@ -80,13 +85,14 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
                 },throwable -> {
                     Log.e("LXT_Log", throwable.toString());
                     throwable.printStackTrace();
-                });
+                })
+        );
     }
 
     @Override
     public void UpdateOrderList(int bill_id, int table_id, int pos, FoodModel foodModel) {
-        SetFoodOrderListService service = RestClient.createService(SetFoodOrderListService.class);
-        service.UpdateOrderList(foodModel.getStt(), bill_id, table_id, foodModel.getIdFood(), foodModel.getCountFood(), foodModel.getCommentFood())
+        OrderListService service = RestClient.createService(OrderListService.class);
+        compositeDisposable.add(service.UpdateItemOrderList(foodModel.getStt(), bill_id, table_id, foodModel.getIdFood(), foodModel.getCountFood(), foodModel.getCommentFood())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
@@ -99,7 +105,8 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
                 },throwable -> {
                     Log.e("LXT_Log", throwable.toString());
                     throwable.printStackTrace();
-                });
+                })
+        );
     }
 
 

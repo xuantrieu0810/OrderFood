@@ -4,13 +4,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -52,6 +52,7 @@ public class Utils {
             }
             //
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)keyStore.getEntry("TOKEN", null);
+            if(privateKeyEntry == null) return "";
 //            RSAPrivateKey privateKey = (RSAPrivateKey) privateKeyEntry.getPrivateKey();
             PrivateKey privateKey = privateKeyEntry.getPrivateKey(); // Don't TypeCast to RSAPrivateKey
 
@@ -59,15 +60,14 @@ public class Utils {
             output.init(Cipher.DECRYPT_MODE, privateKey);
 
             SharedPreferences sharedPreferences = context.getSharedPreferences("DataLocalApp", Context.MODE_PRIVATE);
-            String destination = decryptString(sharedPreferences.getString("TokenApi_0", ""),output)   +"."
-                    + decryptString(sharedPreferences.getString("TokenApi_1", ""),output)              +"."
-                    + decryptString(sharedPreferences.getString("TokenApi_2", ""),output);
+            String destination = decryptString(sharedPreferences.getString("TokenApi_0", "")+"",output)   +"."
+                    + decryptString(sharedPreferences.getString("TokenApi_1", "")+"",output)              +"."
+                    + decryptString(Objects.requireNonNull(sharedPreferences.getString("TokenApi_2", "")),output);
             if(destination.equals(".."))
                 return "";
             else
                 return destination;
         } catch (Exception e) {
-            Toast.makeText(context, "Exception GetTokenLocal " + e.getMessage() + " occured", Toast.LENGTH_LONG).show();
             Log.e("LXT_Log", Log.getStackTraceString(e));
         }
         return "";

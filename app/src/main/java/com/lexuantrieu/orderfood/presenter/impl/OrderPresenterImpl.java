@@ -9,14 +9,17 @@ import com.lexuantrieu.orderfood.service.BillService;
 import com.lexuantrieu.orderfood.utils.Utils;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class OrderPresenterImpl implements OrderPresenter {
-    
+
+    private CompositeDisposable compositeDisposable;
     private Context context;
     private OrderPresenter.View view;
     
     public OrderPresenterImpl(Context context, OrderPresenter.View view) {
+        compositeDisposable = new CompositeDisposable();
         this.context = context;
         this.view = view;
     }
@@ -34,7 +37,7 @@ public class OrderPresenterImpl implements OrderPresenter {
         //
         BillService service = RestClient.createService(BillService.class);
 
-        service.GetBillId("Bearer " + token, table_id).subscribeOn(Schedulers.io())
+        compositeDisposable.add(service.GetBillId("Bearer " + token, table_id).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response-> {
 //                    Log.e("LXT_Log","Response GetBillID: "+ new Gson().toJson(response));
@@ -55,6 +58,7 @@ public class OrderPresenterImpl implements OrderPresenter {
                     Log.e("LXT_Log_Error","Response GetBillID: "+throwable.toString());
                     throwable.printStackTrace();
 
-                });
+                })
+        );
     }
 }

@@ -9,6 +9,7 @@ import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 public interface BillService {
+
     @FormUrlEncoded
     @POST("getBillId.php")
     Observable<ResponseModel<String>> GetBillId(

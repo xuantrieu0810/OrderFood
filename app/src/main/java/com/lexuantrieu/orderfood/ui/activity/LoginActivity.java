@@ -17,16 +17,17 @@ import com.lexuantrieu.orderfood.model.room.database.AppDatabase;
 import com.lexuantrieu.orderfood.presenter.LoginPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.LoginPresenterImpl;
 
+import io.reactivex.disposables.Disposable;
+
 public class LoginActivity extends AppCompatActivity implements LoginPresenter.View {
 
-    public static int counttmp = 0;
+    public Disposable disposable;
     private AppDatabase db;
     private ProgressDialog dialog;
     private LoginPresenter loginPresenter;
     private EditText edt_username;
     private EditText edt_password;
     private Button btn_login;
-    private Intent intentMain;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,6 +46,7 @@ public class LoginActivity extends AppCompatActivity implements LoginPresenter.V
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        loginPresenter.onDisCompositeDisposable();
         Log.e("LXT_Log","finish LoginActivity");
     }
 

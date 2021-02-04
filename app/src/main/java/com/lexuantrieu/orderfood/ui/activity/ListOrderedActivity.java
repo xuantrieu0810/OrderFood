@@ -137,8 +137,9 @@ public class ListOrderedActivity extends AppCompatActivity implements ListFoodCu
     @Override
     public void onSuccessSetFood(FoodModel foodModel, int pos) {
         if(foodModel.getCountFood()==0)
-            arrayCart.clear();
-        arrayCart.set(pos, foodModel);
+            arrayCart.remove(pos);
+        else
+            arrayCart.set(pos, foodModel);
         adapter.notifyDataSetChanged();
         onStopProcessBar();
     }

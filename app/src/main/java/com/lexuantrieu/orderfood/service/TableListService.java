@@ -9,10 +9,13 @@ import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 
-public interface GetListTableService {
+public interface TableListService {
 
-    @GET("getListTable.php")
+    @GET("tablelist.php?method=getlist")
     Observable<ResponseModel<List<TableModel>>> getListTable(
             @Header("Authorization") String authHeader
     );
+
+    @GET("tablelist.php?method=checkstatus")
+    Observable<String> checkTableStatus();
 }

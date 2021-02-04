@@ -18,7 +18,7 @@ public class LibraryString {
         return null;
     }
     public static String covertStringToSlug(String value) {
-        value = value.trim().replace(' ', '-');
+        value = value.trim().toLowerCase().replace(' ', '-');
         try {
             String temp = Normalizer.normalize(value, Normalizer.Form.NFD);
             Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");

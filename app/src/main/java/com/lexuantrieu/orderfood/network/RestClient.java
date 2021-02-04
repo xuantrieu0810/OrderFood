@@ -5,6 +5,9 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -18,7 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RestClient {
 
 //    private static final String TOKEN_API = "";
-    private static final String BASE_URL = Server.localhost;
+    private static final String BASE_URL = ConfigServer.localhost;
     private static Gson gson = new GsonBuilder().setLenient().create();
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
@@ -61,6 +64,12 @@ public class RestClient {
                     public void callEnd(Call call) {
                         super.callEnd(call);
                         Log.e("LXT_Log", "Call End");
+                    }
+                    @Override
+                    public void callFailed(@NotNull Call call, @NotNull IOException ioe) {
+                        super.callFailed(call, ioe);
+
+                        Log.e("LXT_Log", "Call Fail");
                     }
                 });
         return httpClient;

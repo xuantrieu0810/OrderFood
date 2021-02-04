@@ -7,16 +7,20 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.lexuantrieu.orderfood.network.RestClient;
 import com.lexuantrieu.orderfood.presenter.SetFoodPresenter;
-import com.lexuantrieu.orderfood.service.GetCategoryService;
+import com.lexuantrieu.orderfood.service.CategoryService;
 import com.lexuantrieu.orderfood.utils.Utils;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class SetFoodPresenterImpl implements SetFoodPresenter {
+
+    private CompositeDisposable compositeDisposable;
     private Context context;
     private View view;
     public SetFoodPresenterImpl(Context context, View view) {
+        compositeDisposable = new CompositeDisposable();
         this.context = context;
         this.view = view;
     }
@@ -32,8 +36,8 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
             return;
         }
         //
-        GetCategoryService service = RestClient.createService(GetCategoryService.class);
-        service.getCategory("Bearer " + token, func).subscribeOn(Schedulers.io())
+        CategoryService service = RestClient.createService(CategoryService.class);
+        compositeDisposable.add(service.getCategory("Bearer " + token, func).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response-> {
                     Log.e("LXT_Log", new Gson().toJson(response));
@@ -49,7 +53,8 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
                 },throwable -> {
                     view.onInvokeDataFail();
                     throwable.printStackTrace();
-                });
+                })
+        );
         //
         /*AppDatabase db = AppDatabase.getInstance(context);
         db.getUserDao().getListUser().subscribeOn(Schedulers.io())

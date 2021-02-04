@@ -33,11 +33,11 @@ import androidx.fragment.app.FragmentManager;
 
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.CategoryModel;
+import com.lexuantrieu.orderfood.network.RestClient;
 import com.lexuantrieu.orderfood.presenter.SetFoodPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.PriceFoodTextWatcher;
 import com.lexuantrieu.orderfood.presenter.impl.SetFoodPresenterImpl;
-import com.lexuantrieu.orderfood.service.APIUtils;
-import com.lexuantrieu.orderfood.service.DataClient;
+import com.lexuantrieu.orderfood.service.FoodListService;
 import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import com.lexuantrieu.orderfood.utils.LibraryString;
 
@@ -99,12 +99,13 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
                 edtSaleFood.setVisibility(View.INVISIBLE);
         });
         btnAdd.setOnClickListener(v -> {
+            FoodListService foodListService = RestClient.createService(FoodListService.class);
             if(realPath.equals("")){
                 Toast.makeText(getApplicationContext(), "Vui lòng chọn ảnh đại diện", Toast.LENGTH_SHORT).show();
                 return;
             }
             if(CheckNullEdt()) {
-                CheckNameFood();
+                CheckNameFood(foodListService);
             }
         });
         // Create TextWatcher:
@@ -150,18 +151,18 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         return  check;
     }
 
-    private void CheckNameFood() {
+    private void CheckNameFood(FoodListService foodListService) {
         String nameFood = edtNameFood.getText().toString().trim();
         String slug = LibraryString.covertStringToSlug(nameFood);
-        DataClient dataClient = APIUtils.getData();
-        Call<String> callback = dataClient.CheckExistsName(slug);
+
+        Call<String> callback = foodListService.CheckExistsName(slug);
         callback.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 Log.d("LXT_Log","onResponse CheckExistsName: "+response.body());
                 assert response.body() != null;
                 if(response.body().equals("ok")){
-                    UploadFood();
+                    UploadFood(foodListService);
                 }
                 else {
                     edtNameFood.setError("Tên món ăn đã tồn tại.");
@@ -174,7 +175,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         });
     }
 
-    private void UploadFood() {
+    private void UploadFood(FoodListService foodListService) {
         CategoryModel catItem = (CategoryModel) spnCategory.getSelectedItem();
         int catid = catItem.getId();
         String nameFood = edtNameFood.getText().toString().trim();
@@ -186,6 +187,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         int status = 1;
 
         File file = new File(realPath);
+
         String file_path = file.getAbsolutePath();
         String[] arr1 = file_path.split("\\.");
         String typeFile = arr1[1];
@@ -198,8 +200,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"),file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("upload_file",file_path,requestBody);
 
-        DataClient dataClient = APIUtils.getData();
-        Call<String> callback = dataClient.UploadPhoto(body);
+        Call<String> callback = foodListService.UploadPhoto(body);
         onStartProcessBar("Đang thêm...");
         SwapStatus(-1);
         callback.enqueue(new Callback<String>() {
@@ -209,9 +210,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
                 assert response.body() != null;
                 if(!response.body().equals("Failed")) {
                     String imgLink = response.body();
-                    //
-                    DataClient InsertFood = APIUtils.getData();
-                    Call<String> callback = InsertFood.InsertFood(catid,nameFood,slug,imgLink,number,priceFood,pricesale,created_by,status);
+                    Call<String> callback = foodListService.InsertFood(catid,nameFood,slug,imgLink,number,priceFood,pricesale,created_by,status);
                     callback.enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
@@ -253,8 +252,6 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
             }
         });
     }
-
-
 
     private void SwapStatus(int key) {
         if(key == -1) {
