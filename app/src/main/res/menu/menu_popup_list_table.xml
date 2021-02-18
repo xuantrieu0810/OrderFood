@@ -4,17 +4,17 @@
     <!--        android:title="Hoá đơn"-->
     <!--        android:id="@+id/menu_showBill"/>-->
     <item
-        android:title="@string/pay"
-        android:id="@+id/menu_pay"/>
+        android:id="@+id/menu_pay"
+        android:title="@string/pay" />
     <item
-        android:title="@string/ordered"
-        android:id="@+id/menu_ordered"/>
+        android:id="@+id/menu_ordered"
+        android:title="@string/ordered" />
     <item
-        android:title="@string/mark_active"
-        android:id="@+id/menu_table_active"/>
+        android:id="@+id/menu_table_active"
+        android:title="@string/mark_active" />
     <item
-        android:title="@string/mark_empty"
-        android:id="@+id/menu_table_empty"/>
+        android:id="@+id/menu_table_empty"
+        android:title="@string/mark_empty" />
 
 
 </menu>

@@ -43,7 +43,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         return 3;
     }
 
-//    private static final String[] TAB_TITLES = {"Phổ biến", "Danh mục", "Tất cả"};
+    //    private static final String[] TAB_TITLES = {"Phổ biến", "Danh mục", "Tất cả"};
 //    private final Context mContext;
 //
 //    public ViewPagerAdapter(Context context, FragmentManager fm) {
@@ -79,9 +79,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         return TAB_TITLES[position];
-        }
-
-
+    }
 
 
 }

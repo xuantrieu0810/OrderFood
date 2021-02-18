@@ -24,9 +24,9 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginTop="8dp"
-        app:hintEnabled="true"
         app:counterEnabled="true"
         app:counterMaxLength="254"
+        app:hintEnabled="true"
         app:layout_constraintEnd_toEndOf="@+id/txtNameFood_dial"
         app:layout_constraintStart_toStartOf="@+id/txtNameFood_dial"
         app:layout_constraintTop_toBottomOf="@+id/txtNameFood_dial">
@@ -36,11 +36,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start|top"
-            android:textSize="14sp"
             android:hint="Nhập ghi chú..."
-            android:maxLength="254"
+            android:inputType="textMultiLine"
             android:lines="3"
-            android:inputType="textMultiLine"/>
+            android:maxLength="254"
+            android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

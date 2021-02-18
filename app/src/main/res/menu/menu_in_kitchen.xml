@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:title="Hướng dẫn"
         android:id="@+id/menuTutorial"
         android:icon="@drawable/ic_baseline_help_24"
-        app:showAsAction="ifRoom"/>
+        android:title="Hướng dẫn"
+        app:showAsAction="ifRoom" />
 </menu>

@@ -22,18 +22,19 @@ import com.lexuantrieu.orderfood.presenter.impl.OrderPresenterImpl;
 import com.lexuantrieu.orderfood.ui.adapter.ViewPagerAdapter;
 import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 
-public class OrderActivity extends AppCompatActivity implements OrderPresenter.View{
+public class OrderActivity extends AppCompatActivity implements OrderPresenter.View {
 
     public static int billID = -1, tableID = -1;
     public static String tableName;
     public static int idCategory;
     public static String nameCategory;
-    private TabLayout tablayout;
-    private ViewPager viewPager;
-    private ViewPagerAdapter adapter;
     ProgressDialog progressDialog;
     Context context;
     OrderPresenter presenter;
+    private TabLayout tablayout;
+    private ViewPager viewPager;
+    private ViewPagerAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +59,7 @@ public class OrderActivity extends AppCompatActivity implements OrderPresenter.V
         //actionBar.hide(); //Ẩn ActionBar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
         //-----------------------------------------------------------
-        presenter = new OrderPresenterImpl(this,this);
+        presenter = new OrderPresenterImpl(this, this);
         presenter.getBillId(tableID);
         init();
     }
@@ -96,18 +97,18 @@ public class OrderActivity extends AppCompatActivity implements OrderPresenter.V
             case R.id.menuItemCart:
                 intent = new Intent(OrderActivity.this, ListOrderedActivity.class);
                 bundle = new Bundle();
-                bundle.putInt("tableId",tableID);
-                bundle.putString("tableName",tableName);
-                bundle.putInt("billId",billID);
+                bundle.putInt("tableId", tableID);
+                bundle.putString("tableName", tableName);
+                bundle.putInt("billId", billID);
                 intent.putExtras(bundle);
                 startActivity(intent);
                 break;
             case R.id.menuItemSearch:
                 intent = new Intent(OrderActivity.this, SearchActivity.class);
                 bundle = new Bundle();
-                bundle.putInt("tableId",tableID);
-                bundle.putString("tableName",tableName);
-                bundle.putInt("billId",billID);
+                bundle.putInt("tableId", tableID);
+                bundle.putString("tableName", tableName);
+                bundle.putInt("billId", billID);
                 intent.putExtras(bundle);
                 startActivity(intent);
                 break;
@@ -115,7 +116,8 @@ public class OrderActivity extends AppCompatActivity implements OrderPresenter.V
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            default: break;
+            default:
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -150,7 +152,7 @@ public class OrderActivity extends AppCompatActivity implements OrderPresenter.V
 
     @Override
     public void onStopProcessBar() {
-        if(progressDialog.isShowing()) progressDialog.dismiss();
+        if (progressDialog.isShowing()) progressDialog.dismiss();
     }
 
     @Override

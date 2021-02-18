@@ -32,7 +32,7 @@ public class FoodModel {
     @Expose
     private Integer statusFood;
 
-//    public FoodModel(Integer stt, Integer idFood, String nameFood, String nameCategory, Double priceFood, String imageFood, Integer countFood, String nameFoodNonVN, String commentFood, Integer statusFood) {
+    //    public FoodModel(Integer stt, Integer idFood, String nameFood, String nameCategory, Double priceFood, String imageFood, Integer countFood, String nameFoodNonVN, String commentFood, Integer statusFood) {
     public FoodModel(FoodModel model) {
         this.stt = model.stt;
         this.idFood = model.idFood;

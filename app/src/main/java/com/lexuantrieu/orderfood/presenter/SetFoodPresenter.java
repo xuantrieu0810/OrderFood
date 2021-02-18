@@ -8,10 +8,14 @@ import java.util.List;
 
 public interface SetFoodPresenter {
     void invokeData(int func);
-    interface View{
+
+    interface View {
         void onInvokeDataSuccess();
+
         void onInvokeDataFail();
+
         void onInvokeDataPending();
+
         void onStartProcessBar(String message);
 
         void onStopProcessBar();

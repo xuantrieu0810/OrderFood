@@ -19,6 +19,7 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
     private CompositeDisposable compositeDisposable;
     private Context context;
     private View view;
+
     public SetFoodPresenterImpl(Context context, View view) {
         compositeDisposable = new CompositeDisposable();
         this.context = context;
@@ -30,7 +31,7 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
         view.onInvokeDataPending();
         //Lay token
         String token = Utils.GetTokenLocal(context);
-        if(token.isEmpty()) {
+        if (token.isEmpty()) {
             view.onInvokeDataFail();
             Log.e("LXT_Log", "Token null");
             return;
@@ -39,7 +40,7 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
         CategoryService service = RestClient.createService(CategoryService.class);
         compositeDisposable.add(service.getCategory("Bearer " + token, func).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response-> {
+                .subscribe(response -> {
                     Log.e("LXT_Log", new Gson().toJson(response));
                     if (response.getError().equals("null")) {
                         view.initAdapter(context, response.getData());
@@ -50,7 +51,7 @@ public class SetFoodPresenterImpl implements SetFoodPresenter {
                         Log.e("LXT_Log", "ErrorCode: " + response.getError());
                         Toast.makeText(context, "ErrorCode: " + response.getError(), Toast.LENGTH_SHORT).show();
                     }
-                },throwable -> {
+                }, throwable -> {
                     view.onInvokeDataFail();
                     throwable.printStackTrace();
                 })

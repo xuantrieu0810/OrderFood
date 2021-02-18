@@ -38,9 +38,9 @@ import io.reactivex.schedulers.Schedulers;
 
 public class LoginPresenterImpl implements LoginPresenter {
 
-    private CompositeDisposable compositeDisposable;
     private final Context context;
     private final LoginPresenter.View view;
+    private CompositeDisposable compositeDisposable;
     private AppDatabase db;
     private KeyStore keyStore;
 
@@ -53,8 +53,7 @@ public class LoginPresenterImpl implements LoginPresenter {
         try {
             keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
-        }
-        catch(Exception ignored) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -63,7 +62,7 @@ public class LoginPresenterImpl implements LoginPresenter {
     public void onCheckToken() {
 //        view.onStartProcessBar("Loading...");
         String token = Utils.GetTokenLocal(context);
-        if(!token.isEmpty()) {
+        if (!token.isEmpty()) {
             view.onLoginSuccess();
         }
     }
@@ -85,7 +84,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                 .subscribe(response -> {
                     if (response.getError().equals("null")) {
                         ProfileModel mUser = response.getData();
-                        User user = new User(mUser.getUsername(),mUser.getFullname(),mUser.getAccess(),"Not here!");
+                        User user = new User(mUser.getUsername(), mUser.getFullname(), mUser.getAccess(), "Not here!");
                         db.getUserDao().insertNote(user);
                         //Luu token
                         createNewKeys("TOKEN", mUser.getToken());
@@ -95,7 +94,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                         Log.e("LXT_Log", "ErrorCode: " + response.getError());
                     }
                 }, throwable -> {
-                    Log.e("LXT_Log_Error","Response Login: "+throwable.getMessage());
+                    Log.e("LXT_Log_Error", "Response Login: " + throwable.getMessage());
                     throwable.printStackTrace();
                 })
         );
@@ -103,13 +102,13 @@ public class LoginPresenterImpl implements LoginPresenter {
 
     @Override
     public void onDisCompositeDisposable() {
-        if(compositeDisposable != null && !compositeDisposable.isDisposed())
-        compositeDisposable.dispose();
+        if (compositeDisposable != null && !compositeDisposable.isDisposed())
+            compositeDisposable.dispose();
     }
 
     public void createNewKeys(String alias, String token) {
 
-        if(token.isEmpty()) {
+        if (token.isEmpty()) {
             Toast.makeText(context, "TOKEN API NULL", Toast.LENGTH_LONG).show();
             view.onLoginFail();
             return;
@@ -141,14 +140,13 @@ public class LoginPresenterImpl implements LoginPresenter {
         }
 
 
-
         String[] splits = token.split("\\.", 3);
 //            Log.e("LXT_Log", splits[0]);
 //            Log.e("LXT_Log", splits[1]);
 //            Log.e("LXT_Log", splits[2]);
-        encryptString(alias,splits[0],"TokenApi_0");
-        encryptString(alias,splits[1],"TokenApi_1");
-        encryptString(alias,splits[2],"TokenApi_2");
+        encryptString(alias, splits[0], "TokenApi_0");
+        encryptString(alias, splits[1], "TokenApi_1");
+        encryptString(alias, splits[2], "TokenApi_2");
     }
 
 
@@ -163,7 +161,7 @@ public class LoginPresenterImpl implements LoginPresenter {
 
     public void encryptString(String alias, String source, String nameSubToken) {
         try {
-            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)keyStore.getEntry(alias, null);
+            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(alias, null);
 //            RSAPublicKey publicKey = (RSAPublicKey) privateKeyEntry.getCertificate().getPublicKey();
             PublicKey publicKey = privateKeyEntry.getCertificate().getPublicKey(); // Don't TypeCast to RSAPublicKey
 
@@ -171,11 +169,11 @@ public class LoginPresenterImpl implements LoginPresenter {
             inCipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            CipherOutputStream cipherOutputStream = new CipherOutputStream( outputStream, inCipher);
+            CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, inCipher);
             cipherOutputStream.write(source.getBytes("UTF-8"));
             cipherOutputStream.close();
 
-            byte [] vals = outputStream.toByteArray();
+            byte[] vals = outputStream.toByteArray();
 
             SharedPreferences sharedPreferences = context.getSharedPreferences("DataLocalApp", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();

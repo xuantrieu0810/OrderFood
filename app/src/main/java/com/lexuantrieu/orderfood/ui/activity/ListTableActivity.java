@@ -27,7 +27,7 @@ import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListTableActivity extends AppCompatActivity implements ListTableActivityPresenter.View , SwipeRefreshLayout.OnRefreshListener{
+public class ListTableActivity extends AppCompatActivity implements ListTableActivityPresenter.View, SwipeRefreshLayout.OnRefreshListener {
 
     SwipeRefreshLayout refreshLayout;
     ListTableActivityPresenter presenter;
@@ -35,9 +35,10 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
     GridView gridView;
     ArrayList<TableModel> arrayTable;
     TableAdapter adapter;
-//
+    //
     int idTableSelected;
     String nameTableSelected;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,13 +57,14 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
         gridView.setOnItemClickListener((parent, view, position, id) -> {
             Intent intent = new Intent(ListTableActivity.this, OrderActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putInt("tableId",arrayTable.get(position).getId());
-            bundle.putString("tableName",arrayTable.get(position).getName());
+            bundle.putInt("tableId", arrayTable.get(position).getId());
+            bundle.putString("tableName", arrayTable.get(position).getName());
             intent.putExtras(bundle);
             startActivity(intent);
         });
         registerForContextMenu(gridView);
     }//end onCreate
+
     private void init() {
         refreshLayout = findViewById(R.id.swipe_rf_list_table);
         presenter = new ListTableActivityPresenterImpl(this, this);
@@ -80,7 +82,7 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
         // Get the list item position
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int position = info.position;
-        if(arrayTable.get(position).getStatus() == 0)
+        if (arrayTable.get(position).getStatus() == 0)
             menu.getItem(3).setEnabled(false);
         else
             menu.getItem(2).setEnabled(false);
@@ -194,8 +196,8 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
 
     @Override
     public void onStopProcessBar() {
-        if(refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
-        if(progressDialog.isShowing()) progressDialog.dismiss();
+        if (refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
+        if (progressDialog.isShowing()) progressDialog.dismiss();
     }
 
 
@@ -209,6 +211,7 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
     public void initGridView() {
         gridView.setAdapter(adapter);
     }
+
     //------------------------------------------------------------------------------------
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -222,6 +225,7 @@ public class ListTableActivity extends AppCompatActivity implements ListTableAct
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     protected void onResume() {
         super.onResume();

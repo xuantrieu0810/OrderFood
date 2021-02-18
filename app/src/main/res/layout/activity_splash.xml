@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="#f2ebf5"
     android:orientation="vertical">
+
     <TextView
         android:id="@+id/loading"
         android:layout_width="match_parent"
@@ -18,19 +19,21 @@
         android:text="Loading..."
         android:textColor="#462776"
         android:textSize="27dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/loading"
         android:layout_gravity="center_horizontal"
         android:gravity="center">
+
         <ImageView
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="center_horizontal"
-            android:background="@drawable/logo"
-            />
+            android:background="@drawable/logo" />
     </LinearLayout>
+
     <ProgressBar
         android:id="@+id/progress_bar"
         style="@android:style/Widget.DeviceDefault.ProgressBar"

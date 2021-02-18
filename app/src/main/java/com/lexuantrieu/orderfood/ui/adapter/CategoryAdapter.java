@@ -24,7 +24,8 @@ public class CategoryAdapter extends RecyclerView.Adapter {
     ArrayList<CategoryModel> arrayList;
     Context mContext;
     ItemClickListener itemClickListener; // Khai báo interface
-//    public CategoryAdapter(Context mContext, ArrayList<CategoryModel> arrayList) {
+
+    //    public CategoryAdapter(Context mContext, ArrayList<CategoryModel> arrayList) {
 //        this.arrayList = arrayList;
 //        this.mContext = mContext;
 //    }
@@ -38,19 +39,23 @@ public class CategoryAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        View itemView = layoutInflater.inflate(R.layout.item_category,parent,false);
+        View itemView = layoutInflater.inflate(R.layout.item_category, parent, false);
         return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
-        ((ViewHolder)holder).SetViewHolder(arrayList.get(position),position);
+        ((ViewHolder) holder).SetViewHolder(arrayList.get(position), position);
     }
 
     @Override
     public int getItemCount() {
         return arrayList.size();
+    }
+
+    public void initializeItemClickListener(View v, int pos, boolean isLongClick) {
+        itemClickListener.onClick(v, pos, isLongClick);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -62,13 +67,14 @@ public class CategoryAdapter extends RecyclerView.Adapter {
             imgCategory = (ImageView) itemView.findViewById(R.id.imageViewCategory);
             nameCategory = (TextView) itemView.findViewById(R.id.txtCategoryName);
             itemView.setOnClickListener(v -> {
-                initializeItemClickListener(v,getAdapterPosition(),false);
+                initializeItemClickListener(v, getAdapterPosition(), false);
             });
             itemView.setOnLongClickListener(v -> {
-                initializeItemClickListener(v,getAdapterPosition(),true);
+                initializeItemClickListener(v, getAdapterPosition(), true);
                 return false;
             });
         }
+
         void SetViewHolder(CategoryModel category, int position) {
             nameCategory.setText(category.getName());
             String urlImage = category.getImage();
@@ -78,13 +84,14 @@ public class CategoryAdapter extends RecyclerView.Adapter {
                     .error(R.drawable.ic_sync_error)
                     .into(imgCategory, new Callback() {
                         @Override
-                        public void onSuccess() { }
+                        public void onSuccess() {
+                        }
+
                         @Override
                         public void onError(Exception e) {
                             Log.d("LXT_Error:", "LoadImage: " + category.getImage());
                         }
                     });
-
 
 
 //            setItemClickListener(new ItemClickListener() {
@@ -118,10 +125,6 @@ public class CategoryAdapter extends RecyclerView.Adapter {
 //            itemClickListener.onClick(v,getAdapterPosition(),true);
 //            return true;
 //        }
-    }
-    public void initializeItemClickListener(View v, int pos, boolean isLongClick)
-    {
-        itemClickListener.onClick(v,pos,isLongClick);
     }
 }
 

@@ -7,7 +7,10 @@ import com.lexuantrieu.orderfood.model.FoodModel;
 import java.util.List;
 
 public interface ListFoodCustomPresenter {
-    void invokeData(int tableid, int func);
+
+    void invokeDataMultiType(int tableid, String func);
+
+    void invokeDataOrderList(int tableid);
 
     void InsertOrderList(int bill_id, int table_id, int pos, FoodModel foodModel);
 

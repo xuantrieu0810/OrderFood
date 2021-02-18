@@ -40,15 +40,11 @@ public class TableAdapter extends BaseAdapter {
         return 0;
     }
 
-    private class ViewHolder {
-        ImageView imgTable;
-        TextView nameTable;
-    }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHolder holder;
-        if(convertView == null) {
+        if (convertView == null) {
             holder = new ViewHolder();
             convertView = layoutInflater.inflate(R.layout.item_table_cell, null);
             holder.imgTable = (ImageView) convertView.findViewById(R.id.image_table);
@@ -62,6 +58,11 @@ public class TableAdapter extends BaseAdapter {
         holder.nameTable.setText(table.getName());
 
         return convertView;
+    }
+
+    private class ViewHolder {
+        ImageView imgTable;
+        TextView nameTable;
     }
 }
 

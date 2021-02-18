@@ -25,7 +25,7 @@
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="@+id/txtFoodName_SubCart"
         app:layout_constraintEnd_toStartOf="@+id/buttonAdd_SubCart"
-        app:srcCompat="@drawable/icons8_minus_24"/>
+        app:srcCompat="@drawable/icons8_minus_24" />
 
     <EditText
         android:id="@+id/editTextCount_SubCart"
@@ -33,9 +33,9 @@
         android:layout_height="wrap_content"
         android:focusable="false"
         android:focusableInTouchMode="false"
+        android:gravity="center"
         android:inputType="number"
         android:maxLength="2"
-        android:gravity="center"
         android:text="99"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/buttonAdd_SubCart"
@@ -52,7 +52,7 @@
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="@+id/buttonSub_SubCart"
         app:layout_constraintEnd_toStartOf="@+id/buttonDel_SubCart"
-        app:srcCompat="@drawable/icons8_plus_24"/>
+        app:srcCompat="@drawable/icons8_plus_24" />
 
     <TextView
         android:id="@+id/txtPrice_SubCart"
@@ -71,13 +71,13 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginEnd="8dp"
-        android:scaleType="fitXY"
         android:background="@null"
-        app:srcCompat="@android:drawable/ic_delete"
+        android:scaleType="fitXY"
         android:textSize="10sp"
         android:textStyle="bold"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/txtPrice_SubCart"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_delete" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -31,7 +31,7 @@ import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchActivity extends AppCompatActivity implements ListFoodCustomPresenter.View, FoodAdapterListener, SwipeRefreshLayout.OnRefreshListener{
+public class SearchActivity extends AppCompatActivity implements ListFoodCustomPresenter.View, FoodAdapterListener, SwipeRefreshLayout.OnRefreshListener {
 
     String keySearch;
     ListFoodCustomPresenter presenter;
@@ -66,9 +66,9 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
             tableName = bundle.getString("tableName");
             tableID = bundle.getInt("tableId");
             billID = bundle.getInt("billId");
-            if(tableID==-1|| billID==-1){
+            if (tableID == -1 || billID == -1) {
 
-                Log.d("LXT_Log", "table_id: "+tableID+"- bill_id: "+billID);
+                Log.d("LXT_Log", "table_id: " + tableID + "- bill_id: " + billID);
                 finish();
                 Toast.makeText(this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
                 return;
@@ -88,7 +88,7 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
         onStartProcessBar("Đang load...");
-        presenter.invokeData(tableID,0);
+        presenter.invokeDataMultiType(tableID, "all");
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(null);
@@ -134,8 +134,8 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
         int quantity = foodModel.getCountFood();
         int status = foodModel.getStatusFood();
         if (stt != -1 && status == 0) {
-            if(quantity == 0){
-                AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Hủy chọn món đã đặt", "[ "+foodModel.getNameFood()+"]"+
+            if (quantity == 0) {
+                AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Hủy chọn món đã đặt", "[ " + foodModel.getNameFood() + "]" +
                         "\nBạn có chắc không?", resultOk -> {
                     if (resultOk == Activity.RESULT_OK) {
                         onStartProcessBar("Đang xóa...");
@@ -155,7 +155,7 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
 
     @Override
     public void onInvokeDataSuccess() {
-        if(refreshLayout.isRefreshing()) {
+        if (refreshLayout.isRefreshing()) {
             adapter.getFilter().filter(keySearch);
             refreshLayout.setRefreshing(false);
         }
@@ -167,7 +167,7 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
         onStopProcessBar();
         AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
             if (resultOk == Activity.RESULT_OK) {
-                presenter.invokeData(tableID,0);
+                presenter.invokeDataMultiType(tableID, "all");
             } else {
                 finish();
                 onBackPressed();
@@ -187,7 +187,7 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
 
     @Override
     public void onStopProcessBar() {
-        if(progressDialog.isShowing()) progressDialog.dismiss();
+        if (progressDialog.isShowing()) progressDialog.dismiss();
     }
 
 
@@ -233,16 +233,17 @@ public class SearchActivity extends AppCompatActivity implements ListFoodCustomP
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     protected void onResume() {
         super.onResume();
-        presenter.invokeData(tableID,0);
+        presenter.invokeDataMultiType(tableID, "all");
         onStopProcessBar();
     }
 
     @Override
     public void onRefresh() {
-        presenter.invokeData(tableID,0);
+        presenter.invokeDataMultiType(tableID, "all");
     }
     //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------

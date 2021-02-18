@@ -33,11 +33,12 @@ public class ListOrderedActivity extends AppCompatActivity implements ListFoodCu
     ProgressDialog progressDialog;
     SwipeRefreshLayout refreshLayout;
     String tableName;
-    int tableID=-1, billID =-1;
+    int tableID = -1, billID = -1;
     TextView txtTotal;
     ListView listViewCart;
     ArrayList<FoodModel> arrayCart;
     ListOrderedAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +46,11 @@ public class ListOrderedActivity extends AppCompatActivity implements ListFoodCu
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             tableName = bundle.getString("tableName");
-            tableID= bundle.getInt("tableId");
+            tableID = bundle.getInt("tableId");
             billID = bundle.getInt("billId");
-            if(tableID==-1|| billID==-1){
+            if (tableID == -1 || billID == -1) {
 
-                Log.d("LXT_Log", "table_id: "+tableID+"- bill_id: "+billID);
+                Log.d("LXT_Log", "table_id: " + tableID + "- bill_id: " + billID);
                 finish();
                 Toast.makeText(this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
                 return;
@@ -78,7 +79,7 @@ public class ListOrderedActivity extends AppCompatActivity implements ListFoodCu
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
         //---
         onStartProcessBar("Đang load...");
-        presenter.invokeData(tableID,-3);
+        presenter.invokeDataOrderList(tableID);
 
 //        GetListInfoBill();
     }//end of onCreate
@@ -93,7 +94,7 @@ public class ListOrderedActivity extends AppCompatActivity implements ListFoodCu
         onStopProcessBar();
         AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
             if (resultOk == Activity.RESULT_OK) {
-                presenter.invokeData(tableID,-3);
+                presenter.invokeDataOrderList(tableID);
             } else {
                 finish();
                 onBackPressed();
@@ -112,8 +113,8 @@ public class ListOrderedActivity extends AppCompatActivity implements ListFoodCu
 
     @Override
     public void onStopProcessBar() {
-        if(refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
-        if(progressDialog.isShowing()) progressDialog.dismiss();
+        if (refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
+        if (progressDialog.isShowing()) progressDialog.dismiss();
     }
 
     @Override
@@ -136,7 +137,7 @@ public class ListOrderedActivity extends AppCompatActivity implements ListFoodCu
 
     @Override
     public void onSuccessSetFood(FoodModel foodModel, int pos) {
-        if(foodModel.getCountFood()==0)
+        if (foodModel.getCountFood() == 0)
             arrayCart.remove(pos);
         else
             arrayCart.set(pos, foodModel);
@@ -157,16 +158,17 @@ public class ListOrderedActivity extends AppCompatActivity implements ListFoodCu
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     protected void onResume() {
         super.onResume();
-        presenter.invokeData(tableID,-3);
+        presenter.invokeDataOrderList(tableID);
         onStopProcessBar();
     }
 
     @Override
     public void onRefresh() {
-        presenter.invokeData(tableID,-3);
+        presenter.invokeDataOrderList(tableID);
     }
 
     @Override
@@ -175,8 +177,8 @@ public class ListOrderedActivity extends AppCompatActivity implements ListFoodCu
         int quantity = foodModel.getCountFood();
         int status = foodModel.getStatusFood();
         if (stt != -1 && status == 0) {
-            if(quantity == 0){
-                AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Hủy chọn món đã đặt", "[ "+foodModel.getNameFood()+"]"+
+            if (quantity == 0) {
+                AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Hủy chọn món đã đặt", "[ " + foodModel.getNameFood() + "]" +
                         "\nBạn có chắc không?", resultOk -> {
                     if (resultOk == Activity.RESULT_OK) {
                         onStartProcessBar("Đang xóa...");

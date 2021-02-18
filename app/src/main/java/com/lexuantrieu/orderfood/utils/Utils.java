@@ -17,7 +17,8 @@ import javax.crypto.CipherInputStream;
 
 public class Utils {
     public static final String TAG = "LXT_Log";
-    
+    public static final String TAG_ERROR = "LXT_Log_Error";
+
 
     /*public static String GetTokenCurrent(Context context) {
         final String[] tokenResult = new String[1];
@@ -38,21 +39,20 @@ public class Utils {
 
         return tokenResult[0];
     }*/
-    
-    public static String GetTokenLocal(Context context){
+
+    public static String GetTokenLocal(Context context) {
         String result = "";
         KeyStore keyStore;
         try {
             try {
                 keyStore = KeyStore.getInstance("AndroidKeyStore");
                 keyStore.load(null);
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 return "";
             }
             //
-            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)keyStore.getEntry("TOKEN", null);
-            if(privateKeyEntry == null) return "";
+            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry("TOKEN", null);
+            if (privateKeyEntry == null) return "";
 //            RSAPrivateKey privateKey = (RSAPrivateKey) privateKeyEntry.getPrivateKey();
             PrivateKey privateKey = privateKeyEntry.getPrivateKey(); // Don't TypeCast to RSAPrivateKey
 
@@ -60,10 +60,10 @@ public class Utils {
             output.init(Cipher.DECRYPT_MODE, privateKey);
 
             SharedPreferences sharedPreferences = context.getSharedPreferences("DataLocalApp", Context.MODE_PRIVATE);
-            String destination = decryptString(sharedPreferences.getString("TokenApi_0", "")+"",output)   +"."
-                    + decryptString(sharedPreferences.getString("TokenApi_1", "")+"",output)              +"."
-                    + decryptString(Objects.requireNonNull(sharedPreferences.getString("TokenApi_2", "")),output);
-            if(destination.equals(".."))
+            String destination = decryptString(sharedPreferences.getString("TokenApi_0", "") + "", output) + "."
+                    + decryptString(sharedPreferences.getString("TokenApi_1", "") + "", output) + "."
+                    + decryptString(Objects.requireNonNull(sharedPreferences.getString("TokenApi_2", "")), output);
+            if (destination.equals(".."))
                 return "";
             else
                 return destination;
@@ -72,8 +72,9 @@ public class Utils {
         }
         return "";
     }
-    private static String decryptString(String destination,Cipher output) {
-        if(destination.isEmpty()) {
+
+    private static String decryptString(String destination, Cipher output) {
+        if (destination.isEmpty()) {
             return "";
         }
         try {
@@ -82,17 +83,17 @@ public class Utils {
             ArrayList<Byte> values = new ArrayList<>();
             int nextByte;
             while ((nextByte = cipherInputStream.read()) != -1) {
-                values.add((byte)nextByte);
+                values.add((byte) nextByte);
             }
 
             byte[] bytes = new byte[values.size()];
-            for(int i = 0; i < bytes.length; i++) {
+            for (int i = 0; i < bytes.length; i++) {
                 bytes[i] = values.get(i).byteValue();
             }
 
             return new String(bytes, 0, bytes.length, StandardCharsets.UTF_8);
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             return "";
         }
     }

@@ -1,13 +1,7 @@
 package com.lexuantrieu.orderfood.presenter;
 
-import com.lexuantrieu.orderfood.model.room.User;
-
-public interface MainActivityPresenter {
-    void invokeData();
-
+public interface LogoutAccountPresenter {
     void onLogout();
-
-    void checkTableStatus();
 
     interface View {
         void onLogoutPending();
@@ -15,10 +9,6 @@ public interface MainActivityPresenter {
         void onLogoutSuccess();
 
         void onLogoutFail();
-
-        void onInvokeDataSuccess(User user);
-
-        void onInvokeDataFail();
 
         void onStartProcessBar(String message);
 

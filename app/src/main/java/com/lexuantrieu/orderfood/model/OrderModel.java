@@ -3,7 +3,7 @@ package com.lexuantrieu.orderfood.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class OrderModel  {
+public class OrderModel {
 
     @SerializedName("stt")
     @Expose

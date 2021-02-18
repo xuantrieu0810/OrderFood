@@ -17,6 +17,7 @@ public class LibraryString {
         }
         return null;
     }
+
     public static String covertStringToSlug(String value) {
         value = value.trim().toLowerCase().replace(' ', '-');
         try {
@@ -28,6 +29,7 @@ public class LibraryString {
         }
         return null;
     }
+
     private static String convertToHex(byte[] data) {
         StringBuilder buf = new StringBuilder();
         for (byte b : data) {
@@ -46,7 +48,7 @@ public class LibraryString {
         byte[] textBytes = text.getBytes("iso-8859-1");
         md.update(textBytes, 0, textBytes.length);
         byte[] sha1hash = md.digest();
-        String out =convertToHex(sha1hash);
+        String out = convertToHex(sha1hash);
         return out;
     }
 }

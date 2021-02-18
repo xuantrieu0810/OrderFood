@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity implements LoginPresenter.V
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginPresenter.requestLogin(edt_username.getText().toString(),edt_password.getText().toString());
+                loginPresenter.requestLogin(edt_username.getText().toString(), edt_password.getText().toString());
             }
         });
     }
@@ -47,13 +47,13 @@ public class LoginActivity extends AppCompatActivity implements LoginPresenter.V
     protected void onDestroy() {
         super.onDestroy();
         loginPresenter.onDisCompositeDisposable();
-        Log.e("LXT_Log","finish LoginActivity");
+        Log.e("LXT_Log", "finish LoginActivity");
     }
 
     @Override
     public void onLoginSuccess() {
         onStopProcessBar();
-        Log.e("LXT_Log","start MainActivity");
+        Log.e("LXT_Log", "start MainActivity");
 
         startActivity(new Intent(LoginActivity.this, MainActivity.class));
         finish();
@@ -82,12 +82,12 @@ public class LoginActivity extends AppCompatActivity implements LoginPresenter.V
         dialog.dismiss();
     }
 
-    private void init(){
+    private void init() {
         db = AppDatabase.getInstance(this);
-        loginPresenter = new LoginPresenterImpl(this,this,db);
+        loginPresenter = new LoginPresenterImpl(this, this, db);
         dialog = new ProgressDialog(this);
-        edt_username=findViewById(R.id.edt_username);
-        edt_password=findViewById(R.id.edt_password);
-        btn_login=findViewById(R.id.btn_login);
+        edt_username = findViewById(R.id.edt_username);
+        edt_password = findViewById(R.id.edt_password);
+        btn_login = findViewById(R.id.btn_login);
     }
 }

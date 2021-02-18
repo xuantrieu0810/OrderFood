@@ -20,7 +20,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RestClient {
 
-//    private static final String TOKEN_API = "";
+    //    private static final String TOKEN_API = "";
     private static final String BASE_URL = ConfigServer.localhost;
     private static Gson gson = new GsonBuilder().setLenient().create();
     private static Retrofit.Builder builder =
@@ -29,6 +29,7 @@ public class RestClient {
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create(gson)).client(getHttpClient().build()
             );
+    private static Retrofit retrofit = builder.build();
 
     public static OkHttpClient.Builder getHttpClient() {
 
@@ -65,6 +66,7 @@ public class RestClient {
                         super.callEnd(call);
                         Log.e("LXT_Log", "Call End");
                     }
+
                     @Override
                     public void callFailed(@NotNull Call call, @NotNull IOException ioe) {
                         super.callFailed(call, ioe);
@@ -74,9 +76,6 @@ public class RestClient {
                 });
         return httpClient;
     }
-
-
-    private static Retrofit retrofit = builder.build();
 
     public static <S> S createService(Class<S> serviceClass) {
         return retrofit.create(serviceClass);

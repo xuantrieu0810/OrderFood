@@ -10,6 +10,7 @@ public class PriceFoodTextWatcher implements TextWatcher {
     String valueBefore;
     EditText editText;
     Context context;
+
     public PriceFoodTextWatcher(EditText editText, Context context) {
         this.editText = editText;
         this.context = context;

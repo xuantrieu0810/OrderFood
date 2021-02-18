@@ -12,16 +12,15 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Query;
 
 public interface FoodListService {
 
     @FormUrlEncoded
     @POST("getFoodByTable.php")
-    Observable<List<FoodModel>> GetFoodByTable(
+    Observable<List<FoodModel>> GetFoodMultiType(
             @Field("table_id") int tableid,
-            @Field("FUNC") int func );
-
-    //
+            @Query("method") String method);
 
     @Multipart
     @POST("uploadImage.php")

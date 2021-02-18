@@ -14,24 +14,25 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase appDatabase = null;
     private static Context context;
-    private static String DB_NAME ="dborderfood";
+    private static String DB_NAME = "dborderfood";
 
-    public abstract UserDao getUserDao();
-    public static AppDatabase getInstance(Context context){
+    public static AppDatabase getInstance(Context context) {
         AppDatabase.context = context;
-        if(appDatabase==null){
+        if (appDatabase == null) {
             init();
         }
         return appDatabase;
     }
 
     private static void init() {
-        appDatabase= Room.databaseBuilder(context,AppDatabase.class,DB_NAME)
+        appDatabase = Room.databaseBuilder(context, AppDatabase.class, DB_NAME)
                 .allowMainThreadQueries()
 //                .addMigrations(Migration_1_to_3)
                 .build();
 
     }
+
+    public abstract UserDao getUserDao();
 /*
     private static Migration Migration_1_to_2 = new Migration(1,2) {
         @Override

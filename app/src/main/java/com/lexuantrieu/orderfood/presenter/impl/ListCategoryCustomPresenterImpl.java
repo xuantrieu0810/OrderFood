@@ -33,7 +33,7 @@ public class ListCategoryCustomPresenterImpl implements ListCategoryCustomPresen
     public void invokeData(int func) {
         //Lay token
         String token = Utils.GetTokenLocal(context);
-        if(token.isEmpty()) {
+        if (token.isEmpty()) {
             view.onInvokeDataFail();
             Log.e("LXT_Log", "Token null");
             return;
@@ -42,28 +42,26 @@ public class ListCategoryCustomPresenterImpl implements ListCategoryCustomPresen
         CategoryService service = RestClient.createService(CategoryService.class);
 
         compositeDisposable.add(service.getCategory("Bearer " + token, func).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response-> {
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(response -> {
 //                    Log.e("LXT_Log","Response GetCategory: "+ new Gson().toJson(response));
-                    if (response.getError().equals("null")) {
+                            if (response.getError().equals("null")) {
 //                        List<CategoryModel> listRes = response.getData();
-                        for (CategoryModel cat : response.getData()) {
-                            cat.setImage(ConfigServer.urlImageCategory + cat.getImage());
-                        }
-                        view.initAdapter(context, response.getData());
-                        view.initRecyclerView();
-                        view.onInvokeDataSuccess();
-                    }
-                    else
-                    {
-                        view.onInvokeDataFail();
-                        Log.e("LXT_Log", "ErrorCode: " + response.getError());
-                        Toast.makeText(context, "ErrorCode: " + response.getError(), Toast.LENGTH_SHORT).show();
-                    }
-                },throwable -> {
-                    Log.e("LXT_Log_Error","Response GetCategory: "+throwable.getMessage());
-                    throwable.printStackTrace();
-                })
+                                for (CategoryModel cat : response.getData()) {
+                                    cat.setImage(ConfigServer.urlImageCategory + cat.getImage());
+                                }
+                                view.initAdapter(context, response.getData());
+                                view.initRecyclerView();
+                                view.onInvokeDataSuccess();
+                            } else {
+                                view.onInvokeDataFail();
+                                Log.e("LXT_Log", "ErrorCode: " + response.getError());
+                                Toast.makeText(context, "ErrorCode: " + response.getError(), Toast.LENGTH_SHORT).show();
+                            }
+                        }, throwable -> {
+                            Log.e("LXT_Log_Error", "Response GetCategory: " + throwable.getMessage());
+                            throwable.printStackTrace();
+                        })
         );
     }
 }

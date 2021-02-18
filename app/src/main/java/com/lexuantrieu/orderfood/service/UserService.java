@@ -15,12 +15,11 @@ public interface UserService {
     @POST("userlist.php?method=login")
     Observable<ResponseModel<ProfileModel>> requetLogin(
             @Field("username") String username
-            , @Field("password") String password );
+            , @Field("password") String password);
 
     @FormUrlEncoded
     @POST("userlist.php?method=logout")
-
     Observable<ResponseModel<String>> requetLogout(
 //            @Header("Authorization") String authHeader,
-            @Field("username") String username );
+            @Field("username") String username);
 }

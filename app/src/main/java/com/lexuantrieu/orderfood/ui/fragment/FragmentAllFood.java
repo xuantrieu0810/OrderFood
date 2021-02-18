@@ -3,15 +3,12 @@ package com.lexuantrieu.orderfood.ui.fragment;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -23,7 +20,6 @@ import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.FoodModel;
 import com.lexuantrieu.orderfood.presenter.ListFoodCustomPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.ListFoodCustomPresenterImpl;
-import com.lexuantrieu.orderfood.ui.activity.ListOrderedActivity;
 import com.lexuantrieu.orderfood.ui.activity.OrderActivity;
 import com.lexuantrieu.orderfood.ui.adapter.FoodAdapter;
 import com.lexuantrieu.orderfood.ui.adapter.listener.FoodAdapterListener;
@@ -32,7 +28,7 @@ import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter.View, FoodAdapterListener , SwipeRefreshLayout.OnRefreshListener{
+public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter.View, FoodAdapterListener, SwipeRefreshLayout.OnRefreshListener {
 
     Context mContext;
     ListFoodCustomPresenter presenter;
@@ -46,6 +42,9 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
     SwipeRefreshLayout refreshLayout;
     View viewFrag;
 
+    public FragmentAllFood() {
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,12 +52,12 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
         tableID = OrderActivity.tableID;
         tableName = OrderActivity.tableName;
     }
-    public FragmentAllFood() {}
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mContext = container.getContext();
-        viewFrag = inflater.inflate(R.layout.fragment_all_food,container,false);
+        viewFrag = inflater.inflate(R.layout.fragment_all_food, container, false);
         init();
         presenter = new ListFoodCustomPresenterImpl(this.getContext(), this);
         progressDialog = new ProgressDialog(mContext);
@@ -70,7 +69,7 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 //        onStartProcessBar("Đang load...");
-        presenter.invokeData(tableID,0);
+        presenter.invokeDataMultiType(tableID, "all");
         return viewFrag;
     }
 
@@ -86,8 +85,8 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
         int quantity = foodModel.getCountFood();
         int status = foodModel.getStatusFood();
         if (stt != -1 && status == 0) {
-            if(quantity == 0){
-                AlertDialogFragment dialogFragment = new AlertDialogFragment(mContext, "Hủy chọn món đã đặt", "[ "+foodModel.getNameFood()+"]"+
+            if (quantity == 0) {
+                AlertDialogFragment dialogFragment = new AlertDialogFragment(mContext, "Hủy chọn món đã đặt", "[ " + foodModel.getNameFood() + "]" +
                         "\nBạn có chắc không?", resultOk -> {
                     if (resultOk == Activity.RESULT_OK) {
                         onStartProcessBar("Đang xóa...");
@@ -108,7 +107,7 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
 
     @Override
     public void onInvokeDataSuccess() {
-        if(refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
+        if (refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
         onStopProcessBar();
     }
 
@@ -117,7 +116,7 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
         onStopProcessBar();
         AlertDialogFragment dialogFragment = new AlertDialogFragment(mContext, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
             if (resultOk == Activity.RESULT_OK) {
-                presenter.invokeData(tableID,0);
+                presenter.invokeDataMultiType(tableID, "all");
             } else {
                 getActivity().getFragmentManager().popBackStack();
             }
@@ -134,7 +133,7 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
 
     @Override
     public void onStopProcessBar() {
-        if(progressDialog.isShowing()) progressDialog.dismiss();
+        if (progressDialog.isShowing()) progressDialog.dismiss();
     }
 
 
@@ -162,33 +161,16 @@ public class FragmentAllFood extends Fragment implements ListFoodCustomPresenter
     }
 
     //------------------------------------------------------------------------------------
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            //-------------------------
-            case android.R.id.home:
-                getActivity().getFragmentManager().popBackStack();
-                return true;
-            case R.id.itemCart:
-                //check sl orderlist
-                Intent intent = new Intent(mContext, ListOrderedActivity.class);
-                startActivity(intent);
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onResume() {
         super.onResume();
-        presenter.invokeData(tableID,0);
+        presenter.invokeDataMultiType(tableID, "all");
     }
 
     @Override
     public void onRefresh() {
-        presenter.invokeData(tableID,0);
+        presenter.invokeDataMultiType(tableID, "all");
     }
 }
 

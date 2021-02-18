@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ListTableActivityPresenter {
     void invokeData();
+
     //
     boolean CheckOrderListOfTable(int tableId);
 

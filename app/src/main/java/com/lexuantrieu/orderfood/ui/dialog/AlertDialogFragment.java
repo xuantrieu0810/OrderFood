@@ -8,7 +8,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
-public class AlertDialogFragment extends DialogFragment{
+public class AlertDialogFragment extends DialogFragment {
 
     private Context context;
     private String title = "Title";
@@ -21,7 +21,6 @@ public class AlertDialogFragment extends DialogFragment{
         this.message = message;
         this.listener = listener;
     }
-
 
 
     @Override

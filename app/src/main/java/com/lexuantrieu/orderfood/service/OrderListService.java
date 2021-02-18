@@ -1,5 +1,9 @@
 package com.lexuantrieu.orderfood.service;
 
+import com.lexuantrieu.orderfood.model.FoodModel;
+
+import java.util.List;
+
 import io.reactivex.Observable;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -24,4 +28,8 @@ public interface OrderListService {
             @Field("quantity") int quantity,
             @Field("comment") String commentFood);
 
+    @FormUrlEncoded
+    @POST("orderlist.php?method=getfoodordered")
+    Observable<List<FoodModel>> GetFoodOrderList(
+            @Field("table_id") int tableid);
 }

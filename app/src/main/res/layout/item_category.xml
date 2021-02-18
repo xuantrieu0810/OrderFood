@@ -20,8 +20,8 @@
             android:id="@+id/imageViewCategory"
             android:layout_width="200dp"
             android:layout_height="150dp"
-            android:scaleType="fitXY"
             android:layout_margin="4dp"
+            android:scaleType="fitXY"
             app:srcCompat="@drawable/imagepreview" />
     </androidx.cardview.widget.CardView>
 

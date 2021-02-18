@@ -57,6 +57,7 @@ import retrofit2.Response;
 
 public class SetFoodActivity extends AppCompatActivity implements SetFoodPresenter.View {
 
+    final int REQUEST_CODE_CAMERA = 123, REQUEST_CODE_FOLDER = 456;
     SetFoodPresenter presenter;
     ProgressDialog progressDialog;
     String realPath = "";
@@ -67,7 +68,6 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
     CheckBox cbSales;
     Button btnAdd;
     ProgressBar progressBar;
-    final int REQUEST_CODE_CAMERA = 123, REQUEST_CODE_FOLDER = 456;
     ArrayList<CategoryModel> arrayList;
     ArrayAdapter<CategoryModel> adapter;
 
@@ -93,24 +93,24 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
                 REQUEST_CODE_FOLDER
         ));
         cbSales.setOnCheckedChangeListener((compoundButton, b) -> {
-            if(cbSales.isChecked())
+            if (cbSales.isChecked())
                 edtSaleFood.setVisibility(View.VISIBLE);
             else
                 edtSaleFood.setVisibility(View.INVISIBLE);
         });
         btnAdd.setOnClickListener(v -> {
             FoodListService foodListService = RestClient.createService(FoodListService.class);
-            if(realPath.equals("")){
+            if (realPath.equals("")) {
                 Toast.makeText(getApplicationContext(), "Vui lòng chọn ảnh đại diện", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if(CheckNullEdt()) {
+            if (CheckNullEdt()) {
                 CheckNameFood(foodListService);
             }
         });
         // Create TextWatcher:
-        edtPriceFood.addTextChangedListener( new PriceFoodTextWatcher(this.edtPriceFood,this));
-        edtSaleFood.addTextChangedListener(new PriceFoodTextWatcher(this.edtSaleFood,this));
+        edtPriceFood.addTextChangedListener(new PriceFoodTextWatcher(this.edtPriceFood, this));
+        edtSaleFood.addTextChangedListener(new PriceFoodTextWatcher(this.edtSaleFood, this));
 
     }//end of onCreate
 
@@ -132,23 +132,23 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
 
     private boolean CheckNullEdt() {
         boolean check = true;
-        if( TextUtils.isEmpty(edtNameFood.getText())){
+        if (TextUtils.isEmpty(edtNameFood.getText())) {
             edtNameFood.setError("Nhập tên món ăn");
             check = false;
         }
-        if( TextUtils.isEmpty(edtPriceFood.getText())){
+        if (TextUtils.isEmpty(edtPriceFood.getText())) {
             edtPriceFood.setError("Nhập giá tiền");
             check = false;
         }
-        if( TextUtils.isEmpty(edtNumber.getText())){
+        if (TextUtils.isEmpty(edtNumber.getText())) {
             edtNumber.setError("Nhập số lượng");
             check = false;
         }
-        if(cbSales.isChecked() && TextUtils.isEmpty(edtSaleFood.getText())) {
+        if (cbSales.isChecked() && TextUtils.isEmpty(edtSaleFood.getText())) {
             edtSaleFood.setError("Nhập giá tiền");
             check = false;
         }
-        return  check;
+        return check;
     }
 
     private void CheckNameFood(FoodListService foodListService) {
@@ -159,18 +159,18 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         callback.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.d("LXT_Log","onResponse CheckExistsName: "+response.body());
+                Log.d("LXT_Log", "onResponse CheckExistsName: " + response.body());
                 assert response.body() != null;
-                if(response.body().equals("ok")){
+                if (response.body().equals("ok")) {
                     UploadFood(foodListService);
-                }
-                else {
+                } else {
                     edtNameFood.setError("Tên món ăn đã tồn tại.");
                 }
             }
+
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.d("LXT_Error","onFailure CheckExistsName: "+t.getMessage());
+                Log.d("LXT_Error", "onFailure CheckExistsName: " + t.getMessage());
             }
         });
     }
@@ -197,8 +197,8 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
 //        file_path = arr1[0]+ System.currentTimeMillis()+"."+arr1[1];
         Log.d("LXT_Log", "file_path: " + file_path);
 
-        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"),file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("upload_file",file_path,requestBody);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("upload_file", file_path, requestBody);
 
         Call<String> callback = foodListService.UploadPhoto(body);
         onStartProcessBar("Đang thêm...");
@@ -206,17 +206,17 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         callback.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.i("LXT_Log", "onResponse UploadPhoto :"+response.body());
+                Log.i("LXT_Log", "onResponse UploadPhoto :" + response.body());
                 assert response.body() != null;
-                if(!response.body().equals("Failed")) {
+                if (!response.body().equals("Failed")) {
                     String imgLink = response.body();
-                    Call<String> callback = foodListService.InsertFood(catid,nameFood,slug,imgLink,number,priceFood,pricesale,created_by,status);
+                    Call<String> callback = foodListService.InsertFood(catid, nameFood, slug, imgLink, number, priceFood, pricesale, created_by, status);
                     callback.enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
-                            Log.i("LXT_Log", "onResponse InsertFood :"+response.body());
+                            Log.i("LXT_Log", "onResponse InsertFood :" + response.body());
                             assert response.body() != null;
-                            if(response.body().equals("success")){
+                            if (response.body().equals("success")) {
                                 Toast.makeText(SetFoodActivity.this, "Đã thêm thành công.", Toast.LENGTH_SHORT).show();
                                 onStopProcessBar();
                                 SwapStatus(1);
@@ -227,6 +227,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
                                 SwapStatus(1);
                             }
                         }
+
                         @Override
                         public void onFailure(Call<String> call, Throwable t) {
                             Toast.makeText(SetFoodActivity.this, "Lỗi Network.", Toast.LENGTH_SHORT).show();
@@ -254,11 +255,10 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
     }
 
     private void SwapStatus(int key) {
-        if(key == -1) {
+        if (key == -1) {
             btnAdd.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             btnAdd.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.INVISIBLE);
         }
@@ -281,9 +281,9 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
         return Uri.parse(path);
     }
 
-    public String getRealPathFromURI (Uri contentUri) {
+    public String getRealPathFromURI(Uri contentUri) {
         String path = null;
-        String[] proj = { MediaStore.MediaColumns.DATA };
+        String[] proj = {MediaStore.MediaColumns.DATA};
         Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
         if (cursor.moveToFirst()) {
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
@@ -297,17 +297,19 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_CODE_CAMERA:
-                if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent,REQUEST_CODE_CAMERA);
-                } else Toast.makeText(this, "Bạn không cho phép mở Camera", Toast.LENGTH_SHORT).show();
+                    startActivityForResult(intent, REQUEST_CODE_CAMERA);
+                } else
+                    Toast.makeText(this, "Bạn không cho phép mở Camera", Toast.LENGTH_SHORT).show();
                 break;
             case REQUEST_CODE_FOLDER:
-                if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Intent intent = new Intent(Intent.ACTION_PICK);
                     intent.setType("image/*");
-                    startActivityForResult(intent,REQUEST_CODE_FOLDER);
-                } else Toast.makeText(this, "Bạn không cho phép mở Thư viện ảnh", Toast.LENGTH_SHORT).show();
+                    startActivityForResult(intent, REQUEST_CODE_FOLDER);
+                } else
+                    Toast.makeText(this, "Bạn không cho phép mở Thư viện ảnh", Toast.LENGTH_SHORT).show();
                 break;
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -315,19 +317,19 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == REQUEST_CODE_CAMERA && resultCode == RESULT_OK && data != null) {
+        if (requestCode == REQUEST_CODE_CAMERA && resultCode == RESULT_OK && data != null) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             imgFood.setImageBitmap(photo);
             // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
             Uri tempUri = getImageUri(getApplicationContext(), photo);
             realPath = getRealPathFromURI(tempUri);
-            Log.d("LXT_Log","realPath: "+ realPath);
+            Log.d("LXT_Log", "realPath: " + realPath);
         }
-        if(requestCode == REQUEST_CODE_FOLDER && resultCode == RESULT_OK && data != null) {
+        if (requestCode == REQUEST_CODE_FOLDER && resultCode == RESULT_OK && data != null) {
             Bitmap photo;
             Uri uri = data.getData();
             realPath = getRealPathFromURI(uri);
-            Log.d("LXT_Log","realPath: "+ realPath);
+            Log.d("LXT_Log", "realPath: " + realPath);
             try {
                 InputStream inputStream = getContentResolver().openInputStream(uri);
                 photo = BitmapFactory.decodeStream(inputStream);
@@ -350,9 +352,9 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
     @Override
     public void onInvokeDataFail() {
         onStopProcessBar();
-       // Create YesNoDialogFragment
+        // Create YesNoDialogFragment
         AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
-            if(resultOk == Activity.RESULT_OK) {
+            if (resultOk == Activity.RESULT_OK) {
                 presenter.invokeData(0);
             } else {//if(resultCode == Activity.RESULT_CANCELED) {
                 finish();

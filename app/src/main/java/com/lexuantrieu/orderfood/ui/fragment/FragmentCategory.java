@@ -6,12 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -24,7 +22,6 @@ import com.lexuantrieu.orderfood.model.CategoryModel;
 import com.lexuantrieu.orderfood.presenter.ListCategoryCustomPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.ListCategoryCustomPresenterImpl;
 import com.lexuantrieu.orderfood.ui.activity.FoodByCatActivity;
-import com.lexuantrieu.orderfood.ui.activity.ListOrderedActivity;
 import com.lexuantrieu.orderfood.ui.activity.OrderActivity;
 import com.lexuantrieu.orderfood.ui.adapter.CategoryAdapter;
 import com.lexuantrieu.orderfood.ui.adapter.listener.ItemClickListener;
@@ -33,7 +30,7 @@ import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentCategory extends Fragment implements ListCategoryCustomPresenter.View, ItemClickListener , SwipeRefreshLayout.OnRefreshListener{
+public class FragmentCategory extends Fragment implements ListCategoryCustomPresenter.View, ItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     Context mContext;
     ListCategoryCustomPresenter presenter;
@@ -47,6 +44,9 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
     SwipeRefreshLayout refreshLayout;
     View viewFrag;
 
+    public FragmentCategory() {
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,12 +54,12 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
         tableID = OrderActivity.tableID;
         tableName = OrderActivity.tableName;
     }
-    public FragmentCategory() {}
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mContext = container.getContext();
-        viewFrag = inflater.inflate(R.layout.fragment_category,container,false);
+        viewFrag = inflater.inflate(R.layout.fragment_category, container, false);
         init();
         presenter = new ListCategoryCustomPresenterImpl(this.getContext(), this);
         progressDialog = new ProgressDialog(mContext);
@@ -88,7 +88,7 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
 
     @Override
     public void onInvokeDataSuccess() {
-        if(refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
+        if (refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
         onStopProcessBar();
     }
 
@@ -116,9 +116,8 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
 
     @Override
     public void onStopProcessBar() {
-        if(progressDialog.isShowing()) progressDialog.dismiss();
+        if (progressDialog.isShowing()) progressDialog.dismiss();
     }
-
 
 
     @Override
@@ -134,37 +133,20 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
     }
 
     //------------------------------------------------------------------------------------
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            //-------------------------
-            case android.R.id.home:
-                getActivity().getFragmentManager().popBackStack();
-                return true;
-            case R.id.itemCart:
-                //check sl orderlist
-                Intent intent = new Intent(mContext, ListOrderedActivity.class);
-                startActivity(intent);
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onClick(View view, int position, boolean isLongClick) {
-        if (!isLongClick){
+        if (!isLongClick) {
             Intent intent = new Intent(mContext, FoodByCatActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putInt("tableId",tableID);
-            bundle.putString("tableName",tableName);
-            bundle.putInt("billId",billID);
-            bundle.putInt("catId",arrayCatModel.get(position).getId());
+            bundle.putInt("tableId", tableID);
+            bundle.putString("tableName", tableName);
+            bundle.putInt("billId", billID);
+            bundle.putInt("catId", arrayCatModel.get(position).getId());
             intent.putExtras(bundle);
             startActivity(intent);
         } else {
-            Toast.makeText(mContext, ""+arrayCatModel.get(position).getName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "" + arrayCatModel.get(position).getName(), Toast.LENGTH_SHORT).show();
         }
     }
 

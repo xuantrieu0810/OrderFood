@@ -32,7 +32,7 @@ import com.lexuantrieu.orderfood.utils.CheckConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FoodByCatActivity extends AppCompatActivity implements ListFoodCustomPresenter.View, FoodAdapterListener, SwipeRefreshLayout.OnRefreshListener{
+public class FoodByCatActivity extends AppCompatActivity implements ListFoodCustomPresenter.View, FoodAdapterListener, SwipeRefreshLayout.OnRefreshListener {
 
     String keySearch;
     ListFoodCustomPresenter presenter;
@@ -70,9 +70,9 @@ public class FoodByCatActivity extends AppCompatActivity implements ListFoodCust
             billID = bundle.getInt("billId");
             catID = bundle.getInt("catId");
 
-            if(tableID==-1|| billID==-1||catID==-1){
+            if (tableID == -1 || billID == -1 || catID == -1) {
 
-                Log.d("LXT_Log", "table_id: "+tableID+"- bill_id: "+billID+"- cat_id"+catID);
+                Log.d("LXT_Log", "table_id: " + tableID + "- bill_id: " + billID + "- cat_id" + catID);
                 finish();
                 Toast.makeText(this, "Xảy ra lỗi.", Toast.LENGTH_SHORT).show();
                 return;
@@ -92,7 +92,7 @@ public class FoodByCatActivity extends AppCompatActivity implements ListFoodCust
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
         onStartProcessBar("Đang load...");
-        presenter.invokeData(tableID, catID);
+        presenter.invokeDataMultiType(tableID, String.valueOf(catID));
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(null);
@@ -139,8 +139,8 @@ public class FoodByCatActivity extends AppCompatActivity implements ListFoodCust
         int quantity = foodModel.getCountFood();
         int status = foodModel.getStatusFood();
         if (stt != -1 && status == 0) {
-            if(quantity == 0){
-                AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Hủy chọn món đã đặt", "[ "+foodModel.getNameFood()+"]"+
+            if (quantity == 0) {
+                AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Hủy chọn món đã đặt", "[ " + foodModel.getNameFood() + "]" +
                         "\nBạn có chắc không?", resultOk -> {
                     if (resultOk == Activity.RESULT_OK) {
                         onStartProcessBar("Đang xóa...");
@@ -160,7 +160,7 @@ public class FoodByCatActivity extends AppCompatActivity implements ListFoodCust
 
     @Override
     public void onInvokeDataSuccess() {
-        if(refreshLayout.isRefreshing()) {
+        if (refreshLayout.isRefreshing()) {
             adapter.getFilter().filter(keySearch);
             refreshLayout.setRefreshing(false);
         }
@@ -172,7 +172,7 @@ public class FoodByCatActivity extends AppCompatActivity implements ListFoodCust
         onStopProcessBar();
         AlertDialogFragment dialogFragment = new AlertDialogFragment(this, "Lỗi tải dữ liệu", "Tải lại", resultOk -> {
             if (resultOk == Activity.RESULT_OK) {
-                presenter.invokeData(tableID, catID);
+                presenter.invokeDataMultiType(tableID, String.valueOf(catID));
             } else {
                 finish();
                 onBackPressed();
@@ -192,7 +192,7 @@ public class FoodByCatActivity extends AppCompatActivity implements ListFoodCust
 
     @Override
     public void onStopProcessBar() {
-        if(progressDialog.isShowing()) progressDialog.dismiss();
+        if (progressDialog.isShowing()) progressDialog.dismiss();
     }
 
 
@@ -231,6 +231,11 @@ public class FoodByCatActivity extends AppCompatActivity implements ListFoodCust
             case R.id.itemCart:
                 //check sl orderlist
                 Intent intent = new Intent(FoodByCatActivity.this, ListOrderedActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("tableId", tableID);
+                bundle.putString("tableName", tableName);
+                bundle.putInt("billId", billID);
+                intent.putExtras(bundle);
                 startActivity(intent);
                 break;
             default:
@@ -238,16 +243,17 @@ public class FoodByCatActivity extends AppCompatActivity implements ListFoodCust
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     protected void onResume() {
         super.onResume();
         onStopProcessBar();
-        presenter.invokeData(tableID, catID);
+        presenter.invokeDataMultiType(tableID, String.valueOf(catID));
     }
 
     @Override
     public void onRefresh() {
-        presenter.invokeData(tableID, catID);
+        presenter.invokeDataMultiType(tableID, String.valueOf(catID));
     }
     //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------

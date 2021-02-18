@@ -37,10 +37,12 @@ public class ListOrderedAdapter extends BaseAdapter {
     public int getCount() {
         return arrListFood == null ? 0 : arrListFood.size();
     }
+
     @Override
     public int getItemViewType(int position) {
-        return (arrListFood.get(position).getCountFood()>0)?1:0;
+        return (arrListFood.get(position).getCountFood() > 0) ? 1 : 0;
     }
+
     @Override
     public Object getItem(int position) {
         return null;
@@ -51,28 +53,20 @@ public class ListOrderedAdapter extends BaseAdapter {
         return 0;
     }
 
-    private class ViewHolder {
-
-        TextView nameFood;
-        TextView priceFood;
-        ImageButton btnAdd, btnSub, btnDel;
-        EditText edtCount;
-    }
-
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        if(convertView == null) {
+        if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(layout,null);
+            convertView = inflater.inflate(layout, null);
 
             holder = new ListOrderedAdapter.ViewHolder();
-            holder.nameFood =  convertView.findViewById(R.id.txtFoodName_SubCart);
-            holder.priceFood =  convertView.findViewById(R.id.txtPrice_SubCart);
-            holder.btnAdd =  convertView.findViewById(R.id.buttonAdd_SubCart);
+            holder.nameFood = convertView.findViewById(R.id.txtFoodName_SubCart);
+            holder.priceFood = convertView.findViewById(R.id.txtPrice_SubCart);
+            holder.btnAdd = convertView.findViewById(R.id.buttonAdd_SubCart);
             holder.btnSub = convertView.findViewById(R.id.buttonSub_SubCart);
             holder.btnDel = convertView.findViewById(R.id.buttonDel_SubCart);
-            holder.edtCount =  convertView.findViewById(R.id.editTextCount_SubCart);
+            holder.edtCount = convertView.findViewById(R.id.editTextCount_SubCart);
             convertView.setTag(holder);
         } else {
             holder = (ListOrderedAdapter.ViewHolder) convertView.getTag();
@@ -87,9 +81,9 @@ public class ListOrderedAdapter extends BaseAdapter {
                 break;
         }
         holder.nameFood.setText(foodModel.getNameFood());
-        holder.edtCount.setText(""+ foodModel.getCountFood());
+        holder.edtCount.setText("" + foodModel.getCountFood());
         DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
-        holder.priceFood.setText(decimalFormat.format(foodModel.getPriceFood()*foodModel.getCountFood()));
+        holder.priceFood.setText(decimalFormat.format(foodModel.getPriceFood() * foodModel.getCountFood()));
         //------------------------------------------------------------------------------------------
 
         //------------------------------------------------------------------------------------------
@@ -99,7 +93,7 @@ public class ListOrderedAdapter extends BaseAdapter {
         holder.btnSub.setOnClickListener(v -> ClickButtonSub(foodModel, position));
         holder.btnDel.setOnClickListener(v -> ClickButtonDel(foodModel, position));
 
-        if(foodModel.getStatusFood()>1) {
+        if (foodModel.getStatusFood() > 1) {
             holder.edtCount.setFocusable(false);
             holder.edtCount.setFocusableInTouchMode(true);
             holder.edtCount.setEnabled(false);
@@ -115,8 +109,6 @@ public class ListOrderedAdapter extends BaseAdapter {
         //------------------------------------------------------------------------------------------
         return convertView;
     }
-
-
 
     //----------------------------------------------------------------------------------------------
     private void InputCountFood(FoodModel foodModel, int position) {
@@ -134,7 +126,7 @@ public class ListOrderedAdapter extends BaseAdapter {
                 int countTmp = Integer.parseInt(edtInputCount.getText().toString());
                 if (countTmp >= 0 && countTmp <= 99) {
 //                        FoodModel model = new FoodModel(foodModel);
-                    SetCountFood(position, foodModel , countTmp, "");
+                    SetCountFood(position, foodModel, countTmp, "");
                     dialog.dismiss();
                 } else edtInputCount.setError("Số lượng không hợp lệ.");
             }
@@ -142,6 +134,7 @@ public class ListOrderedAdapter extends BaseAdapter {
         btnCancel.setOnClickListener(v -> dialog.cancel());
         dialog.show();
     }
+
     //----------------------------------------------------------------------------------------------
     private void InputCommentFood(FoodModel foodModel, int position) {
         Dialog dialog = new Dialog(mContext);
@@ -154,42 +147,51 @@ public class ListOrderedAdapter extends BaseAdapter {
         edtInputComment.setText(foodModel.getCommentFood());
         btnSubmit.setOnClickListener(v -> {
             String cmtFood = edtInputComment.getText().toString().trim();
-            if(foodModel.getStt() !=0){
-                SetCountFood(position,foodModel, foodModel.getCountFood() ,cmtFood);
+            if (foodModel.getStt() != 0) {
+                SetCountFood(position, foodModel, foodModel.getCountFood(), cmtFood);
                 dialog.dismiss();
-            }
-            else Toast.makeText(mContext, "Không thể cập nhật", Toast.LENGTH_SHORT).show();
+            } else Toast.makeText(mContext, "Không thể cập nhật", Toast.LENGTH_SHORT).show();
         });
         btnCancel.setOnClickListener(v -> dialog.cancel());
         dialog.show();
     }
+
     //----------------------------------------------------------------------------------------------
     private void ClickButtonAdd(FoodModel foodModel, int position) {
         int countTmp = foodModel.getCountFood();
-        if(countTmp < 99) {
-            SetCountFood(position, foodModel, countTmp+1, "");
-        }
-        else
+        if (countTmp < 99) {
+            SetCountFood(position, foodModel, countTmp + 1, "");
+        } else
             Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
     }
+
     //----------------------------------------------------------------------------------------------
     private void ClickButtonSub(FoodModel foodModel, int position) {
         int countTmp = foodModel.getCountFood();
-        if(countTmp > 0) {
-            SetCountFood(position , foodModel, countTmp-1, "");
-        }
-        else
+        if (countTmp > 0) {
+            SetCountFood(position, foodModel, countTmp - 1, "");
+        } else
             Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
     }
+
     private void ClickButtonDel(FoodModel foodModel, int position) {
-        SetCountFood(position, foodModel, 0,"");
+        SetCountFood(position, foodModel, 0, "");
     }
+
     //Fucntion of adapter
-    private void SetCountFood(int position, FoodModel foodModel, int countTmp ,String cmt) {
+    private void SetCountFood(int position, FoodModel foodModel, int countTmp, String cmt) {
         FoodModel model = new FoodModel(foodModel);
         model.setCountFood(countTmp);
         model.setCommentFood(cmt);
         listener.ChangeFoodItem(position, model);
+    }
+
+    private class ViewHolder {
+
+        TextView nameFood;
+        TextView priceFood;
+        ImageButton btnAdd, btnSub, btnDel;
+        EditText edtCount;
     }
 }
 
