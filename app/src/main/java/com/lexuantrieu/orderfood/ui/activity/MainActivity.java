@@ -17,6 +17,7 @@ import com.lexuantrieu.orderfood.presenter.impl.MainActivityPresenterImpl;
 
 public class MainActivity extends AppCompatActivity implements MainActivityPresenter.View {
 
+    AppBarConfiguration mAppBarConfiguration;
     TextView txtUsername, txtFullname, txtRole, txtToken;
     Button btnLogout, btnSet, btnKitChen, btnWaiter;
     MainActivityPresenter presenter;
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
-        presenter.invokeData();// kiem tra user trong database local
+        presenter.invokeData();
 
         btnSet.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, SetFoodActivity.class);

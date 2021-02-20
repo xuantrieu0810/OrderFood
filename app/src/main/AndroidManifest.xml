@@ -31,7 +31,9 @@
         <activity android:name=".ui.activity.SplashActivity" />
         <activity android:name=".ui.activity.SetFoodActivity" />
         <activity android:name=".ui.activity.FoodByCatActivity" />
-        <activity android:name=".ui.activity.MainActivity" />
+        <activity android:name=".ui.activity.MainActivity"
+            android:theme="@style/Theme.Design.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

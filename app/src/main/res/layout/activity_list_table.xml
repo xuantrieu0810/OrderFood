@@ -5,7 +5,6 @@
     android:id="@+id/swipe_rf_list_table"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#C5CAE9"
     tools:context=".ui.activity.ListTableActivity">
 
     <GridView
