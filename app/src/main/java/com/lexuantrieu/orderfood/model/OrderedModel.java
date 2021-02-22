@@ -3,28 +3,29 @@ package com.lexuantrieu.orderfood.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class FoodModel {
+public class OrderedModel {
+
     @SerializedName("stt")
     @Expose
     private Integer stt;
+    @SerializedName("bill_id")
+    @Expose
+    private Integer billId;
     @SerializedName("food_id")
     @Expose
     private Integer foodId;
     @SerializedName("food_name")
     @Expose
     private String foodName;
-
-    private String categoryName;
+    @SerializedName("table_name")
+    @Expose
+    private String tableName;
     @SerializedName("price")
     @Expose
     private Integer price;
-    @SerializedName("food_image")
-    @Expose
-    private String foodImage;
     @SerializedName("quantity")
     @Expose
-    private Integer quantity;
-    private String foodNameNonAccent;//tiếng việt không dấu
+    private Integer quantity;//SL đã đặt
     @SerializedName("comment")
     @Expose
     private String comment;
@@ -32,17 +33,17 @@ public class FoodModel {
     @Expose
     private Integer status;
 
-    public FoodModel(FoodModel model) {
-        this.stt = model.stt;
-        this.foodId = model.foodId;
-        this.foodName = model.foodName;
-        this.categoryName = model.categoryName;
-        this.price = model.price;
-        this.foodImage = model.foodImage;
-        this.quantity = model.quantity;
-        this.foodNameNonAccent = model.foodNameNonAccent;
-        this.comment = model.comment;
-        this.status = model.status;
+
+    public OrderedModel(OrderedModel m) {
+        this.stt = m.stt;
+        this.billId = m.billId;
+        this.foodId = m.foodId;
+        this.foodName = m.foodName;
+        this.tableName = m.tableName;
+        this.price = m.price;
+        this.quantity = m.quantity;
+        this.comment = m.comment;
+        this.status = m.status;
     }
 
     public Integer getStt() {
@@ -51,6 +52,14 @@ public class FoodModel {
 
     public void setStt(Integer stt) {
         this.stt = stt;
+    }
+
+    public Integer getBillId() {
+        return billId;
+    }
+
+    public void setBillId(Integer billId) {
+        this.billId = billId;
     }
 
     public Integer getFoodId() {
@@ -69,12 +78,12 @@ public class FoodModel {
         this.foodName = foodName;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public String getTableName() {
+        return tableName;
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 
     public Integer getPrice() {
@@ -85,28 +94,12 @@ public class FoodModel {
         this.price = price;
     }
 
-    public String getFoodImage() {
-        return foodImage;
-    }
-
-    public void setFoodImage(String foodImage) {
-        this.foodImage = foodImage;
-    }
-
     public Integer getQuantity() {
         return quantity;
     }
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
-    }
-
-    public String getFoodNameNonAccent() {
-        return foodNameNonAccent;
-    }
-
-    public void setFoodNameNonAccent(String foodNameNonAccent) {
-        this.foodNameNonAccent = foodNameNonAccent;
     }
 
     public String getComment() {

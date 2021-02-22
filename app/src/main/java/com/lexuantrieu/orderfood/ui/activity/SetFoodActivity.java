@@ -34,9 +34,9 @@ import androidx.fragment.app.FragmentManager;
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.CategoryModel;
 import com.lexuantrieu.orderfood.network.RestClient;
-import com.lexuantrieu.orderfood.presenter.SetFoodPresenter;
+import com.lexuantrieu.orderfood.presenter.SetFoodActivityPresenter;
 import com.lexuantrieu.orderfood.presenter.impl.PriceFoodTextWatcher;
-import com.lexuantrieu.orderfood.presenter.impl.SetFoodPresenterImpl;
+import com.lexuantrieu.orderfood.presenter.impl.SetFoodActivityPresenterImpl;
 import com.lexuantrieu.orderfood.service.FoodListService;
 import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import com.lexuantrieu.orderfood.utils.LibraryString;
@@ -55,10 +55,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SetFoodActivity extends AppCompatActivity implements SetFoodPresenter.View {
+public class SetFoodActivity extends AppCompatActivity implements SetFoodActivityPresenter.View {
 
     final int REQUEST_CODE_CAMERA = 123, REQUEST_CODE_FOLDER = 456;
-    SetFoodPresenter presenter;
+    SetFoodActivityPresenter presenter;
     ProgressDialog progressDialog;
     String realPath = "";
     ImageView imgFood;
@@ -115,7 +115,7 @@ public class SetFoodActivity extends AppCompatActivity implements SetFoodPresent
     }//end of onCreate
 
     private void init() {
-        presenter = new SetFoodPresenterImpl(this, this);
+        presenter = new SetFoodActivityPresenterImpl(this, this);
         imgFood = findViewById(R.id.imgfood_setFood);
         btnCamera = findViewById(R.id.imgButtonCamera_setFood);
         btnFolder = findViewById(R.id.imgButtonFolder_setFood);

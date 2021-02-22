@@ -46,7 +46,7 @@ public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 filterList.addAll(arrListFoodModelFull);
             } else {
                 for (FoodModel foods : arrListFoodModelFull) {
-                    if (foods.getNameFoodNonVN().toLowerCase().contains(charConstraint)) {
+                    if (foods.getFoodNameNonAccent().toLowerCase().contains(charConstraint)) {
                         filterList.add(foods);
                     }
                 }
@@ -60,7 +60,6 @@ public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         protected void publishResults(CharSequence constraint, FilterResults results) {
             arrListFoodModel.clear();
             arrListFoodModel.addAll((Collection<? extends FoodModel>) results.values);
-            Log.d("LXT_Log", "Searched item: " + arrListFoodModel.size());
             notifyDataSetChanged();
         }
     };
@@ -84,7 +83,7 @@ public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public int getItemViewType(int position) {
-        return (arrListFoodModel.get(position).getCountFood() > 0) ? TYPE_DEFAULT : TYPE_CUSTOM;
+        return (arrListFoodModel.get(position).getQuantity() > 0) ? TYPE_DEFAULT : TYPE_CUSTOM;
     }
 
     @Override
@@ -111,8 +110,8 @@ public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     //Fucntion of adapter
     private void SetCountFood(int position, FoodModel foodModel, int countTmp, String cmt) {
         FoodModel model = new FoodModel(foodModel);
-        model.setCountFood(countTmp);
-        model.setCommentFood(cmt);
+        model.setQuantity(countTmp);
+        model.setComment(cmt);
         listener.ChangeFoodItem(position, model);
     }
 
@@ -141,11 +140,11 @@ public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         void setHolderDefault(FoodModel foodModel, int position) {
-            nameFood.setText(foodModel.getNameFood());
+            nameFood.setText(foodModel.getFoodName());
             DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
-            unitPrice.setText(decimalFormat.format(foodModel.getPriceFood()));
-            edtCount.setText(String.valueOf(foodModel.getCountFood()));
-            String urlImage = foodModel.getImageFood();
+            unitPrice.setText(decimalFormat.format(foodModel.getPrice()));
+            edtCount.setText(String.valueOf(foodModel.getQuantity()));
+            String urlImage = foodModel.getFoodImage();
             Picasso.get()
                     .load(urlImage)
                     .placeholder(R.drawable.imagepreview)
@@ -157,7 +156,7 @@ public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
                         @Override
                         public void onError(Exception e) {
-                            Log.d("LXT_Error:", "LoadImage: " + foodModel.getNameFood());
+                            Log.d("LXT_Error:", "LoadImage: " + foodModel.getFoodName());
                         }
                     });
             //Button Click event
@@ -175,7 +174,7 @@ public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             EditText edtInputCount = dialog.findViewById(R.id.edtCountFood_dial);//Input
             Button btnSubmit = dialog.findViewById(R.id.buttonSubmit_dial);
             Button btnCancel = dialog.findViewById(R.id.buttonCancel_dial);
-            txtNameFood.setText(foodModel.getNameFood());
+            txtNameFood.setText(foodModel.getFoodName());
             btnSubmit.setOnClickListener(v -> {
                 if (edtInputCount.getText().toString().equals("")) {
                     edtInputCount.setError("Vui lòng nhập số lượng");
@@ -200,12 +199,12 @@ public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             EditText edtInputComment = dialog.findViewById(R.id.editCommentFood_dial);//Input
             Button btnSubmit = dialog.findViewById(R.id.buttonSubmit_dial);
             Button btnCancel = dialog.findViewById(R.id.buttonCancel_dial);
-            txtNameFood.setText(foodModel.getNameFood());
-            edtInputComment.setText(foodModel.getCommentFood());
+            txtNameFood.setText(foodModel.getFoodName());
+            edtInputComment.setText(foodModel.getComment());
             btnSubmit.setOnClickListener(v -> {
                 String cmtFood = edtInputComment.getText().toString().trim();
                 if (foodModel.getStt() != 0) {
-                    SetCountFood(position, foodModel, foodModel.getCountFood(), cmtFood);
+                    SetCountFood(position, foodModel, foodModel.getQuantity(), cmtFood);
                     dialog.dismiss();
                 } else Toast.makeText(mContext, "Không thể cập nhật", Toast.LENGTH_SHORT).show();
             });
@@ -215,7 +214,7 @@ public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         //----------------------------------------------------------------------------------------------
         private void ClickButtonAdd(FoodModel foodModel, int position) {
-            int countTmp = foodModel.getCountFood();
+            int countTmp = foodModel.getQuantity();
             if (countTmp < 99) {
                 SetCountFood(position, foodModel, countTmp + 1, "");
             } else
@@ -224,7 +223,7 @@ public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         //----------------------------------------------------------------------------------------------
         private void ClickButtonSub(FoodModel foodModel, int position) {
-            int countTmp = foodModel.getCountFood();
+            int countTmp = foodModel.getQuantity();
             if (countTmp > 0) {
                 SetCountFood(position, foodModel, countTmp - 1, "");
             } else
@@ -248,10 +247,10 @@ public class FoodSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         void setHolderCustom(FoodModel foodModel, int position) {
-            nameFood.setText(foodModel.getNameFood());
+            nameFood.setText(foodModel.getFoodName());
             DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
-            unitPrice.setText(decimalFormat.format(foodModel.getPriceFood()));
-            String urlImage = foodModel.getImageFood();
+            unitPrice.setText(decimalFormat.format(foodModel.getPrice()));
+            String urlImage = foodModel.getFoodImage();
             Picasso.get()
                     .load(urlImage)
                     .placeholder(R.drawable.imagepreview)

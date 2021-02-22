@@ -1,6 +1,6 @@
 package com.lexuantrieu.orderfood.presenter;
 
-public interface LoginPresenter {
+public interface LoginActivityPresenter {
 
     void requestLogin(String username, String password);
 

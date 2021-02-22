@@ -14,17 +14,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.room.database.AppDatabase;
-import com.lexuantrieu.orderfood.presenter.LoginPresenter;
-import com.lexuantrieu.orderfood.presenter.impl.LoginPresenterImpl;
+import com.lexuantrieu.orderfood.presenter.LoginActivityPresenter;
+import com.lexuantrieu.orderfood.presenter.impl.LoginActivityPresenterImpl;
 
 import io.reactivex.disposables.Disposable;
 
-public class LoginActivity extends AppCompatActivity implements LoginPresenter.View {
+public class LoginActivity extends AppCompatActivity implements LoginActivityPresenter.View {
 
     public Disposable disposable;
     private AppDatabase db;
     private ProgressDialog dialog;
-    private LoginPresenter loginPresenter;
+    private LoginActivityPresenter loginPresenter;
     private EditText edt_username;
     private EditText edt_password;
     private Button btn_login;
@@ -84,7 +84,7 @@ public class LoginActivity extends AppCompatActivity implements LoginPresenter.V
 
     private void init() {
         db = AppDatabase.getInstance(this);
-        loginPresenter = new LoginPresenterImpl(this, this, db);
+        loginPresenter = new LoginActivityPresenterImpl(this, this, db);
         dialog = new ProgressDialog(this);
         edt_username = findViewById(R.id.edt_username);
         edt_password = findViewById(R.id.edt_password);

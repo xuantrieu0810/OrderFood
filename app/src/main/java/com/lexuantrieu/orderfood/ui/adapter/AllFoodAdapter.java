@@ -51,7 +51,7 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        return (arrListFood.get(position).getCountFood() > 0) ? TYPE_DEFAULT : TYPE_CUSTOM;
+        return (arrListFood.get(position).getQuantity() > 0) ? TYPE_DEFAULT : TYPE_CUSTOM;
     }
 
     @Override
@@ -100,11 +100,11 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         void setHolderDefault(FoodModel foodModel, int position) {
-            nameFood.setText(foodModel.getNameFood());
+            nameFood.setText(foodModel.getFoodName());
             DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
-            unitPrice.setText(decimalFormat.format(foodModel.getPriceFood()));
-            edtCount.setText(String.valueOf(foodModel.getCountFood()));
-            String urlImage = foodModel.getImageFood();
+            unitPrice.setText(decimalFormat.format(foodModel.getPrice()));
+            edtCount.setText(String.valueOf(foodModel.getQuantity()));
+            String urlImage = foodModel.getFoodImage();
             Picasso.get()
                     .load(urlImage)
                     .placeholder(R.drawable.imagepreview)
@@ -116,7 +116,7 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
                         @Override
                         public void onError(Exception e) {
-                            Log.d("LXT_Error:", "LoadImage: " + foodModel.getNameFood());
+                            Log.d("LXT_Error:", "LoadImage: " + foodModel.getFoodName());
                         }
                     });
             //Button Click event
@@ -134,14 +134,14 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             EditText edtInputCount = dialog.findViewById(R.id.edtCountFood_dial);//Input
             Button btnSubmit = dialog.findViewById(R.id.buttonSubmit_dial);
             Button btnCancel = dialog.findViewById(R.id.buttonCancel_dial);
-            txtNameFood.setText(foodModel.getNameFood());
+            txtNameFood.setText(foodModel.getFoodName());
             btnSubmit.setOnClickListener(v -> {
                 if (edtInputCount.getText().toString().equals("")) {
                     edtInputCount.setError("Vui lòng nhập số lượng");
                 } else {
                     int countTmp = Integer.parseInt(edtInputCount.getText().toString());
                     if (countTmp >= 0 && countTmp <= 99) {
-                        foodModel.setCountFood(countTmp);
+                        foodModel.setQuantity(countTmp);
                         SetCountFood(position, foodModel);
                         dialog.dismiss();
                     } else edtInputCount.setError("Số lượng không hợp lệ.");
@@ -159,12 +159,12 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             EditText edtInputComment = dialog.findViewById(R.id.editCommentFood_dial);//Input
             Button btnSubmit = dialog.findViewById(R.id.buttonSubmit_dial);
             Button btnCancel = dialog.findViewById(R.id.buttonCancel_dial);
-            txtNameFood.setText(foodModel.getNameFood());
-            edtInputComment.setText(foodModel.getCommentFood());
+            txtNameFood.setText(foodModel.getFoodName());
+            edtInputComment.setText(foodModel.getComment());
             btnSubmit.setOnClickListener(v -> {
                 String cmtFood = edtInputComment.getText().toString().trim();
                 if (foodModel.getStt() != 0) {
-                    foodModel.setCommentFood(cmtFood);
+                    foodModel.setComment(cmtFood);
                     SetCountFood(position, foodModel);
                     dialog.dismiss();
                 } else Toast.makeText(mContext, "Không thể cập nhật", Toast.LENGTH_SHORT).show();
@@ -175,9 +175,9 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         //----------------------------------------------------------------------------------------------
         private void ClickButtonAdd(FoodModel foodModel, int position) {
-            int countTmp = arrListFood.get(position).getCountFood();
+            int countTmp = arrListFood.get(position).getQuantity();
             if (countTmp < 99) {
-                foodModel.setCountFood(countTmp + 1);
+                foodModel.setQuantity(countTmp + 1);
                 SetCountFood(position, foodModel);
             } else
                 Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
@@ -185,9 +185,9 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         //----------------------------------------------------------------------------------------------
         private void ClickButtonSub(FoodModel foodModel, int position) {
-            int countTmp = arrListFood.get(position).getCountFood();
+            int countTmp = arrListFood.get(position).getQuantity();
             if (countTmp > 0) {
-                foodModel.setCountFood(countTmp - 1);
+                foodModel.setQuantity(countTmp - 1);
                 SetCountFood(position, foodModel);
             } else
                 Toast.makeText(mContext, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
@@ -210,10 +210,10 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         void setHolderCustom(FoodModel foodModel, int position) {
-            nameFood.setText(foodModel.getNameFood());
+            nameFood.setText(foodModel.getFoodName());
             DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
-            unitPrice.setText(decimalFormat.format(foodModel.getPriceFood()));
-            String urlImage = foodModel.getImageFood();
+            unitPrice.setText(decimalFormat.format(foodModel.getPrice()));
+            String urlImage = foodModel.getFoodImage();
             Picasso.get()
                     .load(urlImage)
                     .placeholder(R.drawable.imagepreview)
@@ -239,7 +239,7 @@ public class AllFoodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         private void ClickCreate(int position, FoodModel foodModel) {
-            foodModel.setCountFood(1);
+            foodModel.setQuantity(1);
             SetCountFood(position, foodModel);
         }
     }

@@ -19,8 +19,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.lexuantrieu.orderfood.R;
 import com.lexuantrieu.orderfood.model.CategoryModel;
-import com.lexuantrieu.orderfood.presenter.ListCategoryCustomPresenter;
-import com.lexuantrieu.orderfood.presenter.impl.ListCategoryCustomPresenterImpl;
+import com.lexuantrieu.orderfood.presenter.ListCategoryFragmentPresenter;
+import com.lexuantrieu.orderfood.presenter.impl.ListCategoryFragmentPresenterImpl;
 import com.lexuantrieu.orderfood.ui.activity.FoodByCatActivity;
 import com.lexuantrieu.orderfood.ui.activity.OrderActivity;
 import com.lexuantrieu.orderfood.ui.adapter.CategoryAdapter;
@@ -30,10 +30,10 @@ import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentCategory extends Fragment implements ListCategoryCustomPresenter.View, ItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class FragmentCategory extends Fragment implements ListCategoryFragmentPresenter.View, ItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     Context mContext;
-    ListCategoryCustomPresenter presenter;
+    ListCategoryFragmentPresenter presenter;
     ProgressDialog progressDialog;
     int tableID = -1; //default = -1
     int billID = -1; //default = -1
@@ -61,7 +61,7 @@ public class FragmentCategory extends Fragment implements ListCategoryCustomPres
         mContext = container.getContext();
         viewFrag = inflater.inflate(R.layout.fragment_category, container, false);
         init();
-        presenter = new ListCategoryCustomPresenterImpl(this.getContext(), this);
+        presenter = new ListCategoryFragmentPresenterImpl(this.getContext(), this);
         progressDialog = new ProgressDialog(mContext);
         arrayCatModel = new ArrayList<>();
         int spanCount = 2;//Số cột nếu thiết lập lưới đứng, số dòng nếu lưới ngang

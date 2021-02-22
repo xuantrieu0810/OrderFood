@@ -37,6 +37,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
             Intent intent = new Intent(MainActivity.this, ListTableActivity.class);
             startActivity(intent);
         });
+        btnKitChen.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, KitchenActivity.class);
+            startActivity(intent);
+        });
         btnLogout.setOnClickListener(view -> {
             presenter.onLogout();
         });

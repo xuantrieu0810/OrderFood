@@ -10,7 +10,7 @@ public interface ListFoodCustomPresenter {
 
     void invokeDataMultiType(int tableid, String func);
 
-    void invokeDataOrderList(int tableid);
+    void invokeDataOrderList(int tableid, int billid);
 
     void InsertOrderList(int bill_id, int table_id, int pos, FoodModel foodModel);
 

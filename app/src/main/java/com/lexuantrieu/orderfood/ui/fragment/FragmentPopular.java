@@ -82,11 +82,11 @@ public class FragmentPopular extends Fragment implements ListFoodCustomPresenter
     @Override
     public void ChangeFoodItem(int position, FoodModel foodModel) {
         int stt = foodModel.getStt();
-        int quantity = foodModel.getCountFood();
-        int status = foodModel.getStatusFood();
+        int quantity = foodModel.getQuantity();
+        int status = foodModel.getStatus();
         if (stt != -1 && status == 0) {
             if (quantity == 0) {
-                AlertDialogFragment dialogFragment = new AlertDialogFragment(mContext, "Hủy chọn món đã đặt", "[ " + foodModel.getNameFood() + "]" +
+                AlertDialogFragment dialogFragment = new AlertDialogFragment(mContext, "Hủy chọn món đã đặt", "[ " + foodModel.getFoodName() + "]" +
                         "\nBạn có chắc không?", resultOk -> {
                     if (resultOk == Activity.RESULT_OK) {
                         onStartProcessBar("Đang xóa...");

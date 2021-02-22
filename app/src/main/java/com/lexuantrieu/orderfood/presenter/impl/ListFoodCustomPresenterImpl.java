@@ -45,8 +45,8 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
 //                    Log.e(Utils.TAG, "Response GetFoodByTable: "+new Gson().toJson(response));
                             if (response != null) {
                                 for (FoodModel f : response) {
-                                    f.setImageFood(ConfigServer.urlImageProduct + f.getImageFood());
-                                    f.setNameFoodNonVN(LibraryString.covertStringToVN(f.getNameFood()));
+                                    f.setFoodImage(ConfigServer.urlImageProduct + f.getFoodImage());
+                                    f.setFoodNameNonAccent(LibraryString.covertStringToVN(f.getFoodName()));
                                 }
                                 view.initAdapter(context, response);
                                 view.initRecyclerView();
@@ -63,9 +63,9 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     }
 
     @Override
-    public void invokeDataOrderList(int tableid) {
+    public void invokeDataOrderList(int tableid, int billid) {
         OrderListService service = RestClient.createService(OrderListService.class);
-        compositeDisposable.add(service.GetFoodOrderList(tableid).subscribeOn(Schedulers.io())
+        compositeDisposable.add(service.GetFoodOrderList(tableid, billid).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     Log.e(Utils.TAG, "Response GetFoodOrderList: "+new Gson().toJson(response));
@@ -87,7 +87,7 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     @Override
     public void InsertOrderList(int bill_id, int table_id, int pos, FoodModel foodModel) {
         OrderListService service = RestClient.createService(OrderListService.class);
-        compositeDisposable.add(service.AddItemOrderList(bill_id, table_id, foodModel.getIdFood(), foodModel.getCountFood()).subscribeOn(Schedulers.io())
+        compositeDisposable.add(service.AddItemOrderList(bill_id, table_id, foodModel.getFoodId(), foodModel.getQuantity()).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     Log.i(Utils.TAG, "subscribe: " + response.toString());
@@ -114,7 +114,7 @@ public class ListFoodCustomPresenterImpl implements ListFoodCustomPresenter {
     @Override
     public void UpdateOrderList(int bill_id, int table_id, int pos, FoodModel foodModel) {
         OrderListService service = RestClient.createService(OrderListService.class);
-        compositeDisposable.add(service.UpdateItemOrderList(foodModel.getStt(), bill_id, table_id, foodModel.getIdFood(), foodModel.getCountFood(), foodModel.getCommentFood())
+        compositeDisposable.add(service.UpdateItemOrderList(foodModel.getStt(), foodModel.getQuantity(), foodModel.getComment(), foodModel.getStatus())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {

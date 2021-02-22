@@ -40,7 +40,7 @@ public class ListOrderedAdapter extends BaseAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return (arrListFood.get(position).getCountFood() > 0) ? 1 : 0;
+        return (arrListFood.get(position).getQuantity() > 0) ? 1 : 0;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ListOrderedAdapter extends BaseAdapter {
             holder = (ListOrderedAdapter.ViewHolder) convertView.getTag();
         }
         FoodModel foodModel = arrListFood.get(position);
-        switch (foodModel.getStatusFood()) {
+        switch (foodModel.getStatus()) {
             case 1:
                 convertView.setBackgroundColor(Color.YELLOW);// bep dang tien hanh xu li
                 break;
@@ -80,10 +80,10 @@ public class ListOrderedAdapter extends BaseAdapter {
                 convertView.setBackgroundColor(Color.GREEN);// da hoan thanh
                 break;
         }
-        holder.nameFood.setText(foodModel.getNameFood());
-        holder.edtCount.setText("" + foodModel.getCountFood());
+        holder.nameFood.setText(foodModel.getFoodName());
+        holder.edtCount.setText("" + foodModel.getQuantity());
         DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
-        holder.priceFood.setText(decimalFormat.format(foodModel.getPriceFood() * foodModel.getCountFood()));
+        holder.priceFood.setText(decimalFormat.format(foodModel.getPrice() * foodModel.getQuantity()));
         //------------------------------------------------------------------------------------------
 
         //------------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ public class ListOrderedAdapter extends BaseAdapter {
         holder.btnSub.setOnClickListener(v -> ClickButtonSub(foodModel, position));
         holder.btnDel.setOnClickListener(v -> ClickButtonDel(foodModel, position));
 
-        if (foodModel.getStatusFood() > 1) {
+        if (foodModel.getStatus() > 1) {
             holder.edtCount.setFocusable(false);
             holder.edtCount.setFocusableInTouchMode(true);
             holder.edtCount.setEnabled(false);
@@ -118,7 +118,7 @@ public class ListOrderedAdapter extends BaseAdapter {
         EditText edtInputCount = dialog.findViewById(R.id.edtCountFood_dial);//Input
         Button btnSubmit = dialog.findViewById(R.id.buttonSubmit_dial);
         Button btnCancel = dialog.findViewById(R.id.buttonCancel_dial);
-        txtNameFood.setText(foodModel.getNameFood());
+        txtNameFood.setText(foodModel.getFoodName());
         btnSubmit.setOnClickListener(v -> {
             if (edtInputCount.getText().toString().equals("")) {
                 edtInputCount.setError("Vui lòng nhập số lượng");
@@ -143,12 +143,12 @@ public class ListOrderedAdapter extends BaseAdapter {
         EditText edtInputComment = dialog.findViewById(R.id.editCommentFood_dial);//Input
         Button btnSubmit = dialog.findViewById(R.id.buttonSubmit_dial);
         Button btnCancel = dialog.findViewById(R.id.buttonCancel_dial);
-        txtNameFood.setText(foodModel.getNameFood());
-        edtInputComment.setText(foodModel.getCommentFood());
+        txtNameFood.setText(foodModel.getFoodName());
+        edtInputComment.setText(foodModel.getComment());
         btnSubmit.setOnClickListener(v -> {
             String cmtFood = edtInputComment.getText().toString().trim();
             if (foodModel.getStt() != 0) {
-                SetCountFood(position, foodModel, foodModel.getCountFood(), cmtFood);
+                SetCountFood(position, foodModel, foodModel.getQuantity(), cmtFood);
                 dialog.dismiss();
             } else Toast.makeText(mContext, "Không thể cập nhật", Toast.LENGTH_SHORT).show();
         });
@@ -158,7 +158,7 @@ public class ListOrderedAdapter extends BaseAdapter {
 
     //----------------------------------------------------------------------------------------------
     private void ClickButtonAdd(FoodModel foodModel, int position) {
-        int countTmp = foodModel.getCountFood();
+        int countTmp = foodModel.getQuantity();
         if (countTmp < 99) {
             SetCountFood(position, foodModel, countTmp + 1, "");
         } else
@@ -167,7 +167,7 @@ public class ListOrderedAdapter extends BaseAdapter {
 
     //----------------------------------------------------------------------------------------------
     private void ClickButtonSub(FoodModel foodModel, int position) {
-        int countTmp = foodModel.getCountFood();
+        int countTmp = foodModel.getQuantity();
         if (countTmp > 0) {
             SetCountFood(position, foodModel, countTmp - 1, "");
         } else
@@ -181,8 +181,8 @@ public class ListOrderedAdapter extends BaseAdapter {
     //Fucntion of adapter
     private void SetCountFood(int position, FoodModel foodModel, int countTmp, String cmt) {
         FoodModel model = new FoodModel(foodModel);
-        model.setCountFood(countTmp);
-        model.setCommentFood(cmt);
+        model.setQuantity(countTmp);
+        model.setComment(cmt);
         listener.ChangeFoodItem(position, model);
     }
 

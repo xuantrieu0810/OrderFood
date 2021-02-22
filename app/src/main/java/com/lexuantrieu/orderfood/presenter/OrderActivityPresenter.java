@@ -1,6 +1,6 @@
 package com.lexuantrieu.orderfood.presenter;
 
-public interface OrderPresenter {
+public interface OrderActivityPresenter {
     void getBillId(int table_id);
 
     //    void invokeData();

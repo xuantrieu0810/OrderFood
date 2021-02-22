@@ -17,12 +17,12 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.lexuantrieu.orderfood.R;
-import com.lexuantrieu.orderfood.presenter.OrderPresenter;
-import com.lexuantrieu.orderfood.presenter.impl.OrderPresenterImpl;
+import com.lexuantrieu.orderfood.presenter.OrderActivityPresenter;
+import com.lexuantrieu.orderfood.presenter.impl.OrderActivityPresenterImpl;
 import com.lexuantrieu.orderfood.ui.adapter.ViewPagerAdapter;
 import com.lexuantrieu.orderfood.ui.dialog.AlertDialogFragment;
 
-public class OrderActivity extends AppCompatActivity implements OrderPresenter.View {
+public class OrderActivity extends AppCompatActivity implements OrderActivityPresenter.View {
 
     public static int billID = -1, tableID = -1;
     public static String tableName;
@@ -30,7 +30,7 @@ public class OrderActivity extends AppCompatActivity implements OrderPresenter.V
     public static String nameCategory;
     ProgressDialog progressDialog;
     Context context;
-    OrderPresenter presenter;
+    OrderActivityPresenter presenter;
     private TabLayout tablayout;
     private ViewPager viewPager;
     private ViewPagerAdapter adapter;
@@ -59,7 +59,7 @@ public class OrderActivity extends AppCompatActivity implements OrderPresenter.V
         //actionBar.hide(); //Ẩn ActionBar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//Back
         //-----------------------------------------------------------
-        presenter = new OrderPresenterImpl(this, this);
+        presenter = new OrderActivityPresenterImpl(this, this);
         presenter.getBillId(tableID);
         init();
     }

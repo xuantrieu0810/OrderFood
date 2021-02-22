@@ -6,7 +6,7 @@ import com.lexuantrieu.orderfood.model.CategoryModel;
 
 import java.util.List;
 
-public interface SetFoodPresenter {
+public interface SetFoodActivityPresenter {
     void invokeData(int func);
 
     interface View {

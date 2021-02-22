@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.lexuantrieu.orderfood.network.RestClient;
-import com.lexuantrieu.orderfood.presenter.OrderPresenter;
+import com.lexuantrieu.orderfood.presenter.OrderActivityPresenter;
 import com.lexuantrieu.orderfood.service.BillService;
 import com.lexuantrieu.orderfood.utils.Utils;
 
@@ -12,13 +12,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class OrderPresenterImpl implements OrderPresenter {
+public class OrderActivityPresenterImpl implements OrderActivityPresenter {
 
     private CompositeDisposable compositeDisposable;
     private Context context;
-    private OrderPresenter.View view;
+    private OrderActivityPresenter.View view;
 
-    public OrderPresenterImpl(Context context, OrderPresenter.View view) {
+    public OrderActivityPresenterImpl(Context context, OrderActivityPresenter.View view) {
         compositeDisposable = new CompositeDisposable();
         this.context = context;
         this.view = view;

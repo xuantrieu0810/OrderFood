@@ -6,7 +6,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lexuantrieu.orderfood.network.RestClient;
-import com.lexuantrieu.orderfood.presenter.SetFoodPresenter;
+import com.lexuantrieu.orderfood.presenter.SetFoodActivityPresenter;
 import com.lexuantrieu.orderfood.service.CategoryService;
 import com.lexuantrieu.orderfood.utils.Utils;
 
@@ -14,13 +14,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class SetFoodPresenterImpl implements SetFoodPresenter {
+public class SetFoodActivityPresenterImpl implements SetFoodActivityPresenter {
 
     private CompositeDisposable compositeDisposable;
     private Context context;
     private View view;
 
-    public SetFoodPresenterImpl(Context context, View view) {
+    public SetFoodActivityPresenterImpl(Context context, View view) {
         compositeDisposable = new CompositeDisposable();
         this.context = context;
         this.view = view;

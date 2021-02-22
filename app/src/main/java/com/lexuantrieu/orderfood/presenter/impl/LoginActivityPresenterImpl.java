@@ -12,7 +12,7 @@ import com.lexuantrieu.orderfood.model.ProfileModel;
 import com.lexuantrieu.orderfood.model.room.User;
 import com.lexuantrieu.orderfood.model.room.database.AppDatabase;
 import com.lexuantrieu.orderfood.network.RestClient;
-import com.lexuantrieu.orderfood.presenter.LoginPresenter;
+import com.lexuantrieu.orderfood.presenter.LoginActivityPresenter;
 import com.lexuantrieu.orderfood.service.UserService;
 import com.lexuantrieu.orderfood.utils.LibraryString;
 import com.lexuantrieu.orderfood.utils.Utils;
@@ -36,15 +36,15 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class LoginPresenterImpl implements LoginPresenter {
+public class LoginActivityPresenterImpl implements LoginActivityPresenter {
 
     private final Context context;
-    private final LoginPresenter.View view;
+    private final LoginActivityPresenter.View view;
     private CompositeDisposable compositeDisposable;
     private AppDatabase db;
     private KeyStore keyStore;
 
-    public LoginPresenterImpl(Context context, LoginPresenter.View view, AppDatabase db) {
+    public LoginActivityPresenterImpl(Context context, LoginActivityPresenter.View view, AppDatabase db) {
         compositeDisposable = new CompositeDisposable();
         this.context = context;
         this.view = view;
